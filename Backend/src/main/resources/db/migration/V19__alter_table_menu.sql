@@ -1,0 +1,1 @@
+ALTER table menu RENAME COLUMN is_private to is_default

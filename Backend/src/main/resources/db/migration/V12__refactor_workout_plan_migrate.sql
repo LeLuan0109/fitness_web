@@ -1,0 +1,5 @@
+ALTER TABLE `workoutplan`
+ADD COLUMN `start_date` DATE NULL;
+
+ALTER TABLE `workoutday`
+ADD COLUMN `is_deleted` BOOLEAN NOT NULL DEFAULT FALSE;

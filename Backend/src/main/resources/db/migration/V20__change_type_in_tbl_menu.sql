@@ -1,0 +1,1 @@
+ALTER TABLE menu MODIFY COLUMN calories_target FLOAT;

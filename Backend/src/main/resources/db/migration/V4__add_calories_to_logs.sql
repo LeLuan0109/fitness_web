@@ -1,0 +1,1 @@
+ALTER TABLE `WorkoutLogs` ADD COLUMN `calories_burned` FLOAT DEFAULT 0;

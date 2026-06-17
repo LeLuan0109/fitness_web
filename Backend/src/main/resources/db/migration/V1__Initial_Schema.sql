@@ -1,0 +1,375 @@
+-- PHẦN 1: TẠO TẤT CẢ CÁC BẢNG
+CREATE TABLE `User` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255),
+    `username` VARCHAR(255) NOT NULL UNIQUE,
+    `password` VARCHAR(255),
+    `email` VARCHAR(255) NOT NULL UNIQUE,
+    `avatar` VARCHAR(255) NULL,
+    `weight` FLOAT NULL,
+    `height` FLOAT NULL,
+    `sex` VARCHAR(255) NULL,
+    `is_locked` BOOLEAN NULL,
+    `provider` ENUM('LOCAL', 'GOOGLE', 'FACEBOOK') NOT NULL DEFAULT 'LOCAL',
+    `current_streak` INT(10) NULL,
+    `longest_streak` INT(10) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Equipment` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `MuscleGroup` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `TrainingType` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `MealType` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Challenges` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `start_date` TIMESTAMP NULL,
+    `end_date` TIMESTAMP NULL,
+    `type` VARCHAR(255) NULL,
+    `goal` VARCHAR(255) NULL,
+    `description` VARCHAR(255) NULL,
+    `image` VARCHAR(255) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Meal` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `meal_type_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Dishes` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `modeling_duration` VARCHAR(255) NULL,
+    `calories` FLOAT NULL,
+    `protein` FLOAT NULL,
+    `fat` FLOAT NULL,
+    `carbs` FLOAT NULL,
+    `ingredients` VARCHAR(1000) NULL,
+    `recipe` VARCHAR(1000) NULL,
+    `avatar` VARCHAR(255) NULL,
+    `meal_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Bảng phụ thuộc cấp 1
+CREATE TABLE `Note` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(255) NULL UNIQUE,
+    `description` VARCHAR(255) NULL,
+    `user_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Notification` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(255) NULL,
+    `content` VARCHAR(255) NULL,
+    `type` VARCHAR(255) NULL,
+    `is_read` BOOLEAN NULL,
+    `create_at` TIMESTAMP NULL,
+    `user_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `LeaderBoard` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT NULL,
+    `period_type` VARCHAR(255) NULL,
+    `period_start_date` TIMESTAMP NULL,
+    `period_end_date` TIMESTAMP NULL,
+    `rank` INT(10) NULL,
+    `create_at` TIMESTAMP NULL,
+    `is_global` BOOLEAN NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Menu` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `user_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `WorkoutPlan` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `description` VARCHAR(255) NULL,
+    `is_default` BOOLEAN NULL,
+    `workout_week` INT(10) NULL,
+    `duration_week` INT(10) NULL,
+    `user_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Post` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(255) NULL,
+    `name` VARCHAR(255) NULL,
+    `content` VARCHAR(255) NULL,
+    `video` VARCHAR(255) NULL,
+    `image` VARCHAR(255) NULL,
+    `user_id` BIGINT NULL,
+    `create_at` TIMESTAMP NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Exercises` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NULL,
+    `description` VARCHAR(255) NULL,
+    `thumbnail` VARCHAR(255) NULL,
+    `benefit` VARCHAR(255) NULL,
+    `preparation` VARCHAR(255) NULL,
+    `tips` VARCHAR(255) NULL,
+    `training_type` BIGINT NULL,
+    `level` VARCHAR(255) NULL,
+    `is_locked_each` BOOLEAN NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Bảng phụ thuộc cấp 2
+CREATE TABLE `WorkoutDay` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `workout_plan_id` BIGINT NULL,
+    `day_of_week` INT(10) NULL,
+    `day_in_number` INT(10) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Comments` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `content` VARCHAR(255) NULL,
+    `image` VARCHAR(255) NULL,
+    `user_id` BIGINT NULL,
+    `post_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `MealPerDay` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `date` TIMESTAMP NULL,
+    `timestamp` TIMESTAMP NULL,
+    `user_id` BIGINT NULL,
+    `meal_id` BIGINT NULL,
+    `menu_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Bảng junction (Bảng nối Nhiều-Nhiều)
+CREATE TABLE `Exercises_Equipment` (
+    `exercises_id` BIGINT NOT NULL,
+    `equipment_id` BIGINT NOT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Exercises_MuscleGroup` (
+    `exercises_id` BIGINT NOT NULL,
+    `muscle_group_id` BIGINT NOT NULL,
+    `is_primary` INT(10) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `WorkoutDay_Exercises` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `reps` VARCHAR(255) NULL,
+    `weight` VARCHAR(255) NULL,
+    `duration` VARCHAR(255) NULL,
+    `exercises_id` BIGINT NULL,
+    `workout_day_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `WorkoutLogs` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `actual_reps` INT(10) NULL,
+    `actual_weights` INT(10) NULL,
+    `rest` INT(10) NULL,
+    `actual_duration` INT(10) NULL,
+    `day_of_week_index` INT(10) NULL,
+    `workout_day_id` BIGINT NULL,
+    `user_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `User_Challenges` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT NULL,
+    `challenge_id` BIGINT NULL,
+    `is_completed` BOOLEAN NULL,
+    `joined_date` TIMESTAMP NULL,
+    `complete_date` TIMESTAMP NULL,
+    `evidence` VARCHAR(255) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Challenge_Exercises` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `challenge_id` BIGINT NULL,
+    `exercises_id` BIGINT NULL,
+    `reps` VARCHAR(255) NULL,
+    `sets` INT(10) NULL,
+    `time` VARCHAR(255) NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `Dishes_Meal` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `dish_id` BIGINT NULL,
+    `meal_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `PostLike` (
+    `user_id` BIGINT NOT NULL,
+    `post_id` BIGINT NOT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `CommentLike` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `create_at` DATE NULL,
+    `user_id` BIGINT NULL,
+    `comment_id` BIGINT NULL,
+    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `blacklisted_tokens` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `token` VARCHAR(512) NOT NULL UNIQUE,
+    `user_id` BIGINT NULL,
+    `expiry_date` DATETIME NOT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- PHẦN 2: THÊM TẤT CẢ KHÓA NGOẠI (FOREIGN KEYS)
+-- (Không thay đổi, vì bây giờ các kiểu dữ liệu đã khớp)
+
+ALTER TABLE `Note`
+    ADD CONSTRAINT `FK_Note_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`);
+
+ALTER TABLE `Notification`
+    ADD CONSTRAINT `FK_Notification_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`);
+
+ALTER TABLE `LeaderBoard`
+    ADD CONSTRAINT `FK_LeaderBoard_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`);
+
+ALTER TABLE `Menu`
+    ADD CONSTRAINT `FK_Menu_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`);
+
+ALTER TABLE `WorkoutPlan`
+    ADD CONSTRAINT `FK_WorkoutPlan_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`);
+
+ALTER TABLE `Post`
+    ADD CONSTRAINT `FK_Post_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`);
+
+ALTER TABLE `Exercises`
+    ADD CONSTRAINT `FK_Exercises_TrainingType` FOREIGN KEY (`training_type`) REFERENCES `TrainingType`(`id`);
+
+ALTER TABLE `Meal`
+    ADD CONSTRAINT `FK_Meal_MealType` FOREIGN KEY (`meal_type_id`) REFERENCES `MealType`(`id`);
+
+ALTER TABLE `Dishes`
+    ADD CONSTRAINT `FK_Dishes_Meal` FOREIGN KEY (`meal_id`) REFERENCES `Meal`(`id`);
+
+ALTER TABLE `WorkoutDay`
+    ADD CONSTRAINT `FK_WorkoutDay_WorkoutPlan` FOREIGN KEY (`workout_plan_id`) REFERENCES `WorkoutPlan`(`id`);
+
+ALTER TABLE `Comments`
+    ADD CONSTRAINT `FK_Comments_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`),
+    ADD CONSTRAINT `FK_Comments_Post` FOREIGN KEY (`post_id`) REFERENCES `Post`(`id`);
+
+ALTER TABLE `MealPerDay`
+    ADD CONSTRAINT `FK_MealPerDay_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`),
+    ADD CONSTRAINT `FK_MealPerDay_Meal` FOREIGN KEY (`meal_id`) REFERENCES `Meal`(`id`),
+    ADD CONSTRAINT `FK_MealPerDay_Menu` FOREIGN KEY (`menu_id`) REFERENCES `Menu`(`id`);
+
+ALTER TABLE `Exercises_Equipment`
+    ADD CONSTRAINT `FK_ExEq_Exercises` FOREIGN KEY (`exercises_id`) REFERENCES `Exercises`(`id`),
+    ADD CONSTRAINT `FK_ExEq_Equipment` FOREIGN KEY (`equipment_id`) REFERENCES `Equipment`(`id`);
+
+ALTER TABLE `Exercises_MuscleGroup`
+    ADD CONSTRAINT `FK_ExMu_Exercises` FOREIGN KEY (`exercises_id`) REFERENCES `Exercises`(`id`),
+    ADD CONSTRAINT `FK_ExMu_MuscleGroup` FOREIGN KEY (`muscle_group_id`) REFERENCES `MuscleGroup`(`id`);
+
+ALTER TABLE `WorkoutDay_Exercises`
+    ADD CONSTRAINT `FK_WdEx_Exercises` FOREIGN KEY (`exercises_id`) REFERENCES `Exercises`(`id`),
+    ADD CONSTRAINT `FK_WdEx_WorkoutDay` FOREIGN KEY (`workout_day_id`) REFERENCES `WorkoutDay`(`id`);
+
+ALTER TABLE `WorkoutLogs`
+    ADD CONSTRAINT `FK_WorkoutLogs_WorkoutDay` FOREIGN KEY (`workout_day_id`) REFERENCES `WorkoutDay`(`id`),
+    ADD CONSTRAINT `FK_WorkoutLogs_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`);
+
+ALTER TABLE `User_Challenges`
+    ADD CONSTRAINT `FK_UsCh_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`),
+    ADD CONSTRAINT `FK_UsCh_Challenges` FOREIGN KEY (`challenge_id`) REFERENCES `Challenges`(`id`);
+
+ALTER TABLE `Challenge_Exercises`
+    ADD CONSTRAINT `FK_ChEx_Challenges` FOREIGN KEY (`challenge_id`) REFERENCES `Challenges`(`id`),
+    ADD CONSTRAINT `FK_ChEx_Exercises` FOREIGN KEY (`exercises_id`) REFERENCES `Exercises`(`id`);
+
+ALTER TABLE `Dishes_Meal`
+    ADD CONSTRAINT `FK_DiMe_Dishes` FOREIGN KEY (`dish_id`) REFERENCES `Dishes`(`id`),
+    ADD CONSTRAINT `FK_DiMe_Meal` FOREIGN KEY (`meal_id`) REFERENCES `Meal`(`id`);
+
+ALTER TABLE `PostLike`
+    ADD CONSTRAINT `FK_PostLike_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`),
+    ADD CONSTRAINT `FK_PostLike_Post` FOREIGN KEY (`post_id`) REFERENCES `Post`(`id`);
+
+ALTER TABLE `CommentLike`
+    ADD CONSTRAINT `FK_CommentLike_User` FOREIGN KEY (`user_id`) REFERENCES `User`(`id`),
+    ADD CONSTRAINT `FK_CommentLike_Comments` FOREIGN KEY (`comment_id`) REFERENCES `Comments`(`id`);
+
+ALTER TABLE `blacklisted_tokens`
+    ADD CONSTRAINT `FK_BlacklistedToken_User`
+    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`);

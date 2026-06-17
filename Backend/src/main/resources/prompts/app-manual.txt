@@ -1,0 +1,12 @@
+HƯỚNG DẪN SỬ DỤNG HỆ THỐNG DOANBE FITNESS:
+1. Tổng quan: Đây là ứng dụng hỗ trợ tập luyện và dinh dưỡng cá nhân hóa.
+2. Tính năng Gợi ý (Recommendation):
+   - Vào Dashboard để xem.
+   - Yêu cầu: Phải cập nhật Chiều cao, Cân nặng, Mục tiêu trong Profile trước.
+3. Quản lý Thực đơn (Menu):
+   - Vào "Thực đơn của tôi" -> Bấm "Tạo mới" (nút dấu cộng).
+   - Tìm món ăn (Dish) và thêm vào bữa Sáng/Trưa/Tối.
+4. Quản lý Lịch tập (Workout):
+   - Hệ thống tự gợi ý lịch tập dựa trên BMI.
+   - User có thể clone lịch tập mẫu về sửa đổi.
+5. Hỗ trợ: Liên hệ admin@fitness.com nếu gặp lỗi.

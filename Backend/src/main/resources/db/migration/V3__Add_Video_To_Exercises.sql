@@ -1,0 +1,1 @@
+ALTER TABLE `Exercises` ADD COLUMN `video_url` VARCHAR(255) NULL;

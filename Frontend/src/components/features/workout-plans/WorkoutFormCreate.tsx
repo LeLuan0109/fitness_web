@@ -1,0 +1,369 @@
+import { WorkoutPlanBuilder } from "@/components/features/workout-plans/WorkoutPlanBuilder"
+import { Button } from "@/components/shared/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shared/ui/card"
+import { Checkbox } from "@/components/shared/ui/checkbox"
+import { CustomSelect } from "@/components/shared/ui/custom-select"
+import { Form } from "@/components/shared/ui/form"
+import { Input } from "@/components/shared/ui/input"
+import { Separator } from "@/components/shared/ui/separator"
+import { SimpleDatePicker } from "@/components/shared/ui/simple-datepicker"
+import { SimpleField } from "@/components/shared/ui/simple-field"
+import { Textarea } from "@/components/shared/ui/textarea"
+import { FITNESS_GOAL_OPTIONS, LEVEL_OPTIONS } from "@/constants/common"
+import { ROUTES } from "@/constants/routes"
+import { ROLES } from "@/constants/roles.constant"
+import { daysPerWeekOptions, durationOptions } from "@/constants/workout-plan.constant"
+import { useGetExerciseOptions } from "@/hooks/queries/exercises/useGetExerciseOptions"
+import { useCreatePlan } from "@/hooks/queries/workout-plan/useCreatePlan"
+import { ExerciseSelected, ScheduleItem, WorkoutPlanFormSchema } from "@/schemas/workout-plan.schema"
+import authStore from "@/stores/auth.store"
+import { WorkoutFormData } from "@/types/workout-plan.type"
+import { transformWorkoutPlanDTO } from "@/utils/workout-plan.util"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { CheckCircle2, ChevronRight, Loader2, XIcon } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useFieldArray, useForm } from "react-hook-form"
+import { generatePath, useNavigate } from "react-router"
+import { toast } from "sonner"
+
+// Helper function to map day names to numbers
+const getDayOfWeekNumber = (dayId: string): number => {
+  const dayMap = {
+    sunday: 0,
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
+  }
+  return dayMap[dayId] || 0
+}
+
+export const WorkoutFormCreate = () => {
+  const [selectedDays, setSelectedDays] = useState<string[]>([])
+  const auth = authStore.use.auth()
+  const isAdmin = auth?.role?.name === ROLES.ADMIN
+
+  const form = useForm<WorkoutFormData>({
+    resolver: zodResolver(WorkoutPlanFormSchema),
+    defaultValues: {
+      name: "",
+      goal: "",
+      startDate: isAdmin ? undefined : new Date(),
+      durationWeek: "",
+      daysPerWeek: "",
+      level: "BEGINNER",
+      description: "",
+      schedule: [],
+    },
+    mode: "onBlur",
+  })
+
+  const navigate = useNavigate()
+
+  const watchedDuration = form.watch("durationWeek")
+  const watchedDaysPerWeek = form.watch("daysPerWeek")
+
+  const { fields: scheduleFields, replace: replaceSchedule } = useFieldArray({
+    control: form.control,
+    name: "schedule",
+    keyName: "fieldId",
+  })
+
+  const { data: exerciseOptions } = useGetExerciseOptions()
+  const { mutate: createPlan, isPending } = useCreatePlan({
+    config: {
+      onSuccess: (data) => {
+        toast.success("Kế hoạch tập luyện đã được tạo thành công!")
+        navigate(generatePath(ROUTES.WORKOUTS.DETAIL, { id: String(data.data) }))
+      },
+      onError: (error) => {
+        toast.error(`Lỗi khi tạo kế hoạch tập luyện: ${error.response?.data?.error.message || "Đã có lỗi xảy ra."}`)
+      },
+    },
+  })
+
+  const initializeSchedule = () => {
+    const requiredDaysCount = Number(watchedDaysPerWeek)
+    const hasEnoughDays = selectedDays.length === requiredDaysCount
+
+    if (Number(watchedDuration) > 0 && requiredDaysCount > 0 && hasEnoughDays) {
+      const currentSchedule = [...scheduleFields]
+      const newSchedule: ScheduleItem[] = []
+
+      // Tạo map để lưu các bài tập cũ theo weekNumber và dayOfWeek
+      const existingExercisesMap = new Map<string, ExerciseSelected[]>()
+      currentSchedule.forEach((item) => {
+        const key = `${item.weekNumber}-${item.dayOfWeek}`
+        existingExercisesMap.set(key, item.exercises)
+      })
+
+      for (let weekNumber = 1; weekNumber <= Number(watchedDuration); weekNumber++) {
+        selectedDays.forEach((dayId) => {
+          const dayOfWeek = getDayOfWeekNumber(dayId)
+          const key = `${weekNumber}-${dayOfWeek}`
+
+          // Giữ lại exercises cũ nếu có, nếu không thì tạo mới
+          const exercises = existingExercisesMap.get(key) || [
+            {
+              exerciseId: "",
+              sets: "3",
+              reps: "10",
+              duration: "",
+              weight: "",
+            },
+          ]
+
+          newSchedule.push({
+            weekNumber,
+            dayOfWeek,
+            exercises,
+          })
+        })
+      }
+
+      replaceSchedule(newSchedule)
+    }
+  }
+
+  useEffect(() => {
+    const duration = Number(watchedDuration)
+    const daysPerWeek = Number(watchedDaysPerWeek)
+
+    // Nếu chưa có duration hoặc daysPerWeek, clear schedule
+    if (!duration || !daysPerWeek) {
+      if (scheduleFields.length > 0) {
+        replaceSchedule([])
+      }
+      return
+    }
+
+    const hasEnoughDays = selectedDays.length === daysPerWeek
+    const expectedScheduleItems = duration * daysPerWeek
+
+    // Clear schedule nếu chưa chọn đủ ngày
+    if (!hasEnoughDays) {
+      if (scheduleFields.length > 0) {
+        replaceSchedule([])
+      }
+      return
+    }
+
+    // Luôn cập nhật schedule khi số items không khớp (tăng hoặc giảm tuần)
+    if (scheduleFields.length !== expectedScheduleItems) {
+      initializeSchedule()
+    }
+  }, [watchedDuration, watchedDaysPerWeek])
+
+  // Effect riêng để xử lý thay đổi selectedDays
+  useEffect(() => {
+    const daysPerWeek = Number(watchedDaysPerWeek)
+    const duration = Number(watchedDuration)
+
+    if (!daysPerWeek || !duration) return
+
+    const hasEnoughDays = selectedDays.length === daysPerWeek
+
+    if (hasEnoughDays) {
+      // Cập nhật schedule khi thay đổi ngày được chọn
+      initializeSchedule()
+    } else if (!hasEnoughDays && scheduleFields.length > 0) {
+      // Clear schedule nếu bỏ chọn ngày
+      replaceSchedule([])
+    }
+  }, [selectedDays])
+
+  const handleBackToList = () => {
+    if (!isAdmin) {
+      navigate(ROUTES.WORKOUTS.MY_LIST)
+    } else {
+      navigate(ROUTES.WORKOUTS.SAMPLE_LIST)
+    }
+  }
+
+  const handleSavePlan = (data: WorkoutFormData) => {
+    const payload = transformWorkoutPlanDTO(data)
+    createPlan(payload)
+  }
+
+  const handleDaySelection = (dayId: string, checked: boolean) => {
+    setSelectedDays((prev) => {
+      let newDays = [...prev]
+      const maxDays = Number(watchedDaysPerWeek) || 0
+
+      if (checked) {
+        if (!newDays.includes(dayId) && newDays.length < maxDays) {
+          newDays.push(dayId)
+        }
+      } else {
+        newDays = newDays.filter((d) => d !== dayId)
+      }
+
+      return newDays
+    })
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSavePlan)} className="space-y-2">
+        <div className="flex items-center gap-4">
+          <Button type="button" variant="ghost" onClick={handleBackToList}>
+            <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
+            Quay lại
+          </Button>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Tạo kế hoạch tập luyện mới</CardTitle>
+            <CardDescription>Thiết kế kế hoạch tập luyện phù hợp với mục tiêu của bạn</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Basic Info */}
+            <div className="grid gap-y-2 gap-x-4 md:grid-cols-2">
+              <SimpleField name="name" control={form.control} label="Tên kế hoạch" required>
+                {(field) => <Input {...field} placeholder="VD: Kế hoạch giảm cân mùa hè" />}
+              </SimpleField>
+
+              <SimpleField name="goal" control={form.control} label="Mục tiêu" required>
+                {(field) => (
+                  <CustomSelect
+                    options={FITNESS_GOAL_OPTIONS}
+                    placeholder="Chọn mục tiêu"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              </SimpleField>
+
+              <SimpleField name="durationWeek" control={form.control} label="Thời gian (tuần)" required>
+                {(field) => (
+                  <CustomSelect
+                    options={durationOptions}
+                    placeholder="Chọn thời gian"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              </SimpleField>
+
+              {!isAdmin && (
+                <SimpleField name="startDate" control={form.control} label="Ngày bắt đầu" required>
+                  {(field) => (
+                    <SimpleDatePicker
+                      {...field}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Chọn thời gian"
+                    />
+                  )}
+                </SimpleField>
+              )}
+
+              <SimpleField name="daysPerWeek" control={form.control} label="Số ngày tập/tuần" required>
+                {(field) => (
+                  <CustomSelect
+                    options={daysPerWeekOptions}
+                    placeholder="Chọn số ngày"
+                    value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value)
+                      const numValue = parseInt(value)
+                      setSelectedDays((prev) => prev.slice(0, numValue))
+                    }}
+                  />
+                )}
+              </SimpleField>
+
+              <SimpleField name="level" control={form.control} label="Cấp độ" required>
+                {(field) => (
+                  <CustomSelect
+                    options={LEVEL_OPTIONS}
+                    placeholder="Chọn cấp độ"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              </SimpleField>
+
+              <div className="md:col-span-2">
+                <label className="text-sm text-foreground leading-5 h-5 font-bold">
+                  Ngày tập trong tuần (tối đa {watchedDaysPerWeek} ngày)
+                </label>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  {[
+                    { id: "monday", label: "Thứ 2" },
+                    { id: "tuesday", label: "Thứ 3" },
+                    { id: "wednesday", label: "Thứ 4" },
+                    { id: "thursday", label: "Thứ 5" },
+                    { id: "friday", label: "Thứ 6" },
+                    { id: "saturday", label: "Thứ 7" },
+                    { id: "sunday", label: "Chủ nhật" },
+                  ].map((day) => (
+                    <div key={day.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={day.id}
+                        className="border-gray-300"
+                        checked={selectedDays.includes(day.id)}
+                        disabled={!selectedDays.includes(day.id) && selectedDays.length >= Number(watchedDaysPerWeek)}
+                        onCheckedChange={(checked) => handleDaySelection(day.id, checked as boolean)}
+                      />
+                      <label
+                        htmlFor={day.id}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {day.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                {selectedDays.length < Number(watchedDaysPerWeek) && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Vui lòng chọn {Number(watchedDaysPerWeek) - selectedDays.length} ngày nữa
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <SimpleField name="description" control={form.control} label="Mô tả">
+              {(field) => <Textarea {...field} placeholder="Mô tả chi tiết về kế hoạch tập luyện..." rows={5} />}
+            </SimpleField>
+
+            <Separator />
+
+            {/* Workout Plan Builder */}
+            {scheduleFields.length > 0 &&
+              exerciseOptions &&
+              selectedDays.length === Number(watchedDaysPerWeek) &&
+              Number(watchedDaysPerWeek) > 0 && <WorkoutPlanBuilder exerciseOptions={exerciseOptions} />}
+
+            {/* Hiển thị message khi chưa chọn đủ ngày */}
+            {Number(watchedDaysPerWeek) > 0 && selectedDays.length < Number(watchedDaysPerWeek) && (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Vui lòng chọn đủ {watchedDaysPerWeek} ngày trong tuần để tiếp tục thiết kế bài tập</p>
+                <p className="text-sm mt-1">
+                  Đã chọn: {selectedDays.length}/{watchedDaysPerWeek} ngày
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-center gap-3 pt-4">
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <Loader2 className={`w-4 h-4 mr-2 animate-spin`} />
+                ) : (
+                  <CheckCircle2 className={`w-4 h-4 mr-2`} />
+                )}
+                {isPending ? "Đang lưu..." : "Lưu kế hoạch"}
+              </Button>
+              <Button type="button" variant="outline" onClick={handleBackToList} disabled={isPending}>
+                <XIcon />
+                Hủy
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    </Form>
+  )
+}
