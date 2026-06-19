@@ -1,0 +1,47 @@
+# Docker Compose: chạy Backend + MySQL chỉ với 1 lệnh.
+# Lần đầu trên máy mới: chỉ cần cài Docker Desktop rồi chạy:  docker compose up -d --build
+#
+# - MySQL tự khởi tạo database 'fitness_db'
+# - Flyway trong backend tự tạo toàn bộ bảng + seed dữ liệu chung (V1..V21) khi start
+# - Backend phục vụ tại http://localhost:8080  (prefix API: /api)
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fitness-mysql
+    restart: unless-stopped
+    # lower_case_table_names=1 để khớp môi trường dev (tên bảng không phân biệt hoa/thường).
+    # Chỉ có hiệu lực khi volume còn TRỐNG (lần khởi tạo đầu). Không đổi giá trị này trên volume cũ.
+    command: --lower-case-table-names=1
+    environment:
+      MYSQL_ROOT_PASSWORD: fitness123
+      MYSQL_DATABASE: fitness_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pfitness123"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  backend:
+    build: .
+    container_name: fitness-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Trỏ datasource sang service 'mysql' (KHÔNG dùng localhost trong container).
+      # Override các giá trị trong application.properties qua biến môi trường (Spring relaxed binding).
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/fitness_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "fitness123"
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:

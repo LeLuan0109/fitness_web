@@ -16,7 +16,7 @@ function App() {
           </AppProvider>
         </HelmetProvider>
       </NuqsAdapter>
-      <Toaster position="top-center" theme="dark" richColors />
+      <Toaster position="top-center" theme="light" richColors />
     </QueryClientProvider>
   )
 }

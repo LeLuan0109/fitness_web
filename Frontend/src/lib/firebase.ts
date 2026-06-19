@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getMessaging, getToken } from "firebase/messaging"
+import { getMessaging, getToken, type Messaging } from "firebase/messaging"
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_REACT_APP_FIREBASE_API_KEY,
@@ -10,11 +10,23 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_REACT_APP_FIREBASE_APP_ID,
 }
 
-const app = initializeApp(firebaseConfig)
-export const messaging = getMessaging(app)
+// Khởi tạo Firebase Messaging an toàn: nếu chưa cấu hình (hoặc lỗi) thì
+// KHÔNG để văng lỗi làm trắng cả app — chỉ tắt tính năng push notification.
+export let messaging: Messaging | null = null
+try {
+  if (firebaseConfig.projectId && firebaseConfig.apiKey) {
+    const app = initializeApp(firebaseConfig)
+    messaging = getMessaging(app)
+  } else {
+    console.warn("[firebase] Thiếu cấu hình - push notification bị tắt.")
+  }
+} catch (error) {
+  console.warn("[firebase] Khởi tạo messaging thất bại - push notification bị tắt:", error)
+}
 
 export const requestNotificationPermission = async () => {
   try {
+    if (!messaging) return null
     const permission = await Notification.requestPermission()
 
     if (permission === "granted") {

@@ -20,11 +20,10 @@ const AppWithProviders = () => {
     </ErrorBoundary>
   )
 
-  if (GOOGLE_CLIENT_ID) {
-    return <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{content}</GoogleOAuthProvider>
-  }
-
-  return content
+  // Luôn bọc GoogleOAuthProvider để nút Google không văng lỗi khi chưa cấu hình.
+  // Chưa có client id thật -> dùng id placeholder (nút mount được, login Google sẽ không hoạt động).
+  const clientId = GOOGLE_CLIENT_ID || "000000000000-placeholder.apps.googleusercontent.com"
+  return <GoogleOAuthProvider clientId={clientId}>{content}</GoogleOAuthProvider>
 }
 
 createRoot(document.getElementById("root")!).render(

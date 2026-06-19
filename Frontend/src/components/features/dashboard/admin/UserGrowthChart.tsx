@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/shared/ui/card"
 import { Button } from "@/components/shared/ui/button"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { ChartResponse } from "@/types/dashboard.type"
 import { memo } from "react"
 
@@ -37,21 +37,39 @@ export const UserGrowthChart = memo(({ data, currentYear, selectedYear, onYearCh
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data || []}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="label" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
+          <AreaChart data={data || []} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+            <defs>
+              <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+            <XAxis dataKey="label" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} width={40} />
+            <Tooltip
+              cursor={{ stroke: "#10b981", strokeWidth: 1, strokeDasharray: "4 4" }}
+              contentStyle={{
+                background: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 10,
+                color: "#111827",
+                fontSize: 13,
+                boxShadow: "0 4px 12px rgba(17, 24, 39, 0.08)",
+              }}
+              labelStyle={{ color: "#6b7280" }}
+            />
+            <Area
               type="monotone"
               dataKey="value"
-              stroke="#8884d8"
-              strokeWidth={2}
               name="Số người dùng"
-              activeDot={{ r: 8 }}
+              stroke="#10b981"
+              strokeWidth={2.5}
+              fill="url(#growthFill)"
+              dot={false}
+              activeDot={{ r: 5, fill: "#10b981", stroke: "#ffffff", strokeWidth: 2 }}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
