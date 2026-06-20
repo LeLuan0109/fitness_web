@@ -17,7 +17,10 @@ services:
       MYSQL_ROOT_PASSWORD: fitness123
       MYSQL_DATABASE: fitness_db
     ports:
-      - "3306:3306"
+      # Cổng host đổi sang 3307 để tránh đụng MySQL khác đang chạy ở 3306.
+      # Backend kết nối qua mạng nội bộ (mysql:3306) nên không bị ảnh hưởng.
+      # Muốn nối từ host (Workbench/DBeaver) thì dùng localhost:3307.
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
