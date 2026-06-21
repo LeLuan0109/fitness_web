@@ -164,14 +164,13 @@ export const WorkoutFormEdit = () => {
           startDate = new Date(plan.startDate as Date)
         }
 
-        console.log("plan Start date: ", plan.startDate)
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         startDate.setHours(0, 0, 0, 0)
-        console.log(startDate <= today)
-        console.log("startDate:", startDate)
-        console.log("today:", today)
-        setHasStarted(startDate <= today)
+        // Chỉ khóa chỉnh sửa khi kế hoạch đã thực sự bắt đầu (ngày bắt đầu ĐÃ QUA).
+        // Dùng "<" thay vì "<=" để kế hoạch tạo trong ngày (start = hôm nay, mặc định của form tạo)
+        // vẫn có thể chỉnh sửa trong chính ngày bắt đầu — nếu không user sẽ không bao giờ sửa được.
+        setHasStarted(startDate < today)
       } else {
         setHasStarted(false) // Kế hoạch mẫu luôn cho phép chỉnh sửa
       }

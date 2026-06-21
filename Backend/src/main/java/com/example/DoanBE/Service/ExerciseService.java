@@ -246,22 +246,29 @@ public class ExerciseService {
                 .description(ex.getDescription())
                 .trainingType(ex.getTrainingType() != null ? ex.getTrainingType().getName() : "")
 
-                // Map Equipment
-                .equipments(ex.getEquipments().stream().map(Equipment::getName).collect(Collectors.toList()))
+                // Map Equipment (null-safe: bài tập có thể không có dụng cụ/mẹo/lỗi/lợi ích)
+                .equipments(ex.getEquipments() == null ? new ArrayList<>()
+                        : ex.getEquipments().stream().map(Equipment::getName).collect(Collectors.toList()))
 
                 // Map Muscle Groups (Chia làm 2 list)
-                .primaryMuscles(ex.getExerciseMuscleGroups().stream()
+                .primaryMuscles(ex.getExerciseMuscleGroups() == null ? new ArrayList<>()
+                        : ex.getExerciseMuscleGroups().stream()
                         .filter(ExerciseMuscleGroup::isPrimary)
                         .map(emg -> emg.getMuscleGroup().getName()).collect(Collectors.toList()))
-                .secondaryMuscles(ex.getExerciseMuscleGroups().stream()
+                .secondaryMuscles(ex.getExerciseMuscleGroups() == null ? new ArrayList<>()
+                        : ex.getExerciseMuscleGroups().stream()
                         .filter(emg -> !emg.isPrimary())
                         .map(emg -> emg.getMuscleGroup().getName()).collect(Collectors.toList()))
 
                 // Map Lists Text
-                .steps(ex.getSteps().stream().map(ExerciseStep::getInstruction).collect(Collectors.toList()))
-                .tips(ex.getTips().stream().map(ExerciseTip::getContent).collect(Collectors.toList()))
-                .mistakes(ex.getMistakes().stream().map(ExerciseMistake::getContent).collect(Collectors.toList()))
-                .benefits(ex.getBenefits().stream().map(ExerciseBenefit::getContent).collect(Collectors.toList()))
+                .steps(ex.getSteps() == null ? new ArrayList<>()
+                        : ex.getSteps().stream().map(ExerciseStep::getInstruction).collect(Collectors.toList()))
+                .tips(ex.getTips() == null ? new ArrayList<>()
+                        : ex.getTips().stream().map(ExerciseTip::getContent).collect(Collectors.toList()))
+                .mistakes(ex.getMistakes() == null ? new ArrayList<>()
+                        : ex.getMistakes().stream().map(ExerciseMistake::getContent).collect(Collectors.toList()))
+                .benefits(ex.getBenefits() == null ? new ArrayList<>()
+                        : ex.getBenefits().stream().map(ExerciseBenefit::getContent).collect(Collectors.toList()))
 
                 .build();
     }

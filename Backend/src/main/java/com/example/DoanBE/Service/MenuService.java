@@ -218,7 +218,10 @@ public class MenuService {
 
         Long currentUserId = getSafeCurrentUserId();
 
-        boolean isOwner = currentUserId != null && menu.getUser().getId().equals(currentUserId);
+        // Thực đơn mẫu (isDefault=true) không có chủ sở hữu -> menu.getUser() = null.
+        // Phải kiểm tra null trước khi gọi getId() để tránh NullPointerException khi xem chi tiết thực đơn mẫu.
+        boolean isOwner = currentUserId != null && menu.getUser() != null
+                && menu.getUser().getId().equals(currentUserId);
 
         if (actionType.equals("READ")) {
             if (Boolean.TRUE.equals(menu.getIsDefault()) || isOwner) {

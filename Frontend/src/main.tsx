@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client"
 import App from "./App"
 import { GOOGLE_CLIENT_ID } from "./constants/api"
 import { ErrorBoundary } from "react-error-boundary"
-import { ErrorFallback } from "./components/shared/common/error-fallback"
+import { ErrorFallbackView } from "./components/shared/common/error-fallback"
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/firebase-messaging-sw.js").catch((err) => {
@@ -15,7 +15,7 @@ if ("serviceWorker" in navigator) {
 
 const AppWithProviders = () => {
   const content = (
-    <ErrorBoundary fallback={<ErrorFallback />}>
+    <ErrorBoundary FallbackComponent={ErrorFallbackView}>
       <App />
     </ErrorBoundary>
   )

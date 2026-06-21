@@ -4,7 +4,9 @@ import { vStringPassword, vStringRequired } from "@/constants/validates"
 
 export const LOGIN_SCHEMA = z.object({
   username: vStringRequired("Tên đăng nhập"),
-  password: vStringPassword(),
+  // Đăng nhập chỉ kiểm tra bắt buộc nhập, KHÔNG áp ràng buộc độ phức tạp (việc đó thuộc về đăng ký).
+  // Áp regex phức tạp ở form login sẽ khóa các tài khoản hợp lệ có mật khẩu cũ/ngắn.
+  password: vStringRequired("Mật khẩu"),
 })
 
 export const REGISTER_SCHEMA = z

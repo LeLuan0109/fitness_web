@@ -246,8 +246,8 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
   // helpers for tab UI
   const tabClass = (meal: MealKey) =>
     selectedMeal === meal
-      ? "px-3 py-2 rounded-md text-white/95 font-semibold bg-gradient-to-b from-white/6 to-white/3 shadow-md ring-1 ring-white/10 transform scale-105 transition-transform duration-150"
-      : "px-3 py-2 bg-white/3 rounded-md text-white/60 hover:bg-white/4 transition-colors duration-150"
+      ? "px-3 py-2 rounded-md text-foreground font-semibold bg-gradient-to-b from-white/6 to-white/3 shadow-md ring-1 ring-white/10 transform scale-105 transition-transform duration-150"
+      : "px-3 py-2 bg-muted rounded-md text-muted-foreground hover:bg-muted transition-colors duration-150"
 
   const isEdit = !!initialData
 
@@ -256,7 +256,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
       <form>
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
-            <h1 className="text-2xl text-white font-bold mb-3">{isEdit ? "Cập nhật thực đơn" : "Tạo thực đơn"}</h1>
+            <h1 className="text-2xl text-foreground font-bold mb-3">{isEdit ? "Cập nhật thực đơn" : "Tạo thực đơn"}</h1>
           </div>
 
           <div className="flex items-center gap-3">
@@ -299,7 +299,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
           <div className="lg:col-span-6">
             <Card className="rounded-xl py-0">
               <CardContent className="p-6">
-                <h3 className="text-white font-semibold mb-4">Danh sách món ăn</h3>
+                <h3 className="text-foreground font-semibold mb-4">Danh sách món ăn</h3>
                 <div className="flex gap-3 mb-4">
                   <SimpleField name="searchDish" control={form.control} hideLabel className="flex-1">
                     {(field) => (
@@ -324,10 +324,10 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                 <ScrollArea className="h-[400px]">
                   {isDishesLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="animate-spin text-white" size={32} />
+                      <Loader2 className="animate-spin text-foreground" size={32} />
                     </div>
                   ) : allDishes.length === 0 ? (
-                    <div className="text-white/60 text-center py-8">Không tìm thấy món ăn nào.</div>
+                    <div className="text-muted-foreground text-center py-8">Không tìm thấy món ăn nào.</div>
                   ) : (
                     <div className="space-y-3">
                       {allDishes.map((dish) => (
@@ -335,7 +335,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                           <img src={dish.image} alt={dish.name} className="w-36 h-20 object-cover rounded" />
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
-                              <div className="text-white font-semibold">{dish.name}</div>
+                              <div className="text-foreground font-semibold">{dish.name}</div>
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -350,22 +350,22 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                               </Button>
                             </div>
 
-                            <div className="grid grid-cols-4 gap-4 text-center text-white/80 text-sm">
+                            <div className="grid grid-cols-4 gap-4 text-center text-muted-foreground text-sm">
                               <div>
-                                <div className="text-white">{dish.calories}</div>
-                                <div className="text-white/60">Calo</div>
+                                <div className="text-foreground">{dish.calories}</div>
+                                <div className="text-muted-foreground">Calo</div>
                               </div>
                               <div>
-                                <div className="text-white">{dish.protein}g</div>
-                                <div className="text-white/60">Protein</div>
+                                <div className="text-foreground">{dish.protein}g</div>
+                                <div className="text-muted-foreground">Protein</div>
                               </div>
                               <div>
-                                <div className="text-white">{dish.carbs}g</div>
-                                <div className="text-white/60">Carbs</div>
+                                <div className="text-foreground">{dish.carbs}g</div>
+                                <div className="text-muted-foreground">Carbs</div>
                               </div>
                               <div>
-                                <div className="text-white">{dish.fat}g</div>
-                                <div className="text-white/60">Fat</div>
+                                <div className="text-foreground">{dish.fat}g</div>
+                                <div className="text-muted-foreground">Fat</div>
                               </div>
                             </div>
                           </div>
@@ -403,7 +403,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
           <div className="lg:col-span-6 space-y-6">
             <Card className="rounded-xl">
               <CardContent>
-                <h3 className="text-white font-semibold mb-4">Tổng lượng dinh dưỡng</h3>
+                <h3 className="text-foreground font-semibold mb-4">Tổng lượng dinh dưỡng</h3>
                 <div className="flex gap-2 mb-2 flex-wrap">
                   <MacroCard label="Calories" value={totalNutrition.calories} Icon={Flame} />
                   <MacroCard label="Protein" value={`${totalNutrition.protein}g`} Icon={Beef} />
@@ -415,40 +415,40 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
 
             <Card className="rounded-xl p-4">
               <CardContent className="p-4">
-                <h3 className="text-white font-semibold mb-4">Thực đơn</h3>
+                <h3 className="text-foreground font-semibold mb-4">Thực đơn</h3>
 
                 <div className="flex gap-3 mb-4">
                   <button type="button" className={tabClass("breakfast")} onClick={() => setSelectedMeal("breakfast")}>
                     Bữa sáng
-                    <div className="text-xs text-white/60">{meals.breakfast.length} món</div>
+                    <div className="text-xs text-muted-foreground">{meals.breakfast.length} món</div>
                   </button>
                   <button type="button" className={tabClass("lunch")} onClick={() => setSelectedMeal("lunch")}>
                     Bữa trưa
-                    <div className="text-xs text-white/60">{meals.lunch.length} món</div>
+                    <div className="text-xs text-muted-foreground">{meals.lunch.length} món</div>
                   </button>
                   <button type="button" className={tabClass("dinner")} onClick={() => setSelectedMeal("dinner")}>
                     Bữa tối
-                    <div className="text-xs text-white/60">{meals.dinner.length} món</div>
+                    <div className="text-xs text-muted-foreground">{meals.dinner.length} món</div>
                   </button>
                   <button type="button" className={tabClass("extra")} onClick={() => setSelectedMeal("extra")}>
                     Bữa phụ
-                    <div className="text-xs text-white/60">{meals.extra.length} món</div>
+                    <div className="text-xs text-muted-foreground">{meals.extra.length} món</div>
                   </button>
                 </div>
 
                 {/* Selected meal items */}
                 <div className="space-y-3">
                   {meals[selectedMeal].length === 0 ? (
-                    <div className="text-white/60 text-sm">Chưa có món nào cho bữa này.</div>
+                    <div className="text-muted-foreground text-sm">Chưa có món nào cho bữa này.</div>
                   ) : (
                     meals[selectedMeal].map((dish) => {
                       const quantity = dish.quantity ?? 1
                       return (
-                        <div key={dish.id} className="bg-white/6 rounded-md p-3">
+                        <div key={dish.id} className="bg-muted rounded-md p-3">
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <div className="text-white text-sm font-medium mb-1">{dish.name}</div>
-                              <div className="text-white/60 text-xs">
+                              <div className="text-foreground text-sm font-medium mb-1">{dish.name}</div>
+                              <div className="text-muted-foreground text-xs">
                                 {((dish.calories ?? 0) * quantity).toFixed(1)} kcal &nbsp; P:{" "}
                                 {((dish.protein ?? 0) * quantity).toFixed(1)}g &nbsp; C:{" "}
                                 {((dish.carbs ?? 0) * quantity).toFixed(1)}g &nbsp; F:{" "}
@@ -467,12 +467,12 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                                   }}
                                   aria-label="Giảm số lượng"
                                   title="Giảm số lượng"
-                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-white/90 hover:bg-white/4"
+                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-foreground hover:bg-muted"
                                 >
                                   -
                                 </button>
 
-                                <div className="px-3 text-sm font-medium text-white">{quantity}</div>
+                                <div className="px-3 text-sm font-medium text-foreground">{quantity}</div>
 
                                 <button
                                   type="button"
@@ -482,7 +482,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                                   }}
                                   aria-label="Tăng số lượng"
                                   title="Tăng số lượng"
-                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-white/90 hover:bg-white/4"
+                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-foreground hover:bg-muted"
                                 >
                                   +
                                 </button>
