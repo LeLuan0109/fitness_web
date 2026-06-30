@@ -28,7 +28,7 @@ export const MealDetailHeader = ({
     <div className="flex items-start justify-between gap-4 mb-6">
       <div className="flex-1">
         <div className="flex items-center gap-3 mb-2">
-          <TypographyH3 className="text-white font-bold leading-tight">{title}</TypographyH3>
+          <TypographyH3 className="text-foreground font-bold leading-tight">{title}</TypographyH3>
           <div className="flex flex-wrap items-center gap-2">
             {tags.map((tag, index) => (
               <Badge
@@ -36,7 +36,7 @@ export const MealDetailHeader = ({
                 title={tag}
                 className={`text-xs font-medium px-2 py-1 rounded-full ${
                   index === 0 ? "ml-0" : "ml-1"
-                } bg-white/6 text-[#2f6bff] border border-white/6 hover:bg-[#2f6bff]/8`}
+                } bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20`}
               >
                 {tag}
               </Badge>

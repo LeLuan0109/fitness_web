@@ -3,6 +3,7 @@ import { Suspense, useCallback, useEffect, useState } from "react"
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom"
 
 import { FloatingChatButton } from "@/components/features/chatbot"
+import { ThemeToggle } from "@/components/shared/common/ThemeToggle"
 import { Badge } from "@/components/shared/ui/badge"
 import {
   DropdownMenu,
@@ -143,7 +144,10 @@ export default function AppLayout() {
             <Separator orientation="vertical" className="mr-2 h-4" />
           </div>
 
-          <div className="ml-auto flex items-center space-x-5">
+          <div className="ml-auto flex items-center space-x-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Notification */}
             <Popover open={notificationOpen} onOpenChange={setNotificationOpen}>
               <PopoverTrigger asChild>
@@ -273,7 +277,7 @@ export default function AppLayout() {
             </div>
           }
         >
-          <div className="flex flex-1 flex-col gap-4 px-4 bg-background @container/main:px-6 @container/main:py-4">
+          <div className="flex flex-1 flex-col gap-4 px-4 app-gradient-bg @container/main:px-6 @container/main:py-4">
             <div className="@container/main flex flex-1 flex-col gap-2">
               <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                 <Outlet />

@@ -3,7 +3,7 @@ import { Calendar } from "@/components/shared/ui/calendar"
 import { FormControl } from "@/components/shared/ui/form"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/shared/ui/popover"
 import { cn } from "@/lib/utils"
-import { format } from "date-fns"
+import { format, isValid } from "date-fns"
 import { CalendarIcon, X } from "lucide-react"
 import { useState } from "react"
 import { ControllerRenderProps, FieldValues, Path } from "react-hook-form"
@@ -48,6 +48,7 @@ function SimpleDatePicker<TFieldValues extends FieldValues, TName extends Path<T
   }
 
   const isDisabled = Boolean(props.disabled)
+  const isValidDate = (value as unknown) instanceof Date && isValid(value)
 
   return (
     <div className="relative w-full">
@@ -58,13 +59,13 @@ function SimpleDatePicker<TFieldValues extends FieldValues, TName extends Path<T
               variant="outline"
               className={cn(
                 "w-full pl-3 text-left font-normal bg-input-background hover:bg-input-hovered focus:bg-input-focused",
-                !value && "text-muted-foreground",
-                value && !props.disabled && "pr-20",
+                !isValidDate && "text-muted-foreground",
+                isValidDate && !props.disabled && "pr-20",
                 className,
               )}
               disabled={isDisabled}
             >
-              {value ? format(value, dateFormat) : <span>{placeholder}</span>}
+              {isValidDate ? format(value, dateFormat) : <span>{placeholder}</span>}
               <CalendarIcon className="ml-auto h-4 w-4" />
             </Button>
           </FormControl>
@@ -76,14 +77,14 @@ function SimpleDatePicker<TFieldValues extends FieldValues, TName extends Path<T
             onSelect={handleSelect}
             disabled={disabledDates || defaultDisabled}
             captionLayout="dropdown"
-            defaultMonth={value}
+            defaultMonth={isValidDate ? value : undefined}
             autoFocus
             startMonth={new Date(fromYear, 0)}
             endMonth={new Date(toYear, 11)}
           />
         </PopoverContent>
       </Popover>
-      {value && !isDisabled && (
+      {isValidDate && !isDisabled && (
         <X
           className="absolute right-9 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 hover:opacity-100 transition-opacity cursor-pointer z-10"
           onClick={handleClear}

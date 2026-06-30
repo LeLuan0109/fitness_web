@@ -35,13 +35,13 @@ export const ExerciseCard = ({ title, description, muscleGroups, difficulty, ima
 
   return (
     <Card
-      className="w-full max-w-md border-gray-700 overflow-hidden py-0 cursor-pointer transition-all 
+      className="w-full max-w-md border-border overflow-hidden py-0 cursor-pointer transition-all 
       duration-300 ease-in-out transform hover:scale-102 hover:shadow-2xl hover:shadow-primary/20 
       hover:-translate-y-1 group"
       onClick={() => navigateToExerciseDetail(id)}
     >
       {/* Image Section */}
-      <div className="relative h-60 bg-gray-200 overflow-hidden">
+      <div className="relative h-60 bg-muted overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -49,8 +49,8 @@ export const ExerciseCard = ({ title, description, muscleGroups, difficulty, ima
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center transition-colors duration-300 group-hover:bg-gray-100">
-            <span className="text-gray-500 transition-colors duration-300 group-hover:text-gray-600">Ảnh bài tập</span>
+          <div className="w-full h-full bg-muted flex items-center justify-center transition-colors duration-300 group-hover:bg-muted/80">
+            <span className="text-muted-foreground transition-colors duration-300">Ảnh bài tập</span>
           </div>
         )}
 
@@ -58,10 +58,10 @@ export const ExerciseCard = ({ title, description, muscleGroups, difficulty, ima
         <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
 
-      <CardContent className="p-4 text-white transition-all duration-300 ">
+      <CardContent className="p-4 transition-all duration-300 ">
         {/* Header with title and difficulty */}
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-xl font-semibold transition-colors duration-300 ">{title}</h3>
+          <h3 className="text-xl font-semibold text-foreground transition-colors duration-300 ">{title}</h3>
           <Badge
             className={`${getDifficultyColor(
               difficulty,
@@ -73,19 +73,19 @@ export const ExerciseCard = ({ title, description, muscleGroups, difficulty, ima
         </div>
 
         {/* Description */}
-        <p className="text-gray-300 text-sm mb-4 leading-relaxed transition-colors duration-300 group-hover:text-gray-200 truncate">
+        <p className="text-muted-foreground text-sm mb-4 leading-relaxed transition-colors duration-300 truncate">
           {description}
         </p>
 
         {/* Muscle groups */}
         <div className="space-y-2">
-          <p className="text-white font-medium transition-colors duration-300 ">Nhóm cơ:</p>
+          <p className="text-foreground font-medium transition-colors duration-300 ">Nhóm cơ:</p>
           <div className="flex flex-wrap gap-2">
             {muscleGroups.map((muscle, index) => (
               <Badge
                 key={index}
                 variant="outline"
-                className="bg-transparent border-gray-600 text-gray-300 hover:bg-primary hover:text-primary-foreground hover:border-primary px-3 py-1 rounded-full transition-all duration-300 transform hover:scale-105"
+                className="bg-transparent border-border text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary px-3 py-1 rounded-full transition-all duration-300 transform hover:scale-105"
               >
                 {muscle}
               </Badge>

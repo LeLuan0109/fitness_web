@@ -153,8 +153,8 @@ export function IngredientForm({ idEdit, initialData, onSubmit, isLoading, exist
                     ) : (
                       <div className="flex items-center justify-center w-full max-w-md h-64 border-2 border-dashed border-gray-300 rounded-lg">
                         <div className="text-center">
-                          <ImageIcon className="w-12 h-12 mx-auto text-gray-400" />
-                          <p className="mt-2 text-sm text-gray-500">Chưa có hình ảnh</p>
+                          <ImageIcon className="w-12 h-12 mx-auto text-muted-foreground" />
+                          <p className="mt-2 text-sm text-muted-foreground">Chưa có hình ảnh</p>
                         </div>
                       </div>
                     )}

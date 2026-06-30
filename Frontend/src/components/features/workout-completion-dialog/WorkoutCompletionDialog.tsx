@@ -32,7 +32,7 @@ export function WorkoutCompletionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-col justify-between w-full">
-          <DialogTitle className="text-xl font-semibold text-white">Tổng kết ngày hôm nay</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-foreground">Tổng kết ngày hôm nay</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>

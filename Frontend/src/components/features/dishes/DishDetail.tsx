@@ -94,7 +94,7 @@ export function DishDetail() {
         <div className="lg:col-span-1 space-y-4">
           <Card className="rounded-xl">
             <CardContent>
-              <h3 className="text-white font-semibold mb-4">Giá trị dinh dưỡng</h3>
+              <h3 className="text-foreground font-semibold mb-4">Giá trị dinh dưỡng</h3>
               <div className="flex gap-3 flex-wrap">
                 <MacroCard label="Calories" value={`${data.calories}`} Icon={Flame} />
                 <MacroCard label="Protein" value={`${data.protein}g`} Icon={Beef} />
@@ -106,7 +106,7 @@ export function DishDetail() {
 
           <Card className="rounded-xl">
             <CardContent>
-              <h3 className="text-white font-semibold mb-4">Nguyên liệu</h3>
+              <h3 className="text-foreground font-semibold mb-4">Nguyên liệu</h3>
               <div className="space-y-3">
                 {data.ingredients.map((ing: any) => (
                   <IngredientItem key={ing.id} item={ing} />
@@ -119,7 +119,7 @@ export function DishDetail() {
 
       <Card className="rounded-xl">
         <CardContent>
-          <h3 className="text-white font-semibold mb-4">Cách chế biến</h3>
+          <h3 className="text-foreground font-semibold mb-4">Cách chế biến</h3>
           <div className="space-y-3">
             {/* Try to split recipe into steps if possible */}
             {String(data.preparation)
@@ -128,7 +128,7 @@ export function DishDetail() {
               .filter(Boolean)
               .map((step, i) => (
                 <div key={i} className="flex gap-3">
-                  <div className="text-white/90">{step}</div>
+                  <div className="text-foreground/90">{step}</div>
                 </div>
               ))}
           </div>

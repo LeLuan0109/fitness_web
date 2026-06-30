@@ -179,7 +179,7 @@ export function History() {
       {/* Exercise Logs */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <TypographyH5 variant="bold" className="text-white">
+          <TypographyH5 variant="bold" className="text-foreground">
             Thống kê
           </TypographyH5>
           <span className="text-muted-foreground text-sm">
@@ -199,11 +199,11 @@ export function History() {
                 <div className="bg-history-date-header rounded-xl px-6 py-4 flex justify-between items-center border border-history-border-gray/50 shadow-sm">
                   <div className="flex items-center gap-3">
                     <CalendarIcon className="w-4 h-4 text-primary" />
-                    <span className="text-white text-sm font-semibold">{log.date}</span>
+                    <span className="text-foreground text-sm font-semibold">{log.date}</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1">
+                  <div className="flex items-center gap-2 bg-muted rounded-full px-3 py-1">
                     <Dumbbell className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-white text-xs font-medium">{log.totalExercises} Bài tập</span>
+                    <span className="text-foreground text-xs font-medium">{log.totalExercises} Bài tập</span>
                   </div>
                 </div>
 

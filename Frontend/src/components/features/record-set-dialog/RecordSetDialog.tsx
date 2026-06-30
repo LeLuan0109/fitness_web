@@ -87,8 +87,8 @@ export const RecordSetDialog = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-col justify-between w-full">
-          <DialogTitle className="text-xl font-semibold text-white">Ghi nhận bài tập hôm nay</DialogTitle>
-          <p className="text-lg text-center font-medium text-gray-200">{exerciseName}</p>
+          <DialogTitle className="text-xl font-semibold text-foreground">Ghi nhận bài tập hôm nay</DialogTitle>
+          <p className="text-lg text-center font-medium text-muted-foreground">{exerciseName}</p>
         </DialogHeader>
 
         <Form {...form}>

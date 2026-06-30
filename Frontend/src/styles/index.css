@@ -84,14 +84,27 @@ body {
 }
 
 .dark {
-  --sidebar: #eff6ff;
-  --sidebar-foreground: #1d4ed8;
-  --sidebar-primary: #1d4ed8;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #93c5fd;
+  --sidebar-primary: #60a5fa;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #dbeafe;
-  --sidebar-accent-foreground: #1e3a8a;
-  --sidebar-border: #dbeafe;
-  --sidebar-ring: #1d4ed8;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #334155;
+  --sidebar-ring: #60a5fa;
+  --color-meal-card-bg: #1e293b;
+  --color-meal-card-border: #334155;
+  --color-meal-header-bg: #1e293b;
+  --color-macro-card-bg: #1e293b;
+  --color-macro-card-border: #334155;
+  --color-meal-summary-bg: #1e293b;
+  --color-status-in-use-bg: #064e3b;
+  --color-status-in-use-border: #065f46;
+  --color-status-in-use-text: #6ee7b7;
+  --color-tag-text: #93c5fd;
+  --color-button-bg: #334155;
+  --color-text-muted: #94a3b8;
+  --color-separator: #334155;
 }
 
 .auth-bg {

@@ -12,11 +12,11 @@ export const Profile = () => {
     return (
       <div className="space-y-6">
         {/* Skeleton for BasicInfo */}
-        <div className="bg-gray-400 animate-pulse rounded-lg h-32"></div>
+        <div className="bg-muted animate-pulse rounded-lg h-32"></div>
         {/* Skeleton for PersonalInfo */}
-        <div className="bg-gray-400 animate-pulse rounded-lg h-48"></div>
+        <div className="bg-muted animate-pulse rounded-lg h-48"></div>
         {/* Skeleton for MonthlyStats */}
-        <div className="bg-gray-400 animate-pulse rounded-lg h-64"></div>
+        <div className="bg-muted animate-pulse rounded-lg h-64"></div>
       </div>
     )
   }

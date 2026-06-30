@@ -5,8 +5,16 @@ import { Toaster } from "sonner"
 import AppProvider from "./components/shared/common/app-provider"
 import { queryClient } from "./lib/react-query"
 import AppRouter from "./router"
+import themeStore from "./stores/theme.store"
 
 function App() {
+  const theme = themeStore.use.theme()
+
+  // Resolve "system" to actual theme for Toaster
+  const resolvedTheme = theme === "system"
+    ? (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+    : theme
+
   return (
     <QueryClientProvider client={queryClient}>
       <NuqsAdapter>
@@ -16,7 +24,7 @@ function App() {
           </AppProvider>
         </HelmetProvider>
       </NuqsAdapter>
-      <Toaster position="top-center" theme="light" richColors />
+      <Toaster position="top-center" theme={resolvedTheme} richColors />
     </QueryClientProvider>
   )
 }

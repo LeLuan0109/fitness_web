@@ -12,10 +12,10 @@ export function StatCard({ icon, label, value, iconColor, className }: StatCardP
   return (
     <div
       className={cn(
-        "group relative bg-history-card-bg rounded-2xl p-6 flex flex-col gap-6",
-        "border border-transparent hover:border-history-border-light",
+        "group relative bg-card rounded-2xl p-6 flex flex-col gap-6",
+        "border border-border hover:border-primary/30",
         "transition-all duration-300 ease-in-out",
-        "hover:shadow-lg hover:shadow-black/20",
+        "hover:shadow-lg hover:shadow-primary/10",
         "hover:-translate-y-1",
         className,
       )}
@@ -25,7 +25,7 @@ export function StatCard({ icon, label, value, iconColor, className }: StatCardP
         <div
           className={cn(
             "flex items-center justify-center w-10 h-10 rounded-xl",
-            "bg-gradient-to-br from-white/5 to-white/[0.02]",
+            "bg-muted",
             "backdrop-blur-sm",
             "transition-all duration-300",
             "group-hover:scale-110 group-hover:shadow-lg",
@@ -39,14 +39,14 @@ export function StatCard({ icon, label, value, iconColor, className }: StatCardP
 
       {/* Value */}
       <div className="flex items-baseline gap-2">
-        <span className="text-white text-3xl font-bold tracking-tight leading-none">{value}</span>
+        <span className="text-foreground text-3xl font-bold tracking-tight leading-none">{value}</span>
       </div>
 
       {/* Subtle gradient overlay on hover */}
       <div
         className={cn(
           "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100",
-          "bg-gradient-to-br from-white/[0.02] to-transparent",
+          "bg-gradient-to-br from-primary/5 to-transparent",
           "transition-opacity duration-300 pointer-events-none",
         )}
       />
