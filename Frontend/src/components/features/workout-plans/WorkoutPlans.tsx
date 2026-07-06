@@ -1,11 +1,9 @@
-import { TypographyH3 } from "@/components/shared/ui/typography"
-import { SampleWorkout } from "./SampleWorkout"
-import { OutstandingPlan } from "./OutstandingPlan"
-import { Separator } from "@radix-ui/react-dropdown-menu"
-import { Button } from "@/components/shared/ui/button"
+import { CoreformPageHeader, CoreformPrimaryButton } from "@/components/shared/coreform"
+import { ROUTES } from "@/constants/routes"
 import authStore from "@/stores/auth.store"
 import { useNavigate } from "react-router"
-import { ROUTES } from "@/constants/routes"
+import { SampleWorkout } from "./SampleWorkout"
+import { OutstandingPlan } from "./OutstandingPlan"
 
 export function WorkoutPlans() {
   const isAdmin = authStore.use.auth().role?.name === "ADMIN"
@@ -16,17 +14,22 @@ export function WorkoutPlans() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <TypographyH3 variant="bold">Kế hoạch tập luyện mẫu</TypographyH3>
-          <p className="text-muted-foreground">Khám phá và tạo kế hoạch tập luyện phù hợp</p>
-        </div>
-        {isAdmin && <Button onClick={handleCreateSamplePlan}>Tạo kế hoạch tập luyện mẫu</Button>}
-      </div>
+    <div className="space-y-8">
+      <CoreformPageHeader
+        title="Kế hoạch tập luyện mẫu"
+        description="Khám phá và tạo kế hoạch tập luyện phù hợp với mục tiêu của bạn."
+        action={
+          isAdmin ? (
+            <CoreformPrimaryButton onClick={handleCreateSamplePlan}>
+              Tạo kế hoạch mẫu
+            </CoreformPrimaryButton>
+          ) : undefined
+        }
+      />
       <OutstandingPlan />
-      <Separator />
-      <SampleWorkout />
+      <div className="border-t border-sand/40 pt-8">
+        <SampleWorkout />
+      </div>
     </div>
   )
 }

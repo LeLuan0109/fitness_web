@@ -1,5 +1,4 @@
-import { Button } from "@/components/shared/ui/button"
-import { Card, CardContent } from "@/components/shared/ui/card"
+import { CoreformFilterCard, CoreformSearchButton } from "@/components/shared/coreform"
 import { CustomSelect } from "@/components/shared/ui/custom-select"
 import { Form } from "@/components/shared/ui/form"
 import { Input } from "@/components/shared/ui/input"
@@ -38,10 +37,10 @@ export const ExerciseSearchForm = ({ onSearch }: ExerciseSearchFormProps) => {
   }
 
   return (
-    <Card>
-      <CardContent className="flex gap-8 justify-between">
-        <Form {...form}>
-          <form className="flex flex-wrap w-full gap-x-6 gap-y-2">
+    <CoreformFilterCard>
+      <Form {...form}>
+        <form className="flex flex-wrap items-end justify-between gap-6">
+          <div className="flex flex-wrap gap-x-6 gap-y-4">
             <SimpleField
               label="Tên bài tập"
               name="search"
@@ -49,13 +48,13 @@ export const ExerciseSearchForm = ({ onSearch }: ExerciseSearchFormProps) => {
               className="w-[220px]"
               enableFormMessage={false}
             >
-              {(field) => <Input {...field} />}
+              {(field) => <Input {...field} className="rounded-xl border-sand/60 bg-cream/50" />}
             </SimpleField>
             <SimpleField
               label="Cấp độ"
               name="level"
               control={form.control}
-              className=" w-[220px]"
+              className="w-[220px]"
               enableFormMessage={false}
             >
               {(field) => <CustomSelect {...field} options={LEVEL_OPTIONS} />}
@@ -64,7 +63,7 @@ export const ExerciseSearchForm = ({ onSearch }: ExerciseSearchFormProps) => {
               label="Loại bài tập"
               name="typeId"
               control={form.control}
-              className=" w-[220px]"
+              className="w-[220px]"
               enableFormMessage={false}
             >
               {(field) => <CustomSelect {...field} options={trainingTypeOptions ?? []} />}
@@ -78,12 +77,12 @@ export const ExerciseSearchForm = ({ onSearch }: ExerciseSearchFormProps) => {
             >
               {(field) => <CustomSelect {...field} options={muscleGroupOptions ?? []} searchable />}
             </SimpleField>
-          </form>
-        </Form>
-        <Button variant="secondary" className="mt-6" onClick={handleSearch}>
-          <SearchIcon /> Tìm kiếm
-        </Button>
-      </CardContent>
-    </Card>
+          </div>
+          <CoreformSearchButton type="button" onClick={handleSearch}>
+            <SearchIcon className="size-4" /> Tìm kiếm
+          </CoreformSearchButton>
+        </form>
+      </Form>
+    </CoreformFilterCard>
   )
 }

@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/shared/ui/dialog"
+import { cn } from "@/lib/utils"
 import { AlertTriangle } from "lucide-react"
 
 interface ConfirmDialogProps {
@@ -48,17 +49,21 @@ export const ConfirmDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {icon || (variant === "destructive" && <AlertTriangle className="h-5 w-5 text-destructive" />)}
-            {title}
-          </DialogTitle>
+          <div className="mb-2 flex size-12 items-center justify-center rounded-2xl bg-earth/5 text-clay">
+            {icon || (variant === "destructive" ? <AlertTriangle className="size-5" /> : null)}
+          </div>
+          <DialogTitle>{title}</DialogTitle>
           {content && <DialogDescription className="text-left">{content}</DialogDescription>}
         </DialogHeader>
-        <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button variant="outline" onClick={handleCancel}>
+        <DialogFooter className="gap-2 sm:flex-row">
+          <Button variant="outline" className="rounded-full border-sand" onClick={handleCancel}>
             {cancelText}
           </Button>
-          <Button variant={variant === "destructive" ? "destructive" : "default"} onClick={handleConfirm}>
+          <Button
+            variant={variant === "destructive" ? "destructive" : "default"}
+            className={cn("rounded-full", variant === "default" && "bg-earth text-cream hover:bg-clay")}
+            onClick={handleConfirm}
+          >
             {confirmText}
           </Button>
         </DialogFooter>

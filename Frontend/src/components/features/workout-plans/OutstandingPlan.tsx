@@ -14,11 +14,11 @@ export function OutstandingPlan() {
 
   return (
     <div>
-      <div className="flex items-center gap-2 mb-4">
-        <Star className="w-5 h-5 text-yellow-500" />
-        <h3>Nổi bật</h3>
+      <div className="mb-5 flex items-center gap-2">
+        <Star className="size-5 text-clay" />
+        <h3 className="font-display text-lg font-medium text-earth">Nổi bật</h3>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {outstandingPlans?.map((plan) => (
           <WorkoutCard
             key={plan.id}

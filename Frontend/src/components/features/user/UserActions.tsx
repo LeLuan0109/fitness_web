@@ -1,5 +1,7 @@
 import { Ban, ShieldCheck } from "lucide-react"
 
+import { CoreformLiftLoader } from "@/components/shared/coreform"
+import { coreformDialogContentClass } from "@/components/shared/coreform/coreform-modal"
 import { Button } from "@/components/shared/ui/button"
 import {
   Dialog,
@@ -22,7 +24,6 @@ export const UserActions = ({ user }: UserActionsProps) => {
   const [open, setOpen] = useState(false)
   const { mutate: updateUserStatus, isPending } = useUpdateUserStatus()
 
-  // Only show actions for users with role "USER"
   if (user.role.name !== "USER") {
     return null
   }
@@ -42,18 +43,18 @@ export const UserActions = ({ user }: UserActionsProps) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {user.isLocked ? (
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2 rounded-full border-sand">
             <ShieldCheck className="size-4" />
             Mở khóa
           </Button>
         ) : (
-          <Button variant="destructive" size="sm" className="gap-2">
+          <Button variant="destructive" size="sm" className="gap-2 rounded-full">
             <Ban className="size-4" />
             Khóa
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className={coreformDialogContentClass}>
         <DialogHeader>
           <DialogTitle>{user.isLocked ? "Mở khóa người dùng" : "Khóa người dùng"}</DialogTitle>
           <DialogDescription>
@@ -62,12 +63,24 @@ export const UserActions = ({ user }: UserActionsProps) => {
               : `Bạn có chắc chắn muốn khóa tài khoản "${user.username}"? Người dùng sẽ không thể đăng nhập sau khi bị khóa.`}
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
+        <DialogFooter className="gap-2">
+          <Button variant="outline" className="rounded-full border-sand" onClick={() => setOpen(false)} disabled={isPending}>
             Hủy
           </Button>
-          <Button variant={user.isLocked ? "default" : "destructive"} onClick={handleConfirm} disabled={isPending}>
-            {isPending ? "Đang xử lý..." : "Xác nhận"}
+          <Button
+            variant={user.isLocked ? "default" : "destructive"}
+            className={user.isLocked ? "rounded-full bg-earth text-cream hover:bg-clay" : "rounded-full"}
+            onClick={handleConfirm}
+            disabled={isPending}
+          >
+            {isPending ? (
+              <span className="flex items-center gap-2">
+                <CoreformLiftLoader size="sm" />
+                Đang xử lý...
+              </span>
+            ) : (
+              "Xác nhận"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

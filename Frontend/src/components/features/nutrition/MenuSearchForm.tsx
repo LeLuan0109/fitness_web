@@ -1,5 +1,4 @@
-import { Button } from "@/components/shared/ui/button"
-import { Card, CardContent } from "@/components/shared/ui/card"
+import { CoreformFilterCard, CoreformSearchButton } from "@/components/shared/coreform"
 import { CustomSelect } from "@/components/shared/ui/custom-select"
 import { Form } from "@/components/shared/ui/form"
 import { Input } from "@/components/shared/ui/input"
@@ -67,140 +66,104 @@ export const MenuSearchForm = ({ onSearch }: MenuSearchFormProps) => {
   }
 
   return (
-    <Card className="border-none rounded-[20px]">
-      <CardContent>
-        <Form {...form}>
-          <form className="flex gap-4 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 w-full">
-              <SimpleField
-                label="Tên thực đơn"
-                name="title"
-                control={form.control}
-                className="col-span-1"
-                enableFormMessage={false}
-              >
-                {(field) => <Input {...field} />}
-              </SimpleField>
-
-              <SimpleField
-                label="Mục tiêu"
-                name="goal"
-                control={form.control}
-                className="col-span-1"
-                enableFormMessage={false}
-              >
-                {(field) => <CustomSelect {...field} options={dataFitnessGoals} />}
-              </SimpleField>
-
-              <SimpleField
-                label="Calories"
-                name="calories"
-                control={form.control}
-                className="col-span-1"
-                enableFormMessage={false}
-              >
-                {(field) => (
-                  <div>
-                    <Slider
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      min={0}
-                      max={3000}
-                      step={50}
-                      className="mt-2"
-                    />
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      {field.value?.[0]} - {field.value?.[1]} kcal
-                    </div>
-                  </div>
-                )}
-              </SimpleField>
-
-              <SimpleField
-                label="Protein (gram)"
-                name="protein"
-                control={form.control}
-                className="col-span-1"
-                enableFormMessage={false}
-              >
-                {(field) => (
-                  <div>
-                    <Slider
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      min={0}
-                      max={200}
-                      step={5}
-                      className="mt-2"
-                    />
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      {field.value?.[0]} - {field.value?.[1]} g
-                    </div>
-                  </div>
-                )}
-              </SimpleField>
-
-              <SimpleField
-                label="Carbs (gram)"
-                name="carbs"
-                control={form.control}
-                className="col-span-1"
-                enableFormMessage={false}
-              >
-                {(field) => (
-                  <div>
-                    <Slider
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      min={0}
-                      max={300}
-                      step={5}
-                      className="mt-2"
-                    />
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      {field.value?.[0]} - {field.value?.[1]} g
-                    </div>
-                  </div>
-                )}
-              </SimpleField>
-
-              <SimpleField
-                label="Fat (gram)"
-                name="fat"
-                control={form.control}
-                className="col-span-1"
-                enableFormMessage={false}
-              >
-                {(field) => (
-                  <div>
-                    <Slider
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      min={0}
-                      max={150}
-                      step={5}
-                      className="mt-2"
-                    />
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      {field.value?.[0]} - {field.value?.[1]} g
-                    </div>
-                  </div>
-                )}
-              </SimpleField>
-            </div>
-            <Button
-              type="button"
-              onClick={handleSearch}
-              variant="secondary"
-              aria-label="Tìm kiếm món ăn"
-              className="mt-7"
+    <CoreformFilterCard>
+      <Form {...form}>
+        <form className="flex flex-wrap items-start justify-between gap-6">
+          <div className="grid w-full flex-1 grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
+            <SimpleField
+              label="Tên thực đơn"
+              name="title"
+              control={form.control}
+              className="col-span-1"
+              enableFormMessage={false}
             >
-              <SearchIcon className="h-4 w-4" />
-              Tìm kiếm
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              {(field) => <Input {...field} className="rounded-xl border-sand/60 bg-cream/50" />}
+            </SimpleField>
+
+            <SimpleField
+              label="Mục tiêu"
+              name="goal"
+              control={form.control}
+              className="col-span-1"
+              enableFormMessage={false}
+            >
+              {(field) => <CustomSelect {...field} options={dataFitnessGoals} />}
+            </SimpleField>
+
+            <SimpleField
+              label="Calories"
+              name="calories"
+              control={form.control}
+              className="col-span-1"
+              enableFormMessage={false}
+            >
+              {(field) => (
+                <div>
+                  <Slider value={field.value} onValueChange={field.onChange} min={0} max={3000} step={50} className="mt-2" />
+                  <div className="mt-2 text-sm text-earth/60">
+                    {field.value?.[0]} - {field.value?.[1]} kcal
+                  </div>
+                </div>
+              )}
+            </SimpleField>
+
+            <SimpleField
+              label="Protein (gram)"
+              name="protein"
+              control={form.control}
+              className="col-span-1"
+              enableFormMessage={false}
+            >
+              {(field) => (
+                <div>
+                  <Slider value={field.value} onValueChange={field.onChange} min={0} max={200} step={5} className="mt-2" />
+                  <div className="mt-2 text-sm text-earth/60">
+                    {field.value?.[0]} - {field.value?.[1]} g
+                  </div>
+                </div>
+              )}
+            </SimpleField>
+
+            <SimpleField
+              label="Carbs (gram)"
+              name="carbs"
+              control={form.control}
+              className="col-span-1"
+              enableFormMessage={false}
+            >
+              {(field) => (
+                <div>
+                  <Slider value={field.value} onValueChange={field.onChange} min={0} max={300} step={5} className="mt-2" />
+                  <div className="mt-2 text-sm text-earth/60">
+                    {field.value?.[0]} - {field.value?.[1]} g
+                  </div>
+                </div>
+              )}
+            </SimpleField>
+
+            <SimpleField
+              label="Fat (gram)"
+              name="fat"
+              control={form.control}
+              className="col-span-1"
+              enableFormMessage={false}
+            >
+              {(field) => (
+                <div>
+                  <Slider value={field.value} onValueChange={field.onChange} min={0} max={150} step={5} className="mt-2" />
+                  <div className="mt-2 text-sm text-earth/60">
+                    {field.value?.[0]} - {field.value?.[1]} g
+                  </div>
+                </div>
+              )}
+            </SimpleField>
+          </div>
+          <CoreformSearchButton type="button" onClick={handleSearch} className="mt-7">
+            <SearchIcon className="size-4" />
+            Tìm kiếm
+          </CoreformSearchButton>
+        </form>
+      </Form>
+    </CoreformFilterCard>
   )
 }

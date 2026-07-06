@@ -1,14 +1,18 @@
 import { ExerciseCard } from "@/components/features/exercises/ExerciseCard"
 import { ExerciseSearchForm } from "@/components/features/exercises/ExercisesSearchForm"
-import { Button } from "@/components/shared/ui/button"
+import {
+  CoreformEmptyState,
+  CoreformLoadingState,
+  CoreformPageHeader,
+  CoreformPrimaryButton,
+} from "@/components/shared/coreform"
 import { CommonPagination } from "@/components/shared/ui/common-pagination"
-import { TypographyH3 } from "@/components/shared/ui/typography"
 import { ROUTES } from "@/constants/routes"
 import { useGetListExercises } from "@/hooks/queries/exercises/useGetListExercises"
 import authStore from "@/stores/auth.store"
 import { Role } from "@/types/enum"
 import { ExerciseSearchParams } from "@/types/exercises.type"
-import { Loader2, Plus } from "lucide-react"
+import { Dumbbell, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 
@@ -46,28 +50,32 @@ export const ExerciseList = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <TypographyH3 variant="bold">Danh sách bài tập</TypographyH3>
-        {isAdmin && (
-          <Button onClick={handleCreateExercise}>
-            <Plus /> Tạo bài tập
-          </Button>
-        )}
-      </div>
+    <div className="space-y-8">
+      <CoreformPageHeader
+        title="Danh sách bài tập"
+        description="Khám phá thư viện bài tập và tinh chỉnh kỹ thuật với AI."
+        action={
+          isAdmin ? (
+            <CoreformPrimaryButton onClick={handleCreateExercise}>
+              <Plus className="size-4" /> Tạo bài tập
+            </CoreformPrimaryButton>
+          ) : undefined
+        }
+      />
+
       <ExerciseSearchForm onSearch={setSearchParams} />
 
       {isFetchingExercises ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <CoreformLoadingState />
       ) : !hasResults ? (
-        <div className="flex justify-center items-center py-12">
-          <p className="text-muted-foreground text-lg">Không tìm thấy bài tập nào phù hợp với từ khóa tìm kiếm</p>
-        </div>
+        <CoreformEmptyState
+          icon={Dumbbell}
+          title="Không tìm thấy bài tập"
+          description="Không có bài tập nào phù hợp với từ khóa tìm kiếm. Thử điều chỉnh bộ lọc."
+        />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {dataListExercises.data.map((exercise) => (
               <ExerciseCard
                 id={exercise.id.toString()}
@@ -81,7 +89,6 @@ export const ExerciseList = () => {
             ))}
           </div>
 
-          {/* Common Pagination */}
           <CommonPagination
             currentPage={currentPage}
             totalPages={totalPages}

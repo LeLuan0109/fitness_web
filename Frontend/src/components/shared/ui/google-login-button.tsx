@@ -1,6 +1,7 @@
 import { Button } from "@/components/shared/ui/button"
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@/constants/api"
 import { useLoginWithGoogle } from "@/hooks/queries/auth/useAuthQuery"
+import transitionStore from "@/stores/transition.store"
 import { localStorageServices } from "@/utils/localStorageServices"
 import { useGoogleLogin } from "@react-oauth/google"
 import axios from "axios"
@@ -12,7 +13,9 @@ export function GoogleLoginButton() {
       onSuccess: (data) => {
         localStorageServices.setAccessToken(data.data?.accessToken ?? "")
         localStorageServices.setRefreshToken(data.data?.refreshToken ?? "")
-        window.location.href = "/"
+        transitionStore.getState().playEnter(() => {
+          window.location.href = "/"
+        })
       },
       onError: (error) => {
         toast.error(error.response?.data?.error.message || "Đăng nhập Google thất bại.")
@@ -55,7 +58,7 @@ export function GoogleLoginButton() {
   return (
     <Button
       variant="outline"
-      className="flex-1 bg-red-600/80 hover:bg-red-600 border-red-500 text-white"
+      className="flex-1 rounded-full border-sand/60 bg-white text-earth hover:border-clay hover:bg-cream"
       onClick={() => {
         googleLogin()
       }}

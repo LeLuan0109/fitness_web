@@ -1,6 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "./theme.css";
+@import "./dashboard.css";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -10,7 +10,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: "Inter", sans-serif;
+  font-family: "Inter", "Noto Sans Vietnamese", sans-serif;
   --sidebar: #eff6ff;
   --sidebar-foreground: #1d4ed8;
   --sidebar-primary: #1d4ed8;

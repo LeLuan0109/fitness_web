@@ -1,9 +1,31 @@
-import { Bell, ChevronDown, Loader2, LockIcon, LogOut, RefreshCw, User } from "lucide-react"
-import { Suspense, useCallback, useEffect, useState } from "react"
+import {
+  Activity,
+  Apple,
+  Bell,
+  Camera,
+  ChevronDown,
+  Compass,
+  Dumbbell,
+  Flame,
+  HeartPulse,
+  LayoutDashboard,
+  LockIcon,
+  LogOut,
+  Menu,
+  Newspaper,
+  RefreshCw,
+  ShieldCheck,
+  User,
+  Users,
+  type LucideIcon,
+} from "lucide-react"
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom"
 
 import { FloatingChatButton } from "@/components/features/chatbot"
+import { CoreformCursor, CoreformLiftLoader } from "@/components/shared/coreform"
 import { Badge } from "@/components/shared/ui/badge"
+import { Button } from "@/components/shared/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,17 +36,192 @@ import {
 } from "@/components/shared/ui/dropdown-menu"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/shared/ui/popover"
 import { ScrollArea } from "@/components/shared/ui/scroll-area"
-import { Separator } from "@/components/shared/ui/separator"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/shared/ui/sidebar"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/shared/ui/sheet"
 import { QUERY_KEYS } from "@/constants/querykeys.constant"
-import { ROUTES } from "@/constants/routes"
 import { ROLES } from "@/constants/roles.constant"
+import { ROUTES } from "@/constants/routes"
 import { useLogout } from "@/hooks/queries/auth/useAuthQuery"
 import { useNotifications } from "@/hooks/queries/notifications/useNotifications"
-import { AppSidebar } from "@/layouts/components/app-sidebar"
 import { queryClient } from "@/lib/react-query"
 import authStore from "@/stores/auth.store"
+import transitionStore from "@/stores/transition.store"
+import type { Notification as AppNotification } from "@/types/notification.type"
 import { toast } from "sonner"
+
+type NavigationItem = {
+  title: string
+  description: string
+  url: string
+  icon: LucideIcon
+}
+
+type NavigationGroup = {
+  label: string
+  icon: LucideIcon
+  items: NavigationItem[]
+}
+
+const userNavigationGroups: NavigationGroup[] = [
+  {
+    label: "Features",
+    icon: Activity,
+    items: [
+      {
+        title: "Smart Form Corrector",
+        description: "AI posture feedback for safer movement.",
+        url: ROUTES.EXERCISES.LIST,
+        icon: Camera,
+      },
+      {
+        title: "Vitals Analyzer",
+        description: "BMI, TDEE, calories, and training signals.",
+        url: ROUTES.HOME,
+        icon: HeartPulse,
+      },
+    ],
+  },
+  {
+    label: "Journey",
+    icon: Compass,
+    items: [
+      {
+        title: "Danh sách bài tập",
+        description: "Browse the movement library.",
+        url: ROUTES.EXERCISES.LIST,
+        icon: Dumbbell,
+      },
+      {
+        title: "Kế hoạch mẫu",
+        description: "Start from guided workout plans.",
+        url: ROUTES.WORKOUTS.SAMPLE_LIST,
+        icon: LayoutDashboard,
+      },
+      {
+        title: "Kế hoạch của tôi",
+        description: "Continue your personal roadmap.",
+        url: ROUTES.WORKOUTS.MY_LIST,
+        icon: ShieldCheck,
+      },
+    ],
+  },
+  {
+    label: "Nutrition",
+    icon: Apple,
+    items: [
+      {
+        title: "Thực đơn mẫu",
+        description: "Balanced menus for clear goals.",
+        url: ROUTES.NUTRITION.SAMPLE,
+        icon: Apple,
+      },
+      {
+        title: "Thực đơn của tôi",
+        description: "Review your saved meal plans.",
+        url: ROUTES.NUTRITION.MY_MEALS,
+        icon: Flame,
+      },
+      {
+        title: "Danh sách món ăn",
+        description: "Explore dishes and nutrition details.",
+        url: ROUTES.DISHES.LIST,
+        icon: HeartPulse,
+      },
+    ],
+  },
+  {
+    label: "Community",
+    icon: Users,
+    items: [
+      {
+        title: "Bảng feed",
+        description: "See updates from the fitness community.",
+        url: ROUTES.COMMUNITY.FEED,
+        icon: Newspaper,
+      },
+      {
+        title: "Bài viết của tôi",
+        description: "Manage your shared progress.",
+        url: ROUTES.COMMUNITY.MY_POSTS,
+        icon: User,
+      },
+    ],
+  },
+]
+
+const adminNavigationGroups: NavigationGroup[] = [
+  {
+    label: "Admin",
+    icon: LayoutDashboard,
+    items: [
+      {
+        title: "Dashboard",
+        description: "Overview of platform activity.",
+        url: ROUTES.ADMIN.DASHBOARD,
+        icon: LayoutDashboard,
+      },
+      {
+        title: "Quản lý người dùng",
+        description: "Review members and account status.",
+        url: ROUTES.ADMIN.USERS,
+        icon: Users,
+      },
+    ],
+  },
+  {
+    label: "Journey",
+    icon: Compass,
+    items: [
+      {
+        title: "Danh sách bài tập",
+        description: "Manage the exercise library.",
+        url: ROUTES.EXERCISES.LIST,
+        icon: Dumbbell,
+      },
+      {
+        title: "Kế hoạch mẫu",
+        description: "Review sample workout plans.",
+        url: ROUTES.WORKOUTS.SAMPLE_LIST,
+        icon: ShieldCheck,
+      },
+    ],
+  },
+  {
+    label: "Nutrition",
+    icon: Apple,
+    items: [
+      {
+        title: "Thực đơn mẫu",
+        description: "Review curated meal plans.",
+        url: ROUTES.NUTRITION.SAMPLE,
+        icon: Apple,
+      },
+      {
+        title: "Danh sách món ăn",
+        description: "Manage dishes and nutrition data.",
+        url: ROUTES.DISHES.LIST,
+        icon: HeartPulse,
+      },
+      {
+        title: "Danh sách nguyên liệu",
+        description: "Maintain ingredient records.",
+        url: ROUTES.INGREDIENTS.LIST,
+        icon: Flame,
+      },
+    ],
+  },
+  {
+    label: "Community",
+    icon: Users,
+    items: [
+      {
+        title: "Bảng feed",
+        description: "Moderate community activity.",
+        url: ROUTES.COMMUNITY.FEED,
+        icon: Newspaper,
+      },
+    ],
+  },
+]
 
 export default function AppLayout() {
   const auth = authStore.use.auth()
@@ -32,16 +229,15 @@ export default function AppLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const [notificationOpen, setNotificationOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isAdmin = auth?.role?.name === ROLES.ADMIN
-  // Redirect người dùng về trang phù hợp với role khi vào "/"
+  const navigationGroups = useMemo(() => (isAdmin ? adminNavigationGroups : userNavigationGroups), [isAdmin])
+
   useEffect(() => {
-    if (auth && location.pathname === "/") {
-      if (isAdmin) {
-        navigate(ROUTES.ADMIN.DASHBOARD, { replace: true })
-      }
-      // User sẽ ở lại trang HOME (Dashboard)
+    if (auth && location.pathname === "/" && isAdmin) {
+      navigate(ROUTES.ADMIN.DASHBOARD, { replace: true })
     }
-  }, [auth, location.pathname, navigate])
+  }, [auth, isAdmin, location.pathname, navigate])
 
   useEffect(() => {
     const channel = new BroadcastChannel("notification_broadcast_channel")
@@ -60,13 +256,12 @@ export default function AppLayout() {
       channel.removeEventListener("message", handleMessage)
       channel.close()
     }
-  }, [queryClient])
+  }, [])
 
-  // Sử dụng hook notifications với infinite scroll
   const { notifications, unreadCount, markAsRead, loadMore, hasMore, isLoadingMore, refetch, isRefetching } =
     useNotifications()
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = (notification: AppNotification) => {
     if (!notification.isRead) {
       markAsRead(notification.id)
       queryClient.invalidateQueries({
@@ -108,11 +303,17 @@ export default function AppLayout() {
     config: {
       onSuccess: () => {
         toast.success("Đăng xuất thành công")
-        clearAuth()
+        transitionStore.getState().playExit(() => {
+          clearAuth()
+          navigate(ROUTES.AUTH.LOGIN)
+        })
       },
       onError: () => {
         toast.error("Đăng xuất thất bại")
-        clearAuth()
+        transitionStore.getState().playExit(() => {
+          clearAuth()
+          navigate(ROUTES.AUTH.LOGIN)
+        })
       },
     },
   })
@@ -133,97 +334,192 @@ export default function AppLayout() {
     mutateLogout({ token: localStorage.getItem("access_token") || "" })
   }
 
-  return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center px-4 gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b border-border bg-background">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-          </div>
+  const handleNavigate = (url: string) => {
+    setMobileMenuOpen(false)
+    navigate(url)
+  }
 
-          <div className="ml-auto flex items-center space-x-5">
-            {/* Notification */}
+  const getStartedRoute = isAdmin ? ROUTES.ADMIN.DASHBOARD : ROUTES.WORKOUTS.SAMPLE_LIST
+
+  return (
+    <div className="coreform-app min-h-svh bg-cream text-earth">
+      <CoreformCursor />
+      <header className="sticky top-0 z-50 border-b border-sand/40 bg-cream/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full text-earth hover:bg-sand-light/60 hover:text-earth lg:hidden"
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open navigation"
+          >
+            <Menu className="size-5" />
+          </Button>
+
+          <button
+            type="button"
+            className="font-display flex shrink-0 items-center gap-2.5 text-xl font-bold tracking-tight text-earth transition duration-300 ease-in-out hover:text-clay"
+            onClick={() => navigate(ROUTES.HOME)}
+          >
+            <span className="flex size-7 items-center justify-center rounded-full bg-earth">
+              <span className="size-2.5 rounded-full bg-clay" />
+            </span>
+            COREFORM
+          </button>
+
+          <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex" aria-label="Main navigation">
+            {navigationGroups.map((group) => {
+              const GroupIcon = group.icon
+
+              return (
+                <DropdownMenu key={group.label}>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      data-cursor-hover=""
+                      className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-earth/80 transition duration-300 ease-in-out hover:bg-sand-light/60 hover:text-earth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/30 data-[state=open]:bg-sand-light/60 data-[state=open]:text-earth"
+                    >
+                      <GroupIcon className="size-4 text-clay" />
+                      {group.label}
+                      <ChevronDown className="size-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="center"
+                    className="w-80 rounded-2xl border-sand bg-white p-2 text-earth shadow-xl shadow-earth/10"
+                  >
+                    <DropdownMenuGroup>
+                      {group.items.map((item) => {
+                        const ItemIcon = item.icon
+
+                        return (
+                          <DropdownMenuItem
+                            key={item.title}
+                            className="cursor-pointer rounded-xl p-3 transition duration-300 ease-in-out focus:bg-sand-light/60 focus:text-earth"
+                            onClick={() => handleNavigate(item.url)}
+                          >
+                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-earth/5 text-clay">
+                              <ItemIcon className="size-5" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-earth">{item.title}</p>
+                              <p className="mt-1 text-xs leading-5 text-earth/60">{item.description}</p>
+                            </div>
+                          </DropdownMenuItem>
+                        )
+                      })}
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )
+            })}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="ghost"
+              className="hidden rounded-full px-3 text-earth/80 transition duration-300 ease-in-out hover:bg-sand-light/60 hover:text-earth sm:inline-flex"
+              onClick={navigateToProfile}
+            >
+              {auth?.username || "Sign In"}
+            </Button>
+
+            <Button
+              className="hidden rounded-full bg-clay px-6 text-sm font-medium text-cream shadow-sm transition duration-300 ease-in-out hover:scale-105 hover:bg-earth md:inline-flex"
+              onClick={() => handleNavigate(getStartedRoute)}
+            >
+              Bắt đầu ngay
+            </Button>
+
             <Popover open={notificationOpen} onOpenChange={setNotificationOpen}>
               <PopoverTrigger asChild>
-                <div className="relative w-fit cursor-pointer">
+                <button
+                  type="button"
+                  className="relative flex size-10 items-center justify-center rounded-full text-earth transition duration-300 ease-in-out hover:bg-sand-light/60"
+                  aria-label="Notifications"
+                >
                   <Bell className="size-5" />
                   {unreadCount > 0 && (
                     <Badge
-                      className="absolute -end-2.5 -top-2.5 h-5 min-w-5 rounded-full px-1 tabular-nums"
+                      className="absolute -end-1.5 -top-1.5 h-5 min-w-5 rounded-full bg-[#B35F4A] px-1 text-white tabular-nums"
                       variant="destructive"
                     >
                       {unreadCount}
                     </Badge>
                   )}
-                </div>
+                </button>
               </PopoverTrigger>
-              <PopoverContent className="p-0 w-80">
-                <div className="px-4 py-3 border-b bg-muted/20 flex items-center justify-between">
-                  <h4 className="font-medium text-sm">Thông báo</h4>
+              <PopoverContent className="w-[min(92vw,22rem)] overflow-hidden rounded-2xl border-sand bg-white p-0 text-earth shadow-xl shadow-earth/10 sm:w-96">
+                <div className="flex items-center justify-between border-b border-sand/40 bg-sand-light/40 px-5 py-4">
+                  <div>
+                    <h4 className="font-display text-base font-medium text-earth">Thông báo</h4>
+                    {unreadCount > 0 && (
+                      <p className="mt-0.5 text-xs text-earth/50">{unreadCount} chưa đọc</p>
+                    )}
+                  </div>
                   <button
                     onClick={handleRefreshNotifications}
                     disabled={isRefetching}
-                    className="p-1 hover:bg-muted rounded-md transition-colors disabled:opacity-50"
+                    className="flex size-9 items-center justify-center rounded-full text-earth/60 transition-colors hover:bg-white hover:text-clay disabled:opacity-50"
                     title="Tải lại thông báo"
                   >
                     <RefreshCw className={`size-4 ${isRefetching ? "animate-spin" : ""}`} />
                   </button>
                 </div>
-                <ScrollArea className="h-72 w-full" onScrollEndCapture={handleScroll}>
-                  <ul className="divide-y">
+                <ScrollArea className="h-80 w-full" onScrollEndCapture={handleScroll}>
+                  <ul className="divide-y divide-sand/30">
                     {notifications.length > 0 ? (
                       <>
                         {notifications.map((notification) => (
                           <li
                             key={notification.id}
-                            className={`px-4 py-3 text-sm hover:bg-muted/50 cursor-pointer transition-all duration-200 ${
+                            className={`cursor-pointer px-5 py-4 text-sm transition-all duration-200 hover:bg-sand-light/40 ${
                               !notification.isRead
-                                ? "bg-muted/30 border-l-4 border-l-primary shadow-sm"
-                                : "border-l-4 border-l-transparent"
+                                ? "border-l-[3px] border-l-clay bg-sand-light/30"
+                                : "border-l-[3px] border-l-transparent bg-white"
                             }`}
                             onClick={() => handleNotificationClick(notification)}
                           >
-                            <div className="flex justify-between items-start">
+                            <div className="flex items-start justify-between gap-3">
                               <div className="flex-1">
-                                <div className={`${!notification.isRead ? "font-semibold" : "font-medium"}`}>
+                                <div className={`text-earth ${!notification.isRead ? "font-semibold" : "font-medium"}`}>
                                   {notification.title}
                                 </div>
-                                <div className="text-muted-foreground text-xs mt-1">{notification.content}</div>
-                                <div className="text-muted-foreground text-xs mt-1">{notification.createdAt}</div>
+                                <div className="mt-1 text-xs leading-relaxed text-earth/60">{notification.content}</div>
+                                <div className="mt-2 text-[11px] text-earth/40">{notification.createdAt}</div>
                                 {notification.referenceUrl && (
-                                  <div className="text-xs text-primary mt-1">👆 Click để xem chi tiết</div>
+                                  <div className="mt-2 text-xs font-medium text-clay">Nhấn để xem chi tiết →</div>
                                 )}
                               </div>
                               {!notification.isRead && (
-                                <div className="w-2 h-2 bg-primary rounded-full ml-2 mt-1 flex-shrink-0 animate-pulse" />
+                                <div className="mt-1 size-2 shrink-0 animate-pulse rounded-full bg-clay" />
                               )}
                             </div>
                           </li>
                         ))}
 
-                        {/* Loading indicator */}
                         {isLoadingMore && (
-                          <li className="px-4 py-3 text-center">
-                            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                              <Loader2 className="w-4 h-4 animate-spin" />
+                          <li className="px-5 py-4 text-center">
+                            <div className="flex items-center justify-center gap-2 text-sm text-earth/50">
+                              <CoreformLiftLoader size="sm" />
                               Đang tải thêm...
                             </div>
                           </li>
                         )}
 
-                        {/* No more data indicator */}
                         {!hasMore && notifications.length > 0 && (
-                          <li className="px-4 py-3 text-center text-xs text-muted-foreground">
-                            📄 Đã hiển thị tất cả thông báo
+                          <li className="px-5 py-4 text-center text-xs text-earth/40">
+                            Đã hiển thị tất cả thông báo
                           </li>
                         )}
                       </>
                     ) : (
-                      <li className="px-4 py-8 text-sm text-center text-muted-foreground">
-                        <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                        Không có thông báo nào
+                      <li className="px-5 py-12 text-center">
+                        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-earth/5 text-clay">
+                          <Bell className="size-5" />
+                        </div>
+                        <p className="font-display text-base font-medium text-earth">Không có thông báo</p>
+                        <p className="mt-1 text-xs text-earth/50">Bạn sẽ nhận cập nhật tại đây</p>
                       </li>
                     )}
                   </ul>
@@ -231,60 +527,110 @@ export default function AppLayout() {
               </PopoverContent>
             </Popover>
 
-            {/* User dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 rounded-md px-2 py-1 transition-colors">
-                  <span className="text-sm truncate max-w-[300px]">{auth?.username}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </div>
+                <button
+                  type="button"
+                  className="flex items-center gap-2 rounded-full px-2 py-2 text-earth transition-colors hover:bg-sand-light/60"
+                >
+                  <span className="hidden max-w-[180px] truncate text-sm sm:inline">{auth?.username}</span>
+                  <ChevronDown className="size-4" />
+                </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
+              <DropdownMenuContent className="w-56 rounded-2xl border-sand bg-white text-earth">
                 <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={navigateToProfile}>
+                  <DropdownMenuItem className="cursor-pointer focus:bg-sand-light/60" onClick={navigateToProfile}>
                     <User />
                     <span>Hồ sơ</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={navigateToChangePassword}>
+                  <DropdownMenuItem className="cursor-pointer focus:bg-sand-light/60" onClick={navigateToChangePassword}>
                     <LockIcon />
                     <span>Đổi mật khẩu</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem className="cursor-pointer focus:bg-sand-light/60" onClick={handleLogout}>
                   <LogOut />
                   <span>Đăng xuất</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Content */}
-        <Suspense
-          fallback={
-            <div className="flex flex-1 flex-col gap-4 p-4 animate-pulse">
-              <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div className="aspect-video rounded-xl bg-muted/50" />
-                <div className="aspect-video rounded-xl bg-muted/50" />
-                <div className="aspect-video rounded-xl bg-muted/50" />
-              </div>
-              <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-            </div>
-          }
-        >
-          <div className="flex flex-1 flex-col gap-4 px-4 bg-background @container/main:px-6 @container/main:py-4">
-            <div className="@container/main flex flex-1 flex-col gap-2">
-              <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                <Outlet />
-              </div>
-            </div>
-          </div>
-        </Suspense>
-      </SidebarInset>
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="left" className="w-[min(88vw,380px)] border-sand bg-cream p-0 text-earth">
+          <SheetHeader className="border-b border-sand/40 px-5 py-4 text-left">
+            <SheetTitle className="font-display flex items-center gap-2.5 text-xl font-bold text-earth">
+              <span className="flex size-7 items-center justify-center rounded-full bg-earth">
+                <span className="size-2.5 rounded-full bg-clay" />
+              </span>
+              COREFORM
+            </SheetTitle>
+          </SheetHeader>
+          <nav className="space-y-6 overflow-y-auto px-5 py-5" aria-label="Mobile navigation">
+            {navigationGroups.map((group) => {
+              const GroupIcon = group.icon
 
-      {/* Floating Chat Button */}
+              return (
+                <div key={group.label}>
+                  <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-clay">
+                    <GroupIcon className="size-4" />
+                    {group.label}
+                  </div>
+                  <div className="space-y-2">
+                    {group.items.map((item) => {
+                      const ItemIcon = item.icon
+
+                      return (
+                        <button
+                          key={item.title}
+                          type="button"
+                          className="flex w-full items-start gap-3 rounded-2xl border border-sand/60 bg-white p-3 text-left transition duration-300 ease-in-out hover:border-clay/40 hover:bg-sand-light/40"
+                          onClick={() => handleNavigate(item.url)}
+                        >
+                          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-earth/5 text-clay">
+                            <ItemIcon className="size-5" />
+                          </span>
+                          <span>
+                            <span className="block text-sm font-semibold text-earth">{item.title}</span>
+                            <span className="mt-1 block text-xs leading-5 text-earth/60">{item.description}</span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+
+            <Button
+              className="w-full rounded-full bg-clay text-cream transition duration-300 ease-in-out hover:bg-earth"
+              onClick={() => handleNavigate(getStartedRoute)}
+            >
+              Bắt đầu ngay
+            </Button>
+          </nav>
+        </SheetContent>
+      </Sheet>
+
+      <Suspense
+        fallback={
+          <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-7xl flex-1 flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="aspect-video rounded-lg bg-[#E8DDD4]" />
+              <div className="aspect-video rounded-lg bg-[#E8DDD4]" />
+              <div className="aspect-video rounded-lg bg-[#E8DDD4]" />
+            </div>
+            <div className="min-h-[60vh] flex-1 rounded-lg bg-[#F4EFEA]" />
+          </main>
+        }
+      >
+        <Outlet />
+      </Suspense>
+
       {!isAdmin && <FloatingChatButton />}
-    </SidebarProvider>
+    </div>
   )
 }

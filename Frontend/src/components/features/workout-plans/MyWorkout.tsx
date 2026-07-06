@@ -1,14 +1,17 @@
-import { Button } from "@/components/shared/ui/button"
-import { Card, CardContent } from "@/components/shared/ui/card"
+import {
+  CoreformEmptyState,
+  CoreformLoadingState,
+  CoreformPageHeader,
+  CoreformPrimaryButton,
+} from "@/components/shared/coreform"
 import { CommonPagination } from "@/components/shared/ui/common-pagination"
 import { ConfirmDialog } from "@/components/shared/ui/confirm-dialog"
-import { TypographyH3 } from "@/components/shared/ui/typography"
 import { ROUTES } from "@/constants/routes"
 import { useDisclosure } from "@/hooks/common/use-disclosure"
 import { useDeletePlan } from "@/hooks/queries/workout-plan/useDeletePlan"
 import { useGetMyPlans } from "@/hooks/queries/workout-plan/useGetMyPlans"
 import { WorkoutPlanSearchParams } from "@/types/workout-plan.type"
-import { Calendar, Loader2, Plus } from "lucide-react"
+import { Calendar, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { generatePath, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
@@ -40,7 +43,6 @@ export const MyWorkout = () => {
     },
   })
 
-  // Pagination logic
   const hasResults = myPlansData?.data && myPlansData.data.length > 0
   const pagination = myPlansData?.pagination
   const currentPage = (searchParams?.page || 0) + 1
@@ -52,11 +54,11 @@ export const MyWorkout = () => {
     }
   }, [searchParams, refetchMyPlans])
 
-  const handleViewDetail = (plan: any) => {
+  const handleViewDetail = (plan: { id: number }) => {
     navigate(generatePath(ROUTES.WORKOUTS.DETAIL, { id: plan.id.toString() }))
   }
 
-  const handleEditPlan = (plan: any) => {
+  const handleEditPlan = (plan: { id: number }) => {
     navigate(generatePath(ROUTES.WORKOUTS.EDIT, { id: plan.id.toString() }))
   }
 
@@ -67,20 +69,20 @@ export const MyWorkout = () => {
 
   const handleConfirmDelete = () => {
     if (deletingPlanId) {
-      deletePlan(deletingPlanId.toString()) // Gọi mutation để xóa
+      deletePlan(deletingPlanId.toString())
     }
     onOpenChange(false)
   }
 
   const handleCancelDelete = () => {
-    setDeletingPlanId(null) // Reset planId khi hủy
-    onOpenChange(false) // Đóng dialog
+    setDeletingPlanId(undefined)
+    onOpenChange(false)
   }
 
   const handleSearch = (params: WorkoutPlanSearchParams) => {
     setSearchParams({
       ...params,
-      page: 0, // Reset to first page when searching
+      page: 0,
     })
   }
 
@@ -97,37 +99,42 @@ export const MyWorkout = () => {
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <TypographyH3 variant="bold">Kế hoạch tập luyện của tôi</TypographyH3>
-          <Button onClick={navigateToCreatePlan}>
-            <Plus className="w-4 h-4 mr-2" />
-            Tạo kế hoạch mới
-          </Button>
-        </div>
+      <div className="space-y-8">
+        <CoreformPageHeader
+          title="Kế hoạch tập luyện của tôi"
+          description="Quản lý và theo dõi lộ trình tập luyện cá nhân của bạn."
+          action={
+            <CoreformPrimaryButton onClick={navigateToCreatePlan}>
+              <Plus className="size-4" />
+              Tạo kế hoạch mới
+            </CoreformPrimaryButton>
+          }
+        />
 
         <WorkoutsSearchForm onSearch={handleSearch} />
 
         {isFetchingMyPlans ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <CoreformLoadingState />
         ) : !hasResults ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="mb-2">Không tìm thấy kế hoạch nào</h3>
-              <p className="text-muted-foreground mb-4">Không có kế hoạch nào phù hợp với từ khóa tìm kiếm</p>
-            </CardContent>
-          </Card>
+          <CoreformEmptyState
+            icon={Calendar}
+            title="Không tìm thấy kế hoạch nào"
+            description="Không có kế hoạch nào phù hợp với từ khóa tìm kiếm."
+            action={
+              <CoreformPrimaryButton onClick={navigateToCreatePlan}>
+                <Plus className="size-4" />
+                Tạo kế hoạch đầu tiên
+              </CoreformPrimaryButton>
+            }
+          />
         ) : (
           <>
             <div>
-              <h3 className="mb-4">
+              <h3 className="font-display mb-5 text-lg font-medium text-earth">
                 Kế hoạch của bạn
-                {pagination?.total && ` (${pagination.total} kế hoạch)`}
+                {pagination?.total ? ` (${pagination.total} kế hoạch)` : ""}
               </h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {myPlansData.data.map((plan) => (
                   <WorkoutCard
                     key={plan.id}
@@ -141,7 +148,6 @@ export const MyWorkout = () => {
               </div>
             </div>
 
-            {/* Common Pagination */}
             <CommonPagination
               currentPage={currentPage}
               totalPages={totalPages}

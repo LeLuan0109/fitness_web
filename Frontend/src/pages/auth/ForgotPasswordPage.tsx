@@ -3,7 +3,7 @@ import { PageLayout } from "@/layouts/PageLayout"
 
 export function ForgotPasswordPage() {
   return (
-    <PageLayout title="Forgot Password">
+    <PageLayout title="Forgot Password" variant="landing">
       <ForgotPasswordForm />
     </PageLayout>
   )

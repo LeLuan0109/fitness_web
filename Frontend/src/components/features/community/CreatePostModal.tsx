@@ -1,3 +1,5 @@
+import { CoreformLiftLoader } from "@/components/shared/coreform"
+import { coreformDialogContentWideClass, coreformInputClass, coreformTextareaClass } from "@/components/shared/coreform/coreform-modal"
 import { Button } from "@/components/shared/ui/button"
 import {
   Dialog,
@@ -18,7 +20,7 @@ import { queryClient } from "@/lib/react-query"
 import { CreatePostFormData, createPostSchema } from "@/schemas/post.schema"
 import { CreatePostRequest } from "@/types/forum.type"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, X } from "lucide-react"
+import { X } from "lucide-react"
 import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -136,26 +138,26 @@ export const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="min-w-3xl max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className={coreformDialogContentWideClass}>
         <DialogHeader>
           <DialogTitle>Tạo bài viết mới</DialogTitle>
           <DialogDescription>Chia sẻ suy nghĩ của bạn với cộng đồng</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-            {/* Title Input */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 py-2">
             <SimpleField control={form.control} name="title" label="Tiêu đề" required>
-              {(field) => <Input {...field} placeholder="Nhập tiêu đề bài viết..." disabled={isPending} />}
+              {(field) => (
+                <Input {...field} placeholder="Nhập tiêu đề bài viết..." disabled={isPending} className={coreformInputClass} />
+              )}
             </SimpleField>
 
-            {/* Content TextArea */}
             <SimpleField control={form.control} name="content" label="Nội dung" required>
               {(field) => (
                 <textarea
                   {...field}
                   placeholder="Viết nội dung bài viết của bạn..."
-                  className="min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className={coreformTextareaClass}
                   disabled={isPending}
                 />
               )}
@@ -178,7 +180,7 @@ export const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) =>
                 variant="outline"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full"
+                className="w-full rounded-full border-sand bg-cream/50"
               >
                 Chọn hình ảnh
               </Button>
@@ -216,7 +218,7 @@ export const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) =>
                 variant="outline"
                 onClick={() => videoInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full"
+                className="w-full rounded-full border-sand bg-cream/50"
               >
                 Chọn video
               </Button>
@@ -237,16 +239,16 @@ export const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) =>
               )}
             </div>
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCancel} disabled={isPending}>
+            <DialogFooter className="gap-2 pt-2">
+              <Button type="button" variant="outline" className="rounded-full border-sand" onClick={handleCancel} disabled={isPending}>
                 Hủy
               </Button>
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" className="rounded-full bg-earth text-cream hover:bg-clay" disabled={isPending}>
                 {isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <span className="flex items-center gap-2">
+                    <CoreformLiftLoader size="sm" />
                     Đang đăng...
-                  </>
+                  </span>
                 ) : (
                   "Đăng bài"
                 )}

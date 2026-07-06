@@ -1,15 +1,19 @@
-import { Button } from "@/components/shared/ui/button"
-import { TypographyH3 } from "@/components/shared/ui/typography"
+import {
+  CoreformEmptyState,
+  CoreformLoadingState,
+  CoreformPageHeader,
+  CoreformPrimaryButton,
+} from "@/components/shared/coreform"
+import { CommonPagination } from "@/components/shared/ui/common-pagination"
 import { ROUTES } from "@/constants/routes"
 import { useGetSampleMenu } from "@/hooks/queries/menus/useGetSampleMenu"
 import authStore from "@/stores/auth.store"
 import { MenuSearhParams } from "@/types/meal.type"
-import { Loader2 } from "lucide-react"
+import { UtensilsCrossed } from "lucide-react"
 import { useState } from "react"
 import { generatePath, useNavigate } from "react-router"
 import { MenuCard } from "./MenuCard"
 import { MenuSearchForm } from "./MenuSearchForm"
-import { CommonPagination } from "@/components/shared/ui/common-pagination"
 
 export function SampleMenu() {
   const navigate = useNavigate()
@@ -39,38 +43,49 @@ export function SampleMenu() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <TypographyH3 variant="bold">Thực đơn mẫu</TypographyH3>
-        {isAdmin && <Button onClick={() => navigate(ROUTES.NUTRITION.CREATE_MENU)}>Tạo thực đơn mới</Button>}
-      </div>
-      <MenuSearchForm onSearch={handleSearch} />
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {isLoading ? (
-          <Loader2 className="animate-spin self-center" />
-        ) : menus && menus.length > 0 ? (
-          menus.map((menu) => (
-            <MenuCard
-              key={menu.id}
-              menu={menu}
-              onDetailClick={() => handleViewDetail(menu.id)}
-              onUpdateClick={() => {}}
-              onDeleteClick={() => {}}
-            />
-          ))
-        ) : (
-          <p className="text-center text-muted-foreground">Không có thực đơn mẫu nào</p>
-        )}
-      </div>
+    <div className="space-y-8">
+      <CoreformPageHeader
+        title="Thực đơn mẫu"
+        description="Khám phá thực đơn cân bằng được thiết kế cho từng mục tiêu dinh dưỡng."
+        action={
+          isAdmin ? (
+            <CoreformPrimaryButton onClick={() => navigate(ROUTES.NUTRITION.CREATE_MENU)}>
+              Tạo thực đơn mới
+            </CoreformPrimaryButton>
+          ) : undefined
+        }
+      />
 
-      {!isLoading && totalPages > 1 && (
-        <CommonPagination
-          currentPage={(searchParams.page ?? 0) + 1}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          pageSize={searchParams.size ?? 12}
-          total={total}
-        />
+      <MenuSearchForm onSearch={handleSearch} />
+
+      {isLoading ? (
+        <CoreformLoadingState />
+      ) : menus.length === 0 ? (
+        <CoreformEmptyState icon={UtensilsCrossed} title="Không có thực đơn mẫu nào" />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {menus.map((menu) => (
+              <MenuCard
+                key={menu.id}
+                menu={menu}
+                onDetailClick={() => handleViewDetail(menu.id)}
+                onUpdateClick={() => {}}
+                onDeleteClick={() => {}}
+              />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <CommonPagination
+              currentPage={(searchParams.page ?? 0) + 1}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              pageSize={searchParams.size ?? 12}
+              total={total}
+            />
+          )}
+        </>
       )}
     </div>
   )

@@ -1,3 +1,4 @@
+import { CoreformEmptyState, CoreformLoadingState, CoreformPageHeader, CoreformPrimaryButton } from "@/components/shared/coreform"
 import { Button } from "@/components/shared/ui/button"
 import {
   Dialog,
@@ -7,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/shared/ui/dialog"
-import { TypographyH3 } from "@/components/shared/ui/typography"
 import { ROUTES } from "@/constants/routes"
 import { useDisclosure } from "@/hooks/common/use-disclosure"
 import { useDeletePost } from "@/hooks/queries/forum/useDeletePost"
@@ -15,7 +15,8 @@ import { useGetMyPosts } from "@/hooks/queries/forum/useGetMyPosts"
 import { useToggleLikePost } from "@/hooks/queries/forum/useToggleLikePost"
 import authStore from "@/stores/auth.store"
 import { PostSearchParams } from "@/types/forum.type"
-import { Loader2 } from "lucide-react"
+import { format } from "date-fns"
+import { PenLine } from "lucide-react"
 import { useState } from "react"
 import { generatePath, useNavigate } from "react-router-dom"
 import { CreatePost } from "./CreatePost"
@@ -23,7 +24,6 @@ import { CreatePostModal } from "./CreatePostModal"
 import { EditPostModal } from "./EditPostModal"
 import { PostCard } from "./PostCard"
 import { FilterTabs, PostFilters } from "./FilterTabs"
-import { format } from "date-fns"
 
 export const MyPosts = () => {
   const navigate = useNavigate()
@@ -46,7 +46,6 @@ export const MyPosts = () => {
     order: "DESC",
   })
 
-  // Update search params when filters change
   const apiParams: PostSearchParams = {
     ...searchParams,
     key: filters.key,
@@ -98,7 +97,6 @@ export const MyPosts = () => {
 
   const handleFiltersChange = (newFilters: PostFilters) => {
     setFilters(newFilters)
-    // Reset to first page when filters change
     setSearchParams((prev) => ({
       ...prev,
       page: 0,
@@ -106,40 +104,33 @@ export const MyPosts = () => {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <TypographyH3 variant="bold">Bài viết của tôi</TypographyH3>
-      </div>
+    <div className="space-y-6">
+      <CoreformPageHeader title="Bài viết của tôi" description="Quản lý và chia sẻ bài viết cá nhân của bạn." />
 
-      {/* Create Post Card */}
       <CreatePost
         userAvatar={auth?.avatar || "https://i.pravatar.cc/150?img=1"}
         userName={auth?.name || "User"}
         onCreateClick={handleCreatePost}
       />
 
-      {/* Filter Tabs */}
       <FilterTabs filters={filters} onFiltersChange={handleFiltersChange} />
 
-      {/* Posts List */}
       {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <CoreformLoadingState />
       ) : posts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            {filters.key || filters.startDate || filters.endDate
+        <CoreformEmptyState
+          icon={PenLine}
+          title={
+            filters.key || filters.startDate || filters.endDate
               ? "Không tìm thấy bài viết nào"
-              : "Bạn chưa có bài viết nào"}
-          </p>
-          {!filters.key && !filters.startDate && !filters.endDate && (
-            <Button className="mt-4" onClick={handleCreatePost}>
-              Tạo bài viết đầu tiên
-            </Button>
-          )}
-        </div>
+              : "Bạn chưa có bài viết nào"
+          }
+          action={
+            !filters.key && !filters.startDate && !filters.endDate ? (
+              <CoreformPrimaryButton onClick={handleCreatePost}>Tạo bài viết đầu tiên</CoreformPrimaryButton>
+            ) : undefined
+          }
+        />
       ) : (
         <div className="space-y-3">
           {posts.map((post) => (
@@ -165,9 +156,8 @@ export const MyPosts = () => {
         </div>
       )}
 
-      {/* Pagination Info */}
       {pagination && posts.length > 0 && (
-        <div className="flex justify-center items-center gap-2 py-4 text-sm text-muted-foreground">
+        <div className="flex justify-center items-center gap-2 py-4 text-sm text-earth/50">
           <span>
             Trang {pagination.page + 1} / {pagination.totalPages}
           </span>
@@ -176,10 +166,8 @@ export const MyPosts = () => {
         </div>
       )}
 
-      {/* Create Post Modal */}
       <CreatePostModal open={isCreateModalOpen} onOpenChange={onOpenChangeCreateModal} />
 
-      {/* Edit Post Modal */}
       {editingPostId && (
         <EditPostModal
           open={isEditModalOpen}
@@ -193,20 +181,19 @@ export const MyPosts = () => {
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl border-sand">
           <DialogHeader>
-            <DialogTitle>Xác nhận xóa bài viết</DialogTitle>
+            <DialogTitle className="font-display">Xác nhận xóa bài viết</DialogTitle>
             <DialogDescription>
               Bạn có chắc chắn muốn xóa bài viết này? Hành động này không thể hoàn tác.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+            <Button variant="outline" className="rounded-full border-sand" onClick={() => setShowDeleteDialog(false)}>
               Hủy
             </Button>
-            <Button variant="destructive" onClick={confirmDelete} disabled={deletePostMutation.isPending}>
+            <Button variant="destructive" className="rounded-full" onClick={confirmDelete} disabled={deletePostMutation.isPending}>
               {deletePostMutation.isPending ? "Đang xóa..." : "Xóa"}
             </Button>
           </DialogFooter>

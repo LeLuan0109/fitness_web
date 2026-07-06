@@ -1,0 +1,483 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap");
+
+@theme inline {
+  --font-display: "Noto Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", sans-serif;
+  --color-cream: #fafafa;
+  --color-earth: #4a3525;
+  --color-clay: #8c6239;
+  --color-sand: #d9c3b0;
+  --color-sand-light: #e8ddd0;
+  --color-sand-dark: #c9a98c;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-feature-settings: "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+}
+
+/* Dùng màu clay thay italic — Playfair/Noto italic gây lỗi dấu tiếng Việt */
+.accent-display,
+.italic-display {
+  color: #8c6239;
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ───── Custom cursor ───── */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+  will-change: transform;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: #4a3525;
+  border-radius: 50%;
+}
+
+.cursor-ring {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(74, 53, 37, 0.4);
+  border-radius: 50%;
+  transition:
+    opacity 0.2s ease-out,
+    width 0.3s ease-out,
+    height 0.3s ease-out,
+    border-color 0.3s ease-out;
+}
+
+.cursor-dot.is-visible,
+.cursor-ring.is-visible {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
+
+/* ───── COREFORM app theme overrides ───── */
+.coreform-app {
+  --background: #fafafa;
+  --foreground: #4a3525;
+  --card: #ffffff;
+  --card-foreground: #4a3525;
+  --popover: #ffffff;
+  --popover-foreground: #4a3525;
+  --primary: #8c6239;
+  --primary-foreground: #fafafa;
+  --button-primary: #4a3525;
+  --button-primary-foreground: #fafafa;
+  --secondary: #f4efea;
+  --secondary-foreground: #4a3525;
+  --muted: #f4efea;
+  --muted-foreground: #6b5a4d;
+  --accent: #f4efea;
+  --accent-foreground: #4a3525;
+  --border: #d9c3b0;
+  --input: #d9c3b0;
+  --input-background: #ffffff;
+  --ring: #8c6239;
+  --slider-track: #e8ddd0;
+  font-family: var(--font-sans);
+}
+
+.coreform-app [data-slot="card"] {
+  border-color: color-mix(in srgb, #d9c3b0 60%, transparent);
+}
+
+.coreform-app [data-slot="input"]:focus,
+.coreform-app [data-slot="input"]:focus-visible {
+  border-color: #8c6239;
+  --tw-ring-color: rgb(140 98 57 / 0.25);
+}
+
+.coreform-app [data-slot="slider-track"] {
+  background: #e8ddd0;
+  height: 4px;
+}
+
+.coreform-app [data-slot="slider-range"] {
+  background: #8c6239;
+}
+
+.coreform-app [data-slot="slider-thumb"] {
+  border-color: #8c6239;
+  background: #fafafa;
+  width: 16px;
+  height: 16px;
+}
+
+
+/* ───── Noise overlay ───── */
+.dashboard-noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
+  animation: dashboard-noise 20s steps(10) infinite;
+}
+
+@keyframes dashboard-noise {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-10%, 5%);
+  }
+  50% {
+    transform: translate(-10%, 5%);
+  }
+  80% {
+    transform: translate(-15%, 0);
+  }
+}
+
+/* ───── Hero entrance ───── */
+.hero-text > * {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-text.is-in > *:nth-child(1) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 100ms;
+}
+.hero-text.is-in > *:nth-child(2) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 280ms;
+}
+.hero-text.is-in > *:nth-child(3) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 460ms;
+}
+.hero-text.is-in > *:nth-child(4) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 640ms;
+}
+.hero-text.is-in > *:nth-child(5) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 820ms;
+}
+
+.hero-slider {
+  opacity: 0;
+  transform: translateY(60px) scale(0.96);
+  transition:
+    opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-slider.is-in {
+  opacity: 1;
+  transform: none;
+  transition-delay: 300ms;
+}
+
+/* ───── Manifesto scrub-blur ───── */
+.manifesto .word {
+  display: inline-block;
+  opacity: 0.18;
+  filter: blur(8px);
+  will-change: filter, opacity;
+}
+
+/* ───── Feature cards ───── */
+.feature-card {
+  opacity: 0;
+  transform: translateY(60px);
+  transition:
+    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.feature-card.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.feature-card:nth-child(1).is-in {
+  transition-delay: 0ms;
+}
+.feature-card:nth-child(2).is-in {
+  transition-delay: 150ms;
+}
+.feature-card:nth-child(3).is-in {
+  transition-delay: 300ms;
+}
+
+/* ───── Horizontal pin scroll ───── */
+.pin-viewport {
+  position: relative;
+}
+
+.pin-track {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.pin-cards {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0 6rem;
+  will-change: transform;
+}
+
+.pin-card {
+  flex-shrink: 0;
+}
+
+.pin-card .scale-wrap {
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pin-progress {
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12rem;
+  height: 1px;
+  background: rgba(250, 250, 250, 0.2);
+}
+
+.pin-progress-fill {
+  height: 100%;
+  background: #d9c3b0;
+  width: 0%;
+}
+
+@media (max-width: 1023px) {
+  .pin-track {
+    position: relative;
+    height: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2rem 0 4rem;
+  }
+
+  .pin-cards {
+    padding: 0 1.5rem;
+    transform: none !important;
+  }
+
+  .pin-progress {
+    display: none;
+  }
+
+  .pin-card .scale-wrap {
+    transform: none !important;
+  }
+}
+
+.frame-counter {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes scrollIndicator {
+  0% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.scroll-line {
+  animation: scrollIndicator 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-noise {
+    animation: none;
+  }
+
+  .scroll-line {
+    animation: none;
+  }
+
+  .hero-text > *,
+  .hero-slider,
+  .feature-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+::selection {
+  background: #8c6239;
+  color: #fafafa;
+}
+
+/* ───── Lift loader fill ───── */
+@keyframes coreformLiftFill {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-64px);
+  }
+}
+
+.coreform-lift-fill-rect {
+  animation: coreformLiftFill 1.4s ease-in-out infinite alternate;
+}
+
+/* ───── Door transition ───── */
+.coreform-door-overlay[data-mode="enter"] .coreform-door-left {
+  animation: coreformDoorOpenLeft 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+.coreform-door-overlay[data-mode="enter"] .coreform-door-right {
+  animation: coreformDoorOpenRight 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+.coreform-door-overlay[data-mode="exit"] .coreform-door-left {
+  animation: coreformDoorCloseLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+  transform: perspective(600px) rotateY(-75deg);
+}
+
+.coreform-door-overlay[data-mode="exit"] .coreform-door-right {
+  animation: coreformDoorCloseRight 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+  transform: perspective(600px) rotateY(75deg);
+}
+
+.coreform-door-left,
+.coreform-door-right {
+  transform: perspective(600px) rotateY(0deg);
+}
+
+@keyframes coreformDoorOpenLeft {
+  to {
+    transform: perspective(600px) rotateY(-75deg);
+  }
+}
+
+@keyframes coreformDoorOpenRight {
+  to {
+    transform: perspective(600px) rotateY(75deg);
+  }
+}
+
+@keyframes coreformDoorCloseLeft {
+  from {
+    transform: perspective(600px) rotateY(-75deg);
+  }
+  to {
+    transform: perspective(600px) rotateY(0deg);
+  }
+}
+
+@keyframes coreformDoorCloseRight {
+  from {
+    transform: perspective(600px) rotateY(75deg);
+  }
+  to {
+    transform: perspective(600px) rotateY(0deg);
+  }
+}
+
+.coreform-person-enter {
+  animation: coreformPersonEnter 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+  opacity: 0;
+  transform: translate(-50%, -20%);
+}
+
+.coreform-person-exit {
+  animation: coreformPersonExit 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes coreformPersonEnter {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 20%);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80%);
+  }
+}
+
+@keyframes coreformPersonExit {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 30%);
+  }
+}
+
+.coreform-door-label {
+  animation: coreformLabelFade 2s ease-in-out forwards;
+}
+
+@keyframes coreformLabelFade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coreform-lift-fill-rect,
+  .coreform-door-left,
+  .coreform-door-right,
+  .coreform-person-enter,
+  .coreform-person-exit,
+  .coreform-door-label {
+    animation: none !important;
+  }
+
+  .coreform-person-enter,
+  .coreform-person-exit {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}

@@ -1,5 +1,4 @@
-import { Button } from "@/components/shared/ui/button"
-import { Card, CardContent, CardTitle } from "@/components/shared/ui/card"
+import { CoreformFilterCard, CoreformSearchButton } from "@/components/shared/coreform"
 import { CustomSelect } from "@/components/shared/ui/custom-select"
 import { Form } from "@/components/shared/ui/form"
 import { Input } from "@/components/shared/ui/input"
@@ -24,66 +23,63 @@ export function WorkoutsSearchForm({ onSearch }: Props) {
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-4">
-        <CardTitle>Tìm kiếm kế hoạch tập luyện</CardTitle>
-        <div className="flex gap-8 justify-between">
-          <Form {...form}>
-            <form className="flex flex-wrap w-full gap-x-6 gap-y-2">
-              <SimpleField
-                label="Từ khóa"
-                name="keyword"
-                control={form.control}
-                className="w-[220px]"
-                enableFormMessage={false}
-              >
-                {(field) => <Input {...field} />}
-              </SimpleField>
-              <SimpleField
-                label="Mục tiêu tập luyện"
-                name="goal"
-                control={form.control}
-                className="w-[220px]"
-                enableFormMessage={false}
-              >
-                {(field) => <CustomSelect {...field} options={FITNESS_GOAL_OPTIONS} />}
-              </SimpleField>
-              <SimpleField
-                label="Cấp độ"
-                name="level"
-                control={form.control}
-                className="w-[220px]"
-                enableFormMessage={false}
-              >
-                {(field) => <CustomSelect {...field} options={LEVEL_OPTIONS} />}
-              </SimpleField>
-              <SimpleField
-                label="Thời gian"
-                name="duration"
-                control={form.control}
-                className="w-[220px]"
-                enableFormMessage={false}
-              >
-                {(field) => (
-                  <CustomSelect
-                    {...field}
-                    options={[
-                      { label: "1 tuần", value: "1" },
-                      { label: "2 tuần", value: "2" },
-                      { label: "4 tuần", value: "4" },
-                      { label: "6 tuần", value: "6" },
-                      { label: "8 tuần", value: "8" },
-                    ]}
-                  />
-                )}
-              </SimpleField>
-            </form>
-          </Form>
-          <Button variant="secondary" className="mt-6" onClick={handleSearch}>
-            <SearchIcon /> Tìm kiếm
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <CoreformFilterCard title="Tìm kiếm kế hoạch tập luyện">
+      <Form {...form}>
+        <form className="flex flex-wrap items-end justify-between gap-6">
+          <div className="flex flex-wrap gap-x-6 gap-y-4">
+            <SimpleField
+              label="Từ khóa"
+              name="keyword"
+              control={form.control}
+              className="w-[220px]"
+              enableFormMessage={false}
+            >
+              {(field) => <Input {...field} className="rounded-xl border-sand/60 bg-cream/50" />}
+            </SimpleField>
+            <SimpleField
+              label="Mục tiêu tập luyện"
+              name="goal"
+              control={form.control}
+              className="w-[220px]"
+              enableFormMessage={false}
+            >
+              {(field) => <CustomSelect {...field} options={FITNESS_GOAL_OPTIONS} />}
+            </SimpleField>
+            <SimpleField
+              label="Cấp độ"
+              name="level"
+              control={form.control}
+              className="w-[220px]"
+              enableFormMessage={false}
+            >
+              {(field) => <CustomSelect {...field} options={LEVEL_OPTIONS} />}
+            </SimpleField>
+            <SimpleField
+              label="Thời gian"
+              name="duration"
+              control={form.control}
+              className="w-[220px]"
+              enableFormMessage={false}
+            >
+              {(field) => (
+                <CustomSelect
+                  {...field}
+                  options={[
+                    { label: "1 tuần", value: "1" },
+                    { label: "2 tuần", value: "2" },
+                    { label: "4 tuần", value: "4" },
+                    { label: "6 tuần", value: "6" },
+                    { label: "8 tuần", value: "8" },
+                  ]}
+                />
+              )}
+            </SimpleField>
+          </div>
+          <CoreformSearchButton type="button" onClick={handleSearch}>
+            <SearchIcon className="size-4" /> Tìm kiếm
+          </CoreformSearchButton>
+        </form>
+      </Form>
+    </CoreformFilterCard>
   )
 }

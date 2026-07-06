@@ -1,16 +1,19 @@
 import { useState } from "react"
 import { DishesSearchForm } from "./DishesSearchForm"
 import { CommonPagination } from "@/components/shared/ui/common-pagination"
-import { TypographyH3 } from "@/components/shared/ui/typography"
+import {
+  CoreformEmptyState,
+  CoreformLoadingState,
+  CoreformPageHeader,
+  CoreformPrimaryButton,
+} from "@/components/shared/coreform"
 import { DishCard } from "./DishCard"
 import { generatePath, useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
 import authStore from "@/stores/auth.store"
-import { Button } from "@/components/shared/ui/button"
-import { Loader2, Plus } from "lucide-react"
+import { Plus, Soup } from "lucide-react"
 import { useDishesList } from "@/hooks/queries/dishes/useDishesList"
 import { DishSearchParams } from "@/types/dish.type"
-import { Card, CardContent } from "@/components/shared/ui/card"
 
 export function DishesList() {
   const navigate = useNavigate()
@@ -40,43 +43,40 @@ export function DishesList() {
       ...prev,
       search: query.name,
       cookingTime: query.cookingTime,
-      page: 0, // Reset to first page when searching
+      page: 0,
     }))
   }
 
   const handlePageChange = (page: number) => {
     setSearchParams((prev) => ({
       ...prev,
-      page: page - 1, // Convert 1-based to 0-based
+      page: page - 1,
     }))
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <TypographyH3 variant="bold">Danh sách món ăn</TypographyH3>
-        {isAdmin && (
-          <Button onClick={handleNavigateToCreateDish}>
-            <Plus className="w-4 h-4 mr-2" /> Thêm mới món ăn
-          </Button>
-        )}
-      </div>
+    <div className="space-y-8">
+      <CoreformPageHeader
+        title="Danh sách món ăn"
+        description="Khám phá món ăn và thông tin dinh dưỡng chi tiết."
+        action={
+          isAdmin ? (
+            <CoreformPrimaryButton onClick={handleNavigateToCreateDish}>
+              <Plus className="size-4" /> Thêm món ăn
+            </CoreformPrimaryButton>
+          ) : undefined
+        }
+      />
 
       <DishesSearchForm onSearch={handleSearch} />
 
       {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <CoreformLoadingState />
       ) : dishes.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">Không tìm thấy món ăn nào</p>
-          </CardContent>
-        </Card>
+        <CoreformEmptyState icon={Soup} title="Không tìm thấy món ăn nào" />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
             {dishes.map((dish) => (
               <DishCard
                 key={dish.id}
@@ -95,15 +95,14 @@ export function DishesList() {
             ))}
           </div>
 
-          <div className="mt-6">
-            <CommonPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              total={pagination?.total ?? 0}
-              pageSize={searchParams.size}
-            />
-          </div>
+          <CommonPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            total={pagination?.total ?? 0}
+            pageSize={searchParams.size}
+            className="mt-6"
+          />
         </>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { coreformDialogContentClass, coreformInputClass } from "@/components/shared/coreform/coreform-modal"
 import { Button } from "@/components/shared/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/shared/ui/dialog"
 import { Form } from "@/components/shared/ui/form"
@@ -24,19 +25,18 @@ export function WorkoutCompletionDialog({
   })
 
   useEffect(() => {
-    // update values when props change / dialog opens
     form.reset({ exercisesPracticed: exercisesPracticed ?? 0, caloriBurned: caloriesBurned ?? 0 })
   }, [exercisesPracticed, caloriesBurned, form])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="flex flex-col justify-between w-full">
-          <DialogTitle className="text-xl font-semibold text-white">Tổng kết ngày hôm nay</DialogTitle>
+      <DialogContent className={coreformDialogContentClass}>
+        <DialogHeader>
+          <DialogTitle>Tổng kết ngày hôm nay</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(() => {})}>
+          <form onSubmit={form.handleSubmit(() => {})} className="space-y-4">
             <SimpleField
               control={form.control}
               name="exercisesPracticed"
@@ -47,6 +47,7 @@ export function WorkoutCompletionDialog({
                 <Input
                   {...field}
                   type="number"
+                  className={coreformInputClass}
                   value={field.value ?? ""}
                   onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                   disabled
@@ -59,6 +60,7 @@ export function WorkoutCompletionDialog({
                 <Input
                   {...field}
                   type="number"
+                  className={coreformInputClass}
                   value={field.value ?? ""}
                   onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                   disabled
@@ -67,7 +69,7 @@ export function WorkoutCompletionDialog({
             </SimpleField>
 
             <DialogClose asChild>
-              <Button type="button" className="w-full">
+              <Button type="button" className="w-full rounded-full bg-earth text-cream hover:bg-clay">
                 Xong
               </Button>
             </DialogClose>

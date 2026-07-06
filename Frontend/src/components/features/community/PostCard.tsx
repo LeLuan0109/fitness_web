@@ -50,16 +50,18 @@ export const PostCard = ({
   const truncatedContent = content.length > 200 ? content.substring(0, 200) + "..." : content
 
   return (
-    <Card className="hover:border-primary/50 transition-all cursor-pointer overflow-hidden p-0 group" onClick={onClick}>
-      <div className="p-4">
-        {/* Author info */}
-        <div className="flex items-center gap-2 mb-2">
-          <Avatar className="h-6 w-6">
+    <Card
+      className="group cursor-pointer overflow-hidden rounded-2xl border-sand/60 bg-white p-0 shadow-sm shadow-earth/5 transition-all hover:border-clay/40 hover:shadow-md"
+      onClick={onClick}
+    >
+      <div className="p-5">
+        <div className="mb-3 flex items-center gap-2">
+          <Avatar className="size-7 border border-sand/40">
             <AvatarImage src={authorAvatar} alt={author} />
-            <AvatarFallback>{author?.charAt(0)}</AvatarFallback>
+            <AvatarFallback className="bg-earth/5 text-xs text-clay">{author?.charAt(0)}</AvatarFallback>
           </Avatar>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground flex-1">
-            <span className="font-medium text-foreground">u/{author}</span>
+          <div className="flex flex-1 items-center gap-1 text-xs text-earth/50">
+            <span className="font-medium text-earth">u/{author}</span>
             <span>•</span>
             <span>{formatDistanceToNow(createdAt, { addSuffix: true, locale: vi })}</span>
           </div>
@@ -106,10 +108,9 @@ export const PostCard = ({
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-semibold mb-2 hover:text-primary transition-colors">{title}</h3>
+        <h3 className="font-display mb-2 text-lg font-medium text-earth transition-colors group-hover:text-clay">{title}</h3>
 
-        {/* Content preview */}
-        <p className="text-sm text-muted-foreground mb-3 whitespace-pre-wrap line-clamp-3">{truncatedContent}</p>
+        <p className="mb-3 line-clamp-3 whitespace-pre-wrap text-sm leading-relaxed text-earth/65">{truncatedContent}</p>
 
         {/* Action buttons */}
         <div className="flex items-center gap-2">
@@ -117,8 +118,8 @@ export const PostCard = ({
             variant="ghost"
             size="sm"
             className={cn(
-              "h-8 gap-1.5 hover:bg-accent",
-              isLiked ? "text-red-500 hover:text-red-600" : "text-muted-foreground",
+              "h-8 gap-1.5 rounded-full hover:bg-sand-light/60",
+              isLiked ? "text-[#B35F4A] hover:text-[#9C4433]" : "text-earth/50",
             )}
             onClick={(e) => {
               e.stopPropagation()
@@ -129,7 +130,7 @@ export const PostCard = ({
             <span className="text-xs font-medium">{likes}</span>
           </Button>
 
-          <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-muted-foreground hover:bg-accent">
+          <Button variant="ghost" size="sm" className="h-8 gap-1.5 rounded-full text-earth/50 hover:bg-sand-light/60">
             <MessageSquare className="h-4 w-4" />
             <span className="text-xs">{replies} bình luận</span>
           </Button>

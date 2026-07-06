@@ -1,3 +1,4 @@
+import { CoreformLiftLoader } from "@/components/shared/coreform"
 import { useEffect, type ReactNode } from "react"
 
 import { useGetBasicInfo } from "@/hooks/queries/auth/useAuthQuery"
@@ -34,7 +35,11 @@ export default function AppProvider({ children }: { readonly children: ReactNode
   }, [isSuccess, userProfile, setAuth, setIsInitialize])
 
   if (isInitialize === "isLoading" && accessToken) {
-    return null
+    return (
+      <div className="coreform-app flex min-h-svh items-center justify-center bg-cream">
+        <CoreformLiftLoader size="lg" label="Đang tải hồ sơ..." />
+      </div>
+    )
   }
 
   return <>{children}</>

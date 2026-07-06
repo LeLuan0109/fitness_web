@@ -1,3 +1,5 @@
+import { CoreformLiftLoader } from "@/components/shared/coreform"
+import { coreformDialogContentClass, coreformInputClass } from "@/components/shared/coreform/coreform-modal"
 import { Button } from "@/components/shared/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/shared/ui/dialog"
 import { Form } from "@/components/shared/ui/form"
@@ -42,7 +44,7 @@ export const RecordSetDialog = ({
     },
   })
 
-  const { mutate: logSet } = useLogSet({
+  const { mutate: logSet, isPending } = useLogSet({
     config: {
       onSuccess: () => {
         toast.success("Ghi log tập luyện thành công!")
@@ -85,19 +87,20 @@ export const RecordSetDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="flex flex-col justify-between w-full">
-          <DialogTitle className="text-xl font-semibold text-white">Ghi nhận bài tập hôm nay</DialogTitle>
-          <p className="text-lg text-center font-medium text-gray-200">{exerciseName}</p>
+      <DialogContent className={coreformDialogContentClass}>
+        <DialogHeader>
+          <DialogTitle>Ghi nhận bài tập hôm nay</DialogTitle>
+          <p className="text-center text-sm font-medium text-clay">{exerciseName}</p>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSave)}>
+          <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
             <SimpleField control={form.control} name="sets" label="Set" required className="space-y-2">
               {(field) => (
                 <Input
                   {...field}
                   type="number"
+                  className={coreformInputClass}
                   value={field.value || ""}
                   onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                   min="1"
@@ -111,9 +114,11 @@ export const RecordSetDialog = ({
                 <Input
                   {...field}
                   type="number"
+                  className={coreformInputClass}
                   value={field.value || ""}
                   onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                   min="0"
+                  disabled={isPending}
                 />
               )}
             </SimpleField>
@@ -123,10 +128,12 @@ export const RecordSetDialog = ({
                 <Input
                   {...field}
                   type="number"
+                  className={coreformInputClass}
                   value={field.value || ""}
                   onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                   min="0"
                   step="0.5"
+                  disabled={isPending}
                 />
               )}
             </SimpleField>
@@ -136,15 +143,24 @@ export const RecordSetDialog = ({
                 <Input
                   {...field}
                   type="number"
+                  className={coreformInputClass}
                   value={field.value || ""}
                   onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                   min="0"
+                  disabled={isPending}
                 />
               )}
             </SimpleField>
 
-            <Button type="submit" className="w-full">
-              Lưu
+            <Button type="submit" className="w-full rounded-full bg-earth text-cream hover:bg-clay" disabled={isPending}>
+              {isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <CoreformLiftLoader size="sm" />
+                  Đang lưu...
+                </span>
+              ) : (
+                "Lưu"
+              )}
             </Button>
           </form>
         </Form>

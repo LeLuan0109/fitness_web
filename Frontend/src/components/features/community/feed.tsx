@@ -1,3 +1,4 @@
+import { CoreformEmptyState, CoreformLoadingState, CoreformPageHeader } from "@/components/shared/coreform"
 import { Button } from "@/components/shared/ui/button"
 import {
   Dialog,
@@ -7,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/shared/ui/dialog"
-import { TypographyH3 } from "@/components/shared/ui/typography"
 import { ROUTES } from "@/constants/routes"
 import { useDisclosure } from "@/hooks/common/use-disclosure"
 import { useDeletePost } from "@/hooks/queries/forum/useDeletePost"
@@ -15,7 +15,7 @@ import { useGetPosts } from "@/hooks/queries/forum/useGetPosts"
 import { useToggleLikePost } from "@/hooks/queries/forum/useToggleLikePost"
 import authStore from "@/stores/auth.store"
 import { PostSearchParams } from "@/types/forum.type"
-import { Loader2 } from "lucide-react"
+import { Newspaper, PenLine } from "lucide-react"
 import { useState } from "react"
 import { generatePath, useNavigate } from "react-router-dom"
 import { CreatePost } from "./CreatePost"
@@ -106,13 +106,9 @@ export const CommunityFeed = () => {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <TypographyH3 variant="bold">Cộng đồng</TypographyH3>
-      </div>
+    <div className="space-y-6">
+      <CoreformPageHeader title="Cộng đồng" description="Chia sẻ tiến trình và kết nối với cộng đồng vận động viên." />
 
-      {/* Create Post Card */}
       <CreatePost
         userAvatar={auth?.avatar || "https://i.pravatar.cc/150?img=1"}
         userName={auth?.name || "User"}
@@ -124,13 +120,9 @@ export const CommunityFeed = () => {
 
       {/* Posts List */}
       {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <CoreformLoadingState />
       ) : posts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Chưa có bài viết nào</p>
-        </div>
+        <CoreformEmptyState icon={Newspaper} title="Chưa có bài viết nào" />
       ) : (
         <div className="space-y-3">
           {posts.map((post) => (
@@ -158,7 +150,7 @@ export const CommunityFeed = () => {
 
       {/* Pagination Info */}
       {pagination && posts.length > 0 && (
-        <div className="flex justify-center items-center gap-2 py-4 text-sm text-muted-foreground">
+        <div className="flex justify-center items-center gap-2 py-4 text-sm text-earth/50">
           <span>
             Trang {pagination.page + 1} / {pagination.totalPages}
           </span>
@@ -186,18 +178,18 @@ export const CommunityFeed = () => {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl border-sand">
           <DialogHeader>
-            <DialogTitle>Xác nhận xóa bài viết</DialogTitle>
+            <DialogTitle className="font-display">Xác nhận xóa bài viết</DialogTitle>
             <DialogDescription>
               Bạn có chắc chắn muốn xóa bài viết này? Hành động này không thể hoàn tác.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+            <Button variant="outline" className="rounded-full border-sand" onClick={() => setShowDeleteDialog(false)}>
               Hủy
             </Button>
-            <Button variant="destructive" onClick={confirmDelete} disabled={deletePostMutation.isPending}>
+            <Button variant="destructive" className="rounded-full" onClick={confirmDelete} disabled={deletePostMutation.isPending}>
               {deletePostMutation.isPending ? "Đang xóa..." : "Xóa"}
             </Button>
           </DialogFooter>

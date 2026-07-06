@@ -3,7 +3,7 @@ import { PageLayout } from "@/layouts/PageLayout"
 
 export function LoginPage() {
   return (
-    <PageLayout title="Login">
+    <PageLayout title="COREFORM — Đăng nhập" variant="landing">
       <LoginForm />
     </PageLayout>
   )
