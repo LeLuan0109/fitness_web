@@ -1,5 +1,6 @@
 import React from "react"
 import { Card, CardContent } from "@/components/shared/ui/card"
+import { ImageWithFallback } from "@/components/shared/common/image-with-fallbacks"
 import { Flame, Beef, Wheat, Droplet } from "lucide-react"
 
 type Dish = {
@@ -14,53 +15,52 @@ type Dish = {
 }
 
 export const DishCard: React.FC<{ dish: Dish; onClick?: () => void }> = ({ dish, onClick }) => {
+  const stats = [
+    { label: "Calo", value: dish.calories, icon: Flame, color: "text-[#B35F4A]", bg: "bg-[#B35F4A]/10" },
+    { label: "Protein", value: dish.protein, icon: Beef, color: "text-[#3B82F6]", bg: "bg-[#3B82F6]/10" },
+    { label: "Fat", value: dish.fat, icon: Droplet, color: "text-[#D97706]", bg: "bg-[#D97706]/10" },
+    { label: "Carbs", value: dish.carbs, icon: Wheat, color: "text-[#8C6239]", bg: "bg-clay/10" },
+  ]
+
   return (
     <Card
-      className="py-0 rounded-2xl overflow-hidden shadow hover:shadow-md transition-shadow cursor-pointer"
+      className="group gap-0 overflow-hidden rounded-2xl border-sand/60 bg-white py-0 text-earth shadow-sm shadow-earth/5 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/10 cursor-pointer"
       onClick={onClick}
     >
-      <div className="relative h-60 w-full">
-        <img src={dish.image} alt={dish.title} className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-        <div className="absolute left-4 bottom-4 text-white">
-          <div className="text-lg font-bold leading-tight">{dish.title}</div>
+      <div className="relative h-60 w-full overflow-hidden bg-[linear-gradient(135deg,#f4efea,#ffffff_52%,#e8ddd0)]">
+        <ImageWithFallback
+          src={dish.image}
+          alt={dish.title}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-earth/80 via-earth/25 to-transparent" />
+        <div className="absolute bottom-4 left-4 right-4 text-cream">
+          <div className="font-display line-clamp-2 text-xl font-semibold leading-tight drop-shadow-sm">{dish.title}</div>
         </div>
-        <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded">{dish.cookTime}</div>
+        {dish.cookTime && (
+          <div className="absolute right-3 top-3 rounded-full border border-cream/25 bg-earth/70 px-2.5 py-1 text-xs font-semibold text-cream shadow-sm backdrop-blur-sm">
+            {dish.cookTime}
+          </div>
+        )}
       </div>
 
-      <CardContent className="mb-4">
-        <div className="grid grid-cols-4 gap-3 text-white/80 text-sm">
-          <div className="flex flex-col items-start gap-1">
-            <div className="inline-flex items-center gap-2">
-              <Flame className="w-4 h-4 text-[#ff8904]" />
-              <span className="text-white font-semibold">{dish.calories}</span>
-            </div>
-            <span className="text-white/60 text-xs">Calo</span>
-          </div>
+      <CardContent className="p-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {stats.map((stat) => {
+            const Icon = stat.icon
 
-          <div className="flex flex-col items-start gap-1">
-            <div className="inline-flex items-center gap-2">
-              <Beef className="w-4 h-4 text-blue-400" />
-              <span className="text-white font-semibold">{dish.protein}</span>
-            </div>
-            <span className="text-white/60 text-xs">Protein</span>
-          </div>
-
-          <div className="flex flex-col items-start gap-1">
-            <div className="inline-flex items-center gap-2">
-              <Droplet className="w-4 h-4 text-yellow-400" />
-              <span className="text-white font-semibold">{dish.fat}</span>
-            </div>
-            <span className="text-white/60 text-xs">Fat</span>
-          </div>
-
-          <div className="flex flex-col items-start gap-1">
-            <div className="inline-flex items-center gap-2">
-              <Wheat className="w-4 h-4 text-amber-400" />
-              <span className="text-white font-semibold">{dish.carbs}</span>
-            </div>
-            <span className="text-white/60 text-xs">Carbs</span>
-          </div>
+            return (
+              <div key={stat.label} className="min-w-0 rounded-xl border border-sand/40 bg-cream/45 p-2.5">
+                <div className="flex items-center gap-1.5">
+                  <span className={`flex size-7 shrink-0 items-center justify-center rounded-full ${stat.bg}`}>
+                    <Icon className={`size-4 ${stat.color}`} />
+                  </span>
+                  <span className="truncate text-sm font-semibold text-earth">{stat.value}</span>
+                </div>
+                <span className="mt-1 block text-xs font-medium text-earth/55">{stat.label}</span>
+              </div>
+            )
+          })}
         </div>
       </CardContent>
     </Card>

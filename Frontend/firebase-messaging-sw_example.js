@@ -12,8 +12,6 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig)
 const messaging = firebase.messaging()
-
-// Xử lý sự kiện nhận tin khi App chạy nền (Background)
 messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title
   const notificationOptions = {

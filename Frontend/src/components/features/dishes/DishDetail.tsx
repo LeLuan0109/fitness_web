@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/shared/ui/card"
+import { ImageWithFallback } from "@/components/shared/common/image-with-fallbacks"
 import { MacroCard } from "@/components/features/nutrition/MacroCard"
 import { Flame, Beef, Wheat, Droplet, Loader2, ArrowLeft, Edit, Trash } from "lucide-react"
 import { IngredientItem } from "./IngredientItem"
@@ -79,22 +80,22 @@ export function DishDetail() {
       <TypographyH3 variant="bold">Chi tiết món ăn</TypographyH3>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Card className="rounded-2xl overflow-hidden h-full p-0">
+          <Card className="rounded-2xl overflow-hidden h-full p-0 border-sand/60 bg-white shadow-sm shadow-earth/5">
             <div className="relative h-full min-h-[500px]">
-              <img src={data.image} alt={data.name} className="absolute inset-0 w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              <ImageWithFallback src={data.image} alt={data.name} className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-earth/85 via-earth/35 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
-                <h1 className="text-2xl font-bold text-white">{data.name}</h1>
-                <div className="text-white/80 mt-2">{data.cookingTime} phút</div>
+                <h1 className="text-2xl font-bold text-cream">{data.name}</h1>
+                <div className="text-cream/80 mt-2">{data.cookingTime} phút</div>
               </div>
             </div>
           </Card>
         </div>
 
         <div className="lg:col-span-1 space-y-4">
-          <Card className="rounded-xl">
+          <Card className="rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
             <CardContent>
-              <h3 className="text-white font-semibold mb-4">Giá trị dinh dưỡng</h3>
+              <h3 className="font-display text-lg font-medium text-earth mb-4">Giá trị dinh dưỡng</h3>
               <div className="flex gap-3 flex-wrap">
                 <MacroCard label="Calories" value={`${data.calories}`} Icon={Flame} />
                 <MacroCard label="Protein" value={`${data.protein}g`} Icon={Beef} />
@@ -104,9 +105,9 @@ export function DishDetail() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl">
+          <Card className="rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
             <CardContent>
-              <h3 className="text-white font-semibold mb-4">Nguyên liệu</h3>
+              <h3 className="font-display text-lg font-medium text-earth mb-4">Nguyên liệu</h3>
               <div className="space-y-3">
                 {data.ingredients.map((ing: any) => (
                   <IngredientItem key={ing.id} item={ing} />
@@ -117,9 +118,9 @@ export function DishDetail() {
         </div>
       </div>
 
-      <Card className="rounded-xl">
+      <Card className="rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
         <CardContent>
-          <h3 className="text-white font-semibold mb-4">Cách chế biến</h3>
+          <h3 className="font-display text-lg font-medium text-earth mb-4">Cách chế biến</h3>
           <div className="space-y-3">
             {/* Try to split recipe into steps if possible */}
             {String(data.preparation)
@@ -128,7 +129,7 @@ export function DishDetail() {
               .filter(Boolean)
               .map((step, i) => (
                 <div key={i} className="flex gap-3">
-                  <div className="text-white/90">{step}</div>
+                  <div className="text-earth/80">{step}</div>
                 </div>
               ))}
           </div>
