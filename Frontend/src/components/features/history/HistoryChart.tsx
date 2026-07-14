@@ -11,25 +11,25 @@ export function HistoryChart({ title, data }: HistoryChartProps) {
   const chartConfig = {
     value: {
       label: title,
-      color: "#ff7f6a",
+      color: "#8c6239",
     },
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-white text-base font-medium">{title}</h3>
+      <h3 className="text-earth text-base font-medium">{title}</h3>
       <ChartContainer config={chartConfig} className="h-[300px] w-full">
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(74,53,37,0.12)" />
           <XAxis
             dataKey="date"
-            stroke="#a1a1aa"
+            stroke="#8c6239"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            stroke="#a1a1aa"
+            stroke="#8c6239"
             fontSize={12}
             tickLine={false}
             axisLine={false}

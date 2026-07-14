@@ -52,7 +52,7 @@ export const ChatSuggestionList = ({ type, items }: Props) => {
                       />
                       {item.calories && (
                         <div className="absolute bottom-1 right-1">
-                          <Badge variant="secondary" className="text-[10px] px-1 h-5 bg-black/60 text-white backdrop-blur-sm border-none">
+                          <Badge variant="secondary" className="h-5 border-none bg-earth/70 px-1 text-[10px] text-cream backdrop-blur-sm">
                             <Flame className="size-3 mr-0.5 text-orange-400" fill="currentColor" />
                             {Math.round(item.calories)}
                           </Badge>

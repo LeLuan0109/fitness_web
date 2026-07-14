@@ -101,7 +101,7 @@ function FileInput({ inputRef, disable, onFileSelect }: FileInputProps) {
       />
       <Label
         htmlFor="file-upload"
-        className="flex text-white bg-gray-700 cursor-pointer items-center gap-2 rounded-md px-6 py-2"
+        className="flex cursor-pointer items-center gap-2 rounded-md bg-earth px-6 py-2 text-cream"
       >
         <Plus size={18} />
         Select Files
@@ -163,13 +163,13 @@ type FileItemProps = {
 function FileItem({ file, onRemove, uploading }: FileItemProps): JSX.Element {
   const Icon = getFileIcon(file.file.type)
   return (
-    <div className="space-y-2 rounded-md bg-gray-700 p-4">
+    <div className="space-y-2 rounded-md border border-sand/60 bg-cream/60 p-4 text-earth">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <Icon size={40} className="text-primary" />
           <div className="flex flex-col">
             <span className="font-medium">{file.file.name}</span>
-            <div className="flex items-center gap-2 text-xs text-gray-400">
+            <div className="flex items-center gap-2 text-xs text-earth/55">
               <span>{formatFileSize(file.file.size)}</span>
               <span>.</span>
               <span>{file.file.type || "Unknow type"}</span>
@@ -178,11 +178,11 @@ function FileItem({ file, onRemove, uploading }: FileItemProps): JSX.Element {
         </div>
         {!uploading && (
           <Button onClick={() => onRemove(file.id)} className="bg-none p-0">
-            <X size={16} className="text-white" />
+            <X size={16} className="text-earth" />
           </Button>
         )}
       </div>
-      <div className="text-white">{file.uploaded ? "Completed" : `${Math.round(file.progress)}%`}</div>
+      <div className="text-earth">{file.uploaded ? "Completed" : `${Math.round(file.progress)}%`}</div>
       <ProgressBar progress={file.progress} />
     </div>
   )
@@ -194,8 +194,8 @@ type ProgressBarProps = {
 
 function ProgressBar({ progress }: ProgressBarProps) {
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-white">
-      <div className="h-full bg-yellow-500 transition-all duration-300" style={{ width: `${progress}%` }} />
+    <div className="h-2 w-full overflow-hidden rounded-full bg-sand-light">
+      <div className="h-full bg-clay transition-all duration-300" style={{ width: `${progress}%` }} />
     </div>
   )
 }

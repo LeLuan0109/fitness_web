@@ -15,27 +15,33 @@ interface MenuCardProps {
 
 export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick }: MenuCardProps) => {
   const { name, description, fitnessGoal, calories, protein, carbs, fat, isDefault } = menu
+  const nutrition = [
+    { label: "Calories", value: calories, Icon: Flame },
+    { label: "Protein", value: `${protein}g`, Icon: Beef },
+    { label: "Carbs", value: `${carbs}g`, Icon: Wheat },
+    { label: "Fat", value: `${fat}g`, Icon: Droplet },
+  ]
 
   return (
-    <Card className="group border-none rounded-2xl w-full hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 gap-0 py-0 bg-gradient-to-br from-white/[0.08] to-white/[0.04] backdrop-blur-sm justify-between">
+    <Card className="group w-full justify-between gap-0 rounded-2xl border-sand/60 bg-white py-0 text-earth shadow-sm shadow-earth/5 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/10">
       <CardContent className="p-6">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4 gap-4">
-          <div className="flex-1">
-            <CardTitle className="text-white text-2xl font-bold leading-tight mb-2 group-hover:text-[#ff8904] transition-colors">
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="mb-2 font-display text-2xl font-semibold leading-tight text-earth transition-colors group-hover:text-clay">
               {name}
             </CardTitle>
-            <Badge className="bg-gradient-to-r from-[#ff8904] to-[#ff6b00] text-white text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap shadow-lg">
+            <Badge className="rounded-full border border-sand/60 bg-cream px-3 py-1.5 text-xs font-semibold text-clay shadow-sm">
               {FITNESS_GOAL_LABELS[fitnessGoal]}
             </Badge>
           </div>
+
           {!isDefault && (
             <div className="flex gap-1">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={onUpdateClick}
-                className="hover:bg-white/10 hover:text-[#ff8904] transition-all"
+                className="text-earth/60 transition-all hover:bg-sand-light/60 hover:text-clay"
               >
                 <Edit className="h-4 w-4" />
               </Button>
@@ -43,7 +49,7 @@ export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick }: 
                 variant="ghost"
                 size="icon"
                 onClick={onDeleteClick}
-                className="hover:bg-red-500/10 text-white/60 hover:text-red-500 transition-all"
+                className="text-earth/60 transition-all hover:bg-red-500/10 hover:text-red-600"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -51,49 +57,31 @@ export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick }: 
           )}
         </div>
 
-        {/* Description */}
         {description && (
-          <p className="text-white/70 text-sm font-normal leading-relaxed mb-6 line-clamp-2 truncate">{description}</p>
+          <p className="mb-6 line-clamp-2 truncate text-sm font-normal leading-relaxed text-earth/65">
+            {description}
+          </p>
         )}
 
-        <Separator className="mb-6 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <Separator className="mb-6 bg-sand/60" />
 
-        {/* Nutrition Info Grid */}
-        <div className="grid grid-cols-4 gap-4">
-          <div className="flex flex-col items-center text-center group/item">
-            <div className="mb-3 p-3 rounded-xl bg-gradient-to-br from-[#ff8904]/20 to-[#ff8904]/5 group-hover/item:scale-110 transition-transform">
-              <Flame className="h-6 w-6 text-[#ff8904]" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {nutrition.map(({ label, value, Icon }) => (
+            <div key={label} className="rounded-xl border border-sand/40 bg-cream/45 p-3 text-center">
+              <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-full bg-earth/5 text-clay transition-transform group-hover:scale-105">
+                <Icon className="h-5 w-5" />
+              </div>
+              <span className="mb-1 block text-xs font-medium uppercase text-earth/50">{label}</span>
+              <span className="block text-lg font-bold text-earth">{value}</span>
             </div>
-            <span className="text-white/50 text-xs font-medium mb-1 uppercase tracking-wide">Calories</span>
-            <span className="text-white text-xl font-bold">{calories}</span>
-          </div>
-          <div className="flex flex-col items-center text-center group/item">
-            <div className="mb-3 p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 group-hover/item:scale-110 transition-transform">
-              <Beef className="h-6 w-6 text-blue-400" />
-            </div>
-            <span className="text-white/50 text-xs font-medium mb-1 uppercase tracking-wide">Protein</span>
-            <span className="text-white text-xl font-bold">{protein}g</span>
-          </div>
-          <div className="flex flex-col items-center text-center group/item">
-            <div className="mb-3 p-3 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 group-hover/item:scale-110 transition-transform">
-              <Wheat className="h-6 w-6 text-amber-400" />
-            </div>
-            <span className="text-white/50 text-xs font-medium mb-1 uppercase tracking-wide">Carbs</span>
-            <span className="text-white text-xl font-bold">{carbs}g</span>
-          </div>
-          <div className="flex flex-col items-center text-center group/item">
-            <div className="mb-3 p-3 rounded-xl bg-gradient-to-br from-yellow-500/20 to-yellow-500/5 group-hover/item:scale-110 transition-transform">
-              <Droplet className="h-6 w-6 text-yellow-400" />
-            </div>
-            <span className="text-white/50 text-xs font-medium mb-1 uppercase tracking-wide">Fat</span>
-            <span className="text-white text-xl font-bold">{fat}g</span>
-          </div>
+          ))}
         </div>
       </CardContent>
+
       <CardFooter className="pb-6 pt-0">
         <Button
           variant="ghost"
-          className="w-full bg-white/5 hover:bg-[#ff8904] hover:text-white border border-white/10 hover:border-[#ff8904] transition-all duration-300 font-semibold"
+          className="w-full rounded-full border border-sand/60 bg-cream/70 font-semibold text-earth transition-all duration-300 hover:border-clay hover:bg-earth hover:text-cream"
           onClick={onDetailClick}
         >
           Xem chi tiết

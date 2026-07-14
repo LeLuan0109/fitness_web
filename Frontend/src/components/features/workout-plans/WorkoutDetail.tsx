@@ -297,7 +297,7 @@ export const WorkoutDetail = () => {
                           week.days.map((day, dayIdx) => (
                             <div key={dayIdx} className="space-y-2">
                               {/* Day Header */}
-                              <div className="bg-gray-700 text-white p-3 rounded-lg flex items-center justify-between">
+                              <div className="rounded-xl border border-sand/60 bg-earth p-3 text-cream flex items-center justify-between">
                                 <h4 className="font-medium">
                                   {getDayName(day.dayOfWeek)}
                                   {day.dayInNumber && ` - Ngày ${day.dayInNumber}`}
@@ -306,7 +306,7 @@ export const WorkoutDetail = () => {
                                   <Button
                                     size="sm"
                                     variant="default"
-                                    className="bg-lime-500 hover:bg-lime-600 text-white px-3 py-1 text-xs"
+                                    className="bg-clay hover:bg-earth text-cream px-3 py-1 text-xs"
                                     onClick={() => handleOpenWorkoutCompletion(true, day)}
                                     disabled={!hasStarted}
                                     title={!hasStarted ? "Chưa đến ngày bắt đầu" : ""}
@@ -324,7 +324,7 @@ export const WorkoutDetail = () => {
                                   const isExpanded = expandedExercises.has(exerciseKey)
 
                                   return (
-                                    <div key={exIdx} className="bg-gray-600 text-white rounded-lg overflow-hidden ml-4">
+                                    <div key={exIdx} className="ml-4 overflow-hidden rounded-xl border border-sand/60 bg-cream/60 text-earth">
                                       {/* Exercise Header */}
                                       <div className="p-3 flex items-center justify-between">
                                         <div
@@ -333,7 +333,7 @@ export const WorkoutDetail = () => {
                                         >
                                           <div className="flex-1">
                                             <p className="font-medium text-sm">{exercise.exerciseName}</p>
-                                            <div className="text-xs text-gray-300 flex gap-2">
+                                            <div className="text-xs text-earth/60 flex gap-2">
                                               {exercise.sets && <span>{exercise.sets} sets</span>}
                                               {exercise.reps && <span>x {exercise.reps} reps</span>}
                                               {exercise.weight && <span>{exercise.weight}kg</span>}
@@ -342,7 +342,7 @@ export const WorkoutDetail = () => {
                                           </div>
                                           {!dataDetailPlan.isDefault && (
                                             <ChevronDown
-                                              className={`w-4 h-4 text-gray-400 transition-transform ${
+                                                className={`w-4 h-4 text-earth/50 transition-transform ${
                                                 isExpanded ? "rotate-180" : ""
                                               }`}
                                             />
@@ -354,7 +354,7 @@ export const WorkoutDetail = () => {
                                             <Button
                                               size="sm"
                                               onClick={() => handleStartExercise(exercise, day.id)}
-                                              className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 text-xs"
+                                              className="bg-clay hover:bg-earth text-cream px-3 py-1 text-xs"
                                               disabled={!hasStarted}
                                               title={!hasStarted ? "Chưa đến ngày bắt đầu" : ""}
                                             >
@@ -366,7 +366,7 @@ export const WorkoutDetail = () => {
                                             size="sm"
                                             variant="outline"
                                             onClick={() => handleExerciseDetail(exercise.exerciseId)}
-                                            className="border-gray-400 text-gray-300 hover:bg-gray-500 px-3 py-1 text-xs"
+                                            className="border-sand/70 text-earth hover:bg-earth hover:text-cream px-3 py-1 text-xs"
                                           >
                                             Chi tiết
                                             <ChevronRight className="w-3 h-3 ml-1" />
@@ -377,9 +377,9 @@ export const WorkoutDetail = () => {
                                       {/* Exercise Logs (only for non-default plans) */}
                                       {!dataDetailPlan.isDefault && isExpanded && (
                                         <div className="px-3 pb-3">
-                                          <div className="bg-gray-700 rounded p-2 space-y-1">
+                                          <div className="rounded-lg border border-sand/50 bg-white p-2 space-y-1">
                                             {(exercise.logs ?? []).map((log, logIdx) => (
-                                              <div key={logIdx} className="text-xs text-gray-300">
+                                              <div key={logIdx} className="text-xs text-earth/65">
                                                 [Set {log.setNumber}]: {log.reps} reps / [Calo đốt cháy]:{" "}
                                                 {log.caloriesBurned}
                                               </div>

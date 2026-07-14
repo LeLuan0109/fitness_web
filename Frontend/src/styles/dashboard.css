@@ -357,127 +357,323 @@
 }
 
 /* ───── Door transition ───── */
-.coreform-door-overlay[data-mode="enter"] .coreform-door-left {
-  animation: coreformDoorOpenLeft 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+.coreform-door-overlay {
+  --door-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.coreform-door-overlay[data-mode="enter"] .coreform-door-right {
-  animation: coreformDoorOpenRight 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+.coreform-door-overlay[data-mode="enter"] {
+  animation: coreformOverlayEnter 2.6s ease forwards;
 }
 
-.coreform-door-overlay[data-mode="exit"] .coreform-door-left {
-  animation: coreformDoorCloseLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
-  transform: perspective(600px) rotateY(-75deg);
+.coreform-door-overlay[data-mode="exit"] {
+  animation: coreformOverlayExit 2.6s ease forwards;
 }
 
-.coreform-door-overlay[data-mode="exit"] .coreform-door-right {
-  animation: coreformDoorCloseRight 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
-  transform: perspective(600px) rotateY(75deg);
+.coreform-door-scene,
+.coreform-door-frame,
+.coreform-door-panel {
+  transform-style: preserve-3d;
+}
+
+.coreform-door-panel,
+.coreform-door-person,
+.coreform-door-reveal,
+.coreform-door-status {
+  will-change: opacity, transform, filter;
 }
 
 .coreform-door-left,
 .coreform-door-right {
-  transform: perspective(600px) rotateY(0deg);
+  transform: translateX(0) rotateY(0deg);
 }
 
-@keyframes coreformDoorOpenLeft {
-  to {
-    transform: perspective(600px) rotateY(-75deg);
-  }
+.coreform-door-overlay[data-mode="enter"] .coreform-door-left {
+  animation: coreformDoorOpenLeft 1.65s var(--door-ease) 0.32s forwards;
 }
 
-@keyframes coreformDoorOpenRight {
-  to {
-    transform: perspective(600px) rotateY(75deg);
-  }
+.coreform-door-overlay[data-mode="enter"] .coreform-door-right {
+  animation: coreformDoorOpenRight 1.65s var(--door-ease) 0.32s forwards;
 }
 
-@keyframes coreformDoorCloseLeft {
-  from {
-    transform: perspective(600px) rotateY(-75deg);
-  }
-  to {
-    transform: perspective(600px) rotateY(0deg);
-  }
+.coreform-door-overlay[data-mode="exit"] .coreform-door-left {
+  transform: translateX(-92%) rotateY(-12deg);
+  animation: coreformDoorCloseLeft 1.45s var(--door-ease) 0.56s forwards;
 }
 
-@keyframes coreformDoorCloseRight {
-  from {
-    transform: perspective(600px) rotateY(75deg);
-  }
-  to {
-    transform: perspective(600px) rotateY(0deg);
-  }
+.coreform-door-overlay[data-mode="exit"] .coreform-door-right {
+  transform: translateX(92%) rotateY(12deg);
+  animation: coreformDoorCloseRight 1.45s var(--door-ease) 0.56s forwards;
 }
 
-.coreform-person-enter {
-  animation: coreformPersonEnter 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
-  opacity: 0;
-  transform: translate(-50%, -20%);
+.coreform-door-overlay[data-mode="enter"] .coreform-door-reveal {
+  animation: coreformRevealEnter 2s var(--door-ease) 0.25s forwards;
 }
 
-.coreform-person-exit {
-  animation: coreformPersonExit 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  opacity: 1;
+.coreform-door-overlay[data-mode="exit"] .coreform-door-reveal {
+  animation: coreformRevealExit 1.8s var(--door-ease) forwards;
+}
+
+.coreform-door-person {
   transform: translate(-50%, -50%);
 }
 
-@keyframes coreformPersonEnter {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 20%);
-  }
-  40% {
+.coreform-door-overlay[data-mode="enter"] .coreform-door-person {
+  animation: coreformPersonEnter 1.95s var(--door-ease) 0.24s forwards;
+}
+
+.coreform-door-overlay[data-mode="exit"] .coreform-door-person {
+  opacity: 0;
+  animation: coreformPersonExit 1.75s var(--door-ease) 0.12s forwards;
+}
+
+.coreform-door-status {
+  animation: coreformStatusFade 2.45s ease forwards;
+}
+
+.coreform-door-handle {
+  animation: coreformHandleGlow 0.9s ease-in-out infinite alternate;
+}
+
+.coreform-person-pulse {
+  animation: coreformPersonPulse 1.1s ease-in-out infinite;
+}
+
+.coreform-walker-arm-left,
+.coreform-walker-leg-right {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: coreformWalkerSwingForward 0.48s ease-in-out infinite alternate;
+}
+
+.coreform-walker-arm-right,
+.coreform-walker-leg-left {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: coreformWalkerSwingBack 0.48s ease-in-out infinite alternate;
+}
+
+@keyframes coreformOverlayEnter {
+  0%,
+  72% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -80%);
+    visibility: hidden;
+  }
+}
+
+@keyframes coreformOverlayExit {
+  0% {
+    opacity: 0;
+  }
+  18%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes coreformDoorOpenLeft {
+  0% {
+    filter: brightness(1);
+    transform: translateX(0) rotateY(0deg);
+  }
+  52% {
+    filter: brightness(1.18);
+  }
+  100% {
+    filter: brightness(0.92);
+    transform: translateX(-92%) rotateY(-12deg);
+  }
+}
+
+@keyframes coreformDoorOpenRight {
+  0% {
+    filter: brightness(1);
+    transform: translateX(0) rotateY(0deg);
+  }
+  52% {
+    filter: brightness(1.18);
+  }
+  100% {
+    filter: brightness(0.92);
+    transform: translateX(92%) rotateY(12deg);
+  }
+}
+
+@keyframes coreformDoorCloseLeft {
+  0% {
+    filter: brightness(0.92);
+    transform: translateX(-92%) rotateY(-12deg);
+  }
+  68% {
+    filter: brightness(1.16);
+  }
+  100% {
+    filter: brightness(1);
+    transform: translateX(0) rotateY(0deg);
+  }
+}
+
+@keyframes coreformDoorCloseRight {
+  0% {
+    filter: brightness(0.92);
+    transform: translateX(92%) rotateY(12deg);
+  }
+  68% {
+    filter: brightness(1.16);
+  }
+  100% {
+    filter: brightness(1);
+    transform: translateX(0) rotateY(0deg);
+  }
+}
+
+@keyframes coreformRevealEnter {
+  0% {
+    opacity: 0.18;
+    transform: scale(0.92);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0.88;
+    transform: scale(1);
+  }
+}
+
+@keyframes coreformRevealExit {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.14;
+    transform: scale(0.92);
+  }
+}
+
+@keyframes coreformPersonEnter {
+  0% {
+    opacity: 0.96;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+  28% {
+    opacity: 1;
+    transform: translate(-50%, -54%) scale(1);
+  }
+  64% {
+    opacity: 0.94;
+    transform: translate(-50%, -75%) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -92%) scale(0.78);
   }
 }
 
 @keyframes coreformPersonExit {
   0% {
-    opacity: 1;
-    transform: translate(-50%, -50%);
+    opacity: 0;
+    transform: translate(-50%, -88%) scale(0.82);
   }
-  60% {
+  34% {
     opacity: 1;
+    transform: translate(-50%, -62%) scale(0.95);
+  }
+  76% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, 30%);
+    transform: translate(-50%, -43%) scale(0.92);
   }
 }
 
-.coreform-door-label {
-  animation: coreformLabelFade 2s ease-in-out forwards;
+@keyframes coreformStatusFade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  16%,
+  82% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
 }
 
-@keyframes coreformLabelFade {
+@keyframes coreformHandleGlow {
+  from {
+    opacity: 0.45;
+    transform: translateY(-50%) scaleY(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1.04);
+  }
+}
+
+@keyframes coreformPersonPulse {
   0%,
   100% {
-    opacity: 0;
+    opacity: 0.16;
+    transform: scale(0.88);
   }
-  20%,
-  80% {
-    opacity: 1;
+  50% {
+    opacity: 0.55;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes coreformWalkerSwingForward {
+  from {
+    transform: rotate(-11deg);
+  }
+  to {
+    transform: rotate(13deg);
+  }
+}
+
+@keyframes coreformWalkerSwingBack {
+  from {
+    transform: rotate(13deg);
+  }
+  to {
+    transform: rotate(-11deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .coreform-lift-fill-rect,
+  .coreform-door-overlay,
   .coreform-door-left,
   .coreform-door-right,
-  .coreform-person-enter,
-  .coreform-person-exit,
-  .coreform-door-label {
+  .coreform-door-reveal,
+  .coreform-door-person,
+  .coreform-door-status,
+  .coreform-door-handle,
+  .coreform-person-pulse,
+  .coreform-walker-arm-left,
+  .coreform-walker-arm-right,
+  .coreform-walker-leg-left,
+  .coreform-walker-leg-right {
     animation: none !important;
   }
 
-  .coreform-person-enter,
-  .coreform-person-exit {
+  .coreform-door-overlay,
+  .coreform-door-status,
+  .coreform-door-person {
     opacity: 1;
+  }
+
+  .coreform-door-person {
     transform: translate(-50%, -50%);
   }
 }

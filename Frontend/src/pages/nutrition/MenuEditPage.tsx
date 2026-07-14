@@ -34,8 +34,8 @@ export const MenuEditPage = () => {
     return (
       <PageLayout title="Chỉnh sửa thực đơn">
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="mr-2 h-8 w-8 animate-spin text-white" />
-          <span className="text-white">Đang tải...</span>
+          <Loader2 className="mr-2 h-8 w-8 animate-spin text-clay" />
+          <span className="text-earth">Đang tải...</span>
         </div>
       </PageLayout>
     )
@@ -44,7 +44,7 @@ export const MenuEditPage = () => {
   if (!menuDetail) {
     return (
       <PageLayout title="Chỉnh sửa thực đơn">
-        <div className="text-center py-8 text-white">Không tìm thấy thực đơn</div>
+        <div className="text-center py-8 text-earth/60">Không tìm thấy thực đơn</div>
       </PageLayout>
     )
   }

@@ -1,4 +1,5 @@
 import { MacroCard } from "@/components/features/nutrition/MacroCard"
+import { ImageWithFallback } from "@/components/shared/common/image-with-fallbacks"
 import { Button } from "@/components/shared/ui/button"
 import { Card, CardContent } from "@/components/shared/ui/card"
 import { CustomSelect } from "@/components/shared/ui/custom-select"
@@ -246,8 +247,8 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
   // helpers for tab UI
   const tabClass = (meal: MealKey) =>
     selectedMeal === meal
-      ? "px-3 py-2 rounded-md text-white/95 font-semibold bg-gradient-to-b from-white/6 to-white/3 shadow-md ring-1 ring-white/10 transform scale-105 transition-transform duration-150"
-      : "px-3 py-2 bg-white/3 rounded-md text-white/60 hover:bg-white/4 transition-colors duration-150"
+      ? "rounded-full border border-earth bg-earth px-4 py-2 text-sm font-semibold text-cream shadow-sm shadow-earth/10 transition-all duration-200"
+      : "rounded-full border border-sand/60 bg-cream/60 px-4 py-2 text-sm font-medium text-earth/65 transition-colors duration-200 hover:border-clay hover:text-earth"
 
   const isEdit = !!initialData
 
@@ -256,7 +257,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
       <form>
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
-            <h1 className="text-2xl text-white font-bold mb-3">{isEdit ? "Cập nhật thực đơn" : "Tạo thực đơn"}</h1>
+            <h1 className="font-display text-3xl text-earth font-medium mb-3">{isEdit ? "Cập nhật thực đơn" : "Tạo thực đơn"}</h1>
           </div>
 
           <div className="flex items-center gap-3">
@@ -297,10 +298,10 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-6">
-            <Card className="rounded-xl py-0">
+            <Card className="gap-0 rounded-2xl border-sand/60 bg-white py-0 shadow-sm shadow-earth/5">
               <CardContent className="p-6">
-                <h3 className="text-white font-semibold mb-4">Danh sách món ăn</h3>
-                <div className="flex gap-3 mb-4">
+                <h3 className="font-display text-lg font-medium text-earth mb-4">Danh sách món ăn</h3>
+                <div className="flex flex-wrap gap-3 mb-4">
                   <SimpleField name="searchDish" control={form.control} hideLabel className="flex-1">
                     {(field) => (
                       <Input
@@ -324,18 +325,18 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                 <ScrollArea className="h-[400px]">
                   {isDishesLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="animate-spin text-white" size={32} />
+                      <Loader2 className="animate-spin text-clay" size={32} />
                     </div>
                   ) : allDishes.length === 0 ? (
-                    <div className="text-white/60 text-center py-8">Không tìm thấy món ăn nào.</div>
+                    <div className="text-earth/60 text-center py-8">Không tìm thấy món ăn nào.</div>
                   ) : (
                     <div className="space-y-3">
                       {allDishes.map((dish) => (
-                        <div key={dish.id} className="flex gap-4 items-center bg-transparent border rounded-md p-3">
-                          <img src={dish.image} alt={dish.name} className="w-36 h-20 object-cover rounded" />
+                        <div key={dish.id} className="flex gap-4 items-center rounded-xl border border-sand/60 bg-cream/40 p-3 transition-colors hover:border-clay/50 hover:bg-sand-light/35">
+                          <ImageWithFallback src={dish.image} alt={dish.name} className="w-36 h-20 object-cover rounded-lg" />
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
-                              <div className="text-white font-semibold">{dish.name}</div>
+                              <div className="text-earth font-semibold">{dish.name}</div>
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -350,22 +351,22 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                               </Button>
                             </div>
 
-                            <div className="grid grid-cols-4 gap-4 text-center text-white/80 text-sm">
+                            <div className="grid grid-cols-4 gap-4 text-center text-sm">
                               <div>
-                                <div className="text-white">{dish.calories}</div>
-                                <div className="text-white/60">Calo</div>
+                                <div className="font-semibold text-earth">{dish.calories}</div>
+                                <div className="text-earth/55">Calo</div>
                               </div>
                               <div>
-                                <div className="text-white">{dish.protein}g</div>
-                                <div className="text-white/60">Protein</div>
+                                <div className="font-semibold text-earth">{dish.protein}g</div>
+                                <div className="text-earth/55">Protein</div>
                               </div>
                               <div>
-                                <div className="text-white">{dish.carbs}g</div>
-                                <div className="text-white/60">Carbs</div>
+                                <div className="font-semibold text-earth">{dish.carbs}g</div>
+                                <div className="text-earth/55">Carbs</div>
                               </div>
                               <div>
-                                <div className="text-white">{dish.fat}g</div>
-                                <div className="text-white/60">Fat</div>
+                                <div className="font-semibold text-earth">{dish.fat}g</div>
+                                <div className="text-earth/55">Fat</div>
                               </div>
                             </div>
                           </div>
@@ -401,9 +402,9 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
 
           {/* Right column - macros + menu */}
           <div className="lg:col-span-6 space-y-6">
-            <Card className="rounded-xl">
+            <Card className="gap-0 rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
               <CardContent>
-                <h3 className="text-white font-semibold mb-4">Tổng lượng dinh dưỡng</h3>
+                <h3 className="font-display text-lg font-medium text-earth mb-4">Tổng lượng dinh dưỡng</h3>
                 <div className="flex gap-2 mb-2 flex-wrap">
                   <MacroCard label="Calories" value={totalNutrition.calories} Icon={Flame} />
                   <MacroCard label="Protein" value={`${totalNutrition.protein}g`} Icon={Beef} />
@@ -413,42 +414,42 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
               </CardContent>
             </Card>
 
-            <Card className="rounded-xl p-4">
+            <Card className="gap-0 rounded-2xl border-sand/60 bg-white p-4 shadow-sm shadow-earth/5">
               <CardContent className="p-4">
-                <h3 className="text-white font-semibold mb-4">Thực đơn</h3>
+                <h3 className="font-display text-lg font-medium text-earth mb-4">Thực đơn</h3>
 
-                <div className="flex gap-3 mb-4">
+                <div className="flex flex-wrap gap-3 mb-4">
                   <button type="button" className={tabClass("breakfast")} onClick={() => setSelectedMeal("breakfast")}>
                     Bữa sáng
-                    <div className="text-xs text-white/60">{meals.breakfast.length} món</div>
+                    <div className={selectedMeal === "breakfast" ? "text-xs text-cream/75" : "text-xs text-earth/50"}>{meals.breakfast.length} món</div>
                   </button>
                   <button type="button" className={tabClass("lunch")} onClick={() => setSelectedMeal("lunch")}>
                     Bữa trưa
-                    <div className="text-xs text-white/60">{meals.lunch.length} món</div>
+                    <div className={selectedMeal === "lunch" ? "text-xs text-cream/75" : "text-xs text-earth/50"}>{meals.lunch.length} món</div>
                   </button>
                   <button type="button" className={tabClass("dinner")} onClick={() => setSelectedMeal("dinner")}>
                     Bữa tối
-                    <div className="text-xs text-white/60">{meals.dinner.length} món</div>
+                    <div className={selectedMeal === "dinner" ? "text-xs text-cream/75" : "text-xs text-earth/50"}>{meals.dinner.length} món</div>
                   </button>
                   <button type="button" className={tabClass("extra")} onClick={() => setSelectedMeal("extra")}>
                     Bữa phụ
-                    <div className="text-xs text-white/60">{meals.extra.length} món</div>
+                    <div className={selectedMeal === "extra" ? "text-xs text-cream/75" : "text-xs text-earth/50"}>{meals.extra.length} món</div>
                   </button>
                 </div>
 
                 {/* Selected meal items */}
                 <div className="space-y-3">
                   {meals[selectedMeal].length === 0 ? (
-                    <div className="text-white/60 text-sm">Chưa có món nào cho bữa này.</div>
+                    <div className="rounded-xl border border-dashed border-sand/70 bg-cream/40 px-4 py-8 text-center text-sm text-earth/60">Chưa có món nào cho bữa này.</div>
                   ) : (
                     meals[selectedMeal].map((dish) => {
                       const quantity = dish.quantity ?? 1
                       return (
-                        <div key={dish.id} className="bg-white/6 rounded-md p-3">
+                        <div key={dish.id} className="rounded-xl border border-sand/60 bg-cream/45 p-3">
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <div className="text-white text-sm font-medium mb-1">{dish.name}</div>
-                              <div className="text-white/60 text-xs">
+                              <div className="text-earth text-sm font-semibold mb-1">{dish.name}</div>
+                              <div className="text-earth/60 text-xs">
                                 {((dish.calories ?? 0) * quantity).toFixed(1)} kcal &nbsp; P:{" "}
                                 {((dish.protein ?? 0) * quantity).toFixed(1)}g &nbsp; C:{" "}
                                 {((dish.carbs ?? 0) * quantity).toFixed(1)}g &nbsp; F:{" "}
@@ -467,12 +468,12 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                                   }}
                                   aria-label="Giảm số lượng"
                                   title="Giảm số lượng"
-                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-white/90 hover:bg-white/4"
+                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-earth/80 hover:bg-sand-light/60"
                                 >
                                   -
                                 </button>
 
-                                <div className="px-3 text-sm font-medium text-white">{quantity}</div>
+                                <div className="px-3 text-sm font-medium text-earth">{quantity}</div>
 
                                 <button
                                   type="button"
@@ -482,7 +483,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                                   }}
                                   aria-label="Tăng số lượng"
                                   title="Tăng số lượng"
-                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-white/90 hover:bg-white/4"
+                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-earth/80 hover:bg-sand-light/60"
                                 >
                                   +
                                 </button>
