@@ -1,13 +1,14 @@
 # ============================================================================
 # Profile PRODUCT  - kích hoạt bằng:  SPRING_PROFILES_ACTIVE=product
 # ----------------------------------------------------------------------------
-# Chỉ override các giá trị KHÁC với application.yml (base) cho môi trường production.
-# Mọi secret/cấu hình đọc từ biến môi trường theo cú pháp ${ENV:default}
-#   -> chưa set env thì dùng default; docker-compose-product.yml sẽ truyền env vào.
+# CHỈ override thứ KHÁC theo môi trường production. Các secret dùng chung
+# (Cloudinary, Gemini, Google OAuth, Mail, JWT) KẾ THỪA từ application.yml (base).
+#
+# Giá trị đọc từ biến môi trường ${ENV:default}; docker-compose-product.yml truyền env vào.
+#   - DB: server thật 10.10.100.100:3311 (root/fitness123)
 # ============================================================================
 spring:
   datasource:
-    # DB ngoài (mặc định 10.10.100.100:3311)
     url: "jdbc:mysql://${DB_HOST:10.10.100.100}:${DB_PORT:3311}/${DB_NAME:fitness_db}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:fitness123}
@@ -16,21 +17,10 @@ spring:
     # Tắt log SQL ở production
     show-sql: false
 
-  mail:
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
-
-  ai:
-    openai:
-      api-key: ${GEMINI_API_KEY:AIzaPLACEHOLDER}
-
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${GOOGLE_CLIENT_ID:}
-            client-secret: ${GOOGLE_CLIENT_SECRET:}
+  # DB trên server thật được nạp trực tiếp bằng file SQL -> KHÔNG chạy Flyway.
+  # (tránh lỗi khi bảng/dữ liệu đã tồn tại hoặc migration đang ở trạng thái failed)
+  flyway:
+    enabled: false
 
 logging:
   level:
@@ -39,9 +29,7 @@ logging:
       springframework:
         security: WARN
 
-jwt:
-  secretKey: ${JWT_SECRET_KEY:eybb+/++uLfMDzpiLPeyPdvPpAtYDxYSsfBNp5RSSaU=}
-
+# URL công khai theo domain production (override khi deploy domain thật)
 app:
   oauth2:
     redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/oauth2/redirect}
@@ -49,8 +37,3 @@ app:
 open:
   api:
     serverUrl: ${OPENAPI_SERVER_URL:http://localhost:8080}
-
-cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME:demo}
-  api-key: ${CLOUDINARY_API_KEY:000000000000000}
-  api-secret: ${CLOUDINARY_API_SECRET:demo_secret}
