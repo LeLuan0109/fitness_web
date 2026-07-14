@@ -1,0 +1,85 @@
+# ============================================================================
+# Docker Compose PRODUCTION - Backend Fitness
+# ----------------------------------------------------------------------------
+# Chỉ build & chạy BACKEND, dùng MySQL ngoài (mặc định 10.10.100.100:3311).
+# Kích hoạt profile Spring "product" -> nạp application-product.yml.
+# Giá trị cấu hình truyền qua biến môi trường (đọc từ .env, đều có default).
+#
+# Cách dùng:
+#   1. (Tùy chọn) cp .env.example .env  rồi đổi giá trị.
+#   2. Build & chạy:  docker compose -f docker-compose-product.yml up -d --build
+#   3. Xem log:       docker compose -f docker-compose-product.yml logs -f backend
+#
+# Backend phục vụ tại http://<host>:${BACKEND_PORT:-8080}  (prefix API: /api)
+# ============================================================================
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fitness-backend:latest
+    container_name: fitness-backend-prod
+    restart: always
+    environment:
+      # ---- Kích hoạt profile production (nạp application-product.yml) ----
+      SPRING_PROFILES_ACTIVE: product
+
+      # ---- Database MySQL ngoài (feed placeholder trong application-product.yml) ----
+      DB_HOST: ${DB_HOST:-10.10.100.100}
+      DB_PORT: ${DB_PORT:-3311}
+      DB_NAME: ${DB_NAME:-fitness_db}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-fitness123}
+
+      # ---- JWT (nên đổi secret thật ở production) ----
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-eybb+/++uLfMDzpiLPeyPdvPpAtYDxYSsfBNp5RSSaU=}
+
+      # ---- URLs công khai ----
+      OAUTH2_REDIRECT_URI: ${OAUTH2_REDIRECT_URI:-http://localhost:5173/oauth2/redirect}
+      OPENAPI_SERVER_URL: ${OPENAPI_SERVER_URL:-http://localhost:8080}
+
+      # ---- Cloudinary (upload ảnh) ----
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-demo}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-000000000000000}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-demo_secret}
+
+      # ---- Gemini AI (chatbot) ----
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-AIzaPLACEHOLDER}
+
+      # ---- Mail SMTP (tùy chọn) ----
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+
+      # ---- Google OAuth2 (tùy chọn) ----
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+
+      # ---- JVM tuning (JVM tự đọc JAVA_TOOL_OPTIONS, không cần sửa Dockerfile) ----
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--Xms256m -Xmx768m}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    # extra_hosts: nếu DB nằm trên chính máy host, đặt DB_HOST=host.docker.internal và bỏ comment:
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+    healthcheck:
+      # Healthy khi server có phản hồi HTTP bất kỳ (exit 0=2xx, 8=4xx/5xx);
+      # chỉ unhealthy khi cổng chưa lên (connection refused).
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/api/ ; [ $? -eq 0 -o $? -eq 8 ]"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M

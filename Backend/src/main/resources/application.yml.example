@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: fitness
+
+  datasource:
+    url: "jdbc:mysql://localhost:3306/fitness_db?useSSL=false&serverTimezone=UTC"
+    username: root
+    password: "{your_pw}"
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    # ddl-auto: create   # 'create' cho lần chạy đầu để tạo bảng, 'update' cho các lần sau
+    show-sql: true
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  # OAUTH Config
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "{your_client_id}"
+            client-secret: "{your_client_secret}"
+            scope: email, profile
+
+  # GMAIL SMTP
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "{your_username}"
+    password: "{your_pw}"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # File size
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  # Gemini AI - API Key của Google (lấy tại aistudio.google.com)
+  ai:
+    openai:
+      api-key: "AIza...(Tu Lay Key Di)"
+      base-url: https://generativelanguage.googleapis.com/v1beta/openai/
+      chat:
+        options:
+          model: gemini-2.5-flash
+          temperature: 0.7
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+# JWT
+jwt:
+  expiration: 2592000
+  expiration-refresh-token: 5184000
+  reset-password-expiration: 600
+  secretKey: "eybb+/++uLfMDzpiLPeyPdvPpAtYDxYSsfBNp5RSSaU="
+
+# API_PREFIX
+api:
+  prefix: api
+
+app:
+  oauth2:
+    redirect-uri: http://localhost:5173/oauth2/redirect
+
+# SWAGGER
+open:
+  api:
+    title: Fitness Service Documents
+    version: v.1.0.0
+    serverUrl: http://localhost:8080
+
+# Cloudinary Config
+cloudinary:
+  cloud-name: ten_cloud_cua_ban
+  api-key: api_key_cua_ban
+  api-secret: api_secret_cua_ban

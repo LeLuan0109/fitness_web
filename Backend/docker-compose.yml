@@ -3,7 +3,7 @@
 #
 # - MySQL tự khởi tạo database 'fitness_db'
 # - Flyway trong backend tự tạo toàn bộ bảng + seed dữ liệu chung (V1..V21) khi start
-# - Backend phục vụ tại http://localhost:8080  (prefix API: /api)
+# - Backend phục vụ tại http://localhost:8055  (prefix API: /api)
 
 services:
   mysql:
@@ -44,7 +44,7 @@ services:
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "fitness123"
     ports:
-      - "8080:8080"
+      - "8055:8080"
 
 volumes:
   mysql_data:
