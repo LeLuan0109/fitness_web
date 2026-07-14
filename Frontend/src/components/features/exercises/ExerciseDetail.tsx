@@ -15,12 +15,14 @@ import { ROLES } from "@/constants/roles.constant"
 import { ROUTES } from "@/constants/routes"
 import { useDisclosure } from "@/hooks/common/use-disclosure"
 import { ConfirmDialog } from "@/components/shared/ui/confirm-dialog"
+import { useDeleteExercise } from "@/hooks/queries/exercises/useDeleteExercise"
 
 export const ExerciseDetail = () => {
   const { id } = useParams()
   const isAdminView = authStore.use.auth().role?.name === ROLES.ADMIN
   const navigate = useNavigate()
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
+  const deleteMutation = useDeleteExercise()
 
   const { data: dataDetailExercise, isFetching: isFetchingDetail } = useDetailExercises(id)
   const { data: dataRelatedExercises, isFetching: isFetchingRelated } = useGetRelatedExercise(id)
@@ -38,7 +40,13 @@ export const ExerciseDetail = () => {
   }
 
   const handleDelete = () => {
-    // Xử lý xóa bài tập ở đây
+    if (id) {
+      deleteMutation.mutate(id, {
+        onSuccess: () => {
+          navigate(ROUTES.EXERCISES.LIST)
+        },
+      })
+    }
   }
 
   return (
@@ -101,7 +109,16 @@ export const ExerciseDetail = () => {
           <RelatedExerciseGroup exercises={dataRelatedExercises} />
         </div>
       </div>
-      <ConfirmDialog variant="destructive" open={isOpen} onOpenChange={onOpenChange} onConfirm={handleDelete} />
+      <ConfirmDialog
+        open={isOpen}
+        onOpenChange={onOpenChange}
+        title="Xác nhận xóa bài tập"
+        content={`Bạn có chắc chắn muốn xóa bài tập "${dataDetailExercise.name}"? Hành động này không thể hoàn tác.`}
+        onConfirm={handleDelete}
+        variant="destructive"
+        confirmText="Xóa bài tập"
+        cancelText="Hủy"
+      />
     </div>
   )
 }

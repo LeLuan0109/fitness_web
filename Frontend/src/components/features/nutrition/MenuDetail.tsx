@@ -15,11 +15,16 @@ import { toast } from "sonner"
 import authStore from "@/stores/auth.store"
 import { MealType } from "@/types/enum"
 
-export const MenuDetail = () => {
+type MenuDetailProps = {
+  isSample?: boolean
+}
+
+export const MenuDetail = ({ isSample: isSampleRoute }: MenuDetailProps = {}) => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { isOpen, onOpenChange, onOpen } = useDisclosure()
   const isAdmin = authStore.use.auth()?.role?.name === "ADMIN"
+  const listRoute = isSampleRoute ? ROUTES.NUTRITION.SAMPLE : ROUTES.NUTRITION.MY_MEALS
 
   const { data: menu, isLoading } = useGetMenuDetail(id)
   const { mutate: deleteMenu } = useDeleteMenu()
@@ -49,7 +54,7 @@ export const MenuDetail = () => {
       deleteMenu(id, {
         onSuccess: () => {
           onOpenChange(false)
-          navigate(ROUTES.NUTRITION.MY_MEALS)
+          navigate(listRoute)
         },
       })
     }

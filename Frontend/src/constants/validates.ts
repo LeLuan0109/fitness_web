@@ -1,8 +1,7 @@
 import { z } from "zod"
 
 import { MAX_LENGTH } from "@/constants/common"
-
-const PASSWORD_VALIDATION = new RegExp(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+import { PASSWORD_REGEX } from "@/utils/regex"
 
 export const vStringPassword = () =>
   z
@@ -11,8 +10,8 @@ export const vStringPassword = () =>
     .max(MAX_LENGTH[255], {
       message: "Mật khẩu không được vượt quá 255 ký tự",
     })
-    .regex(PASSWORD_VALIDATION, {
-      message: "Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm cả chữ cái và số",
+    .regex(PASSWORD_REGEX, {
+      message: "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái, số và ít nhất 1 ký tự đặc biệt",
     })
 
 export const vStringEmail = () => {
