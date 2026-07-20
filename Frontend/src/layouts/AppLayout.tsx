@@ -2,7 +2,6 @@ import {
   Activity,
   Apple,
   Bell,
-  Camera,
   ChevronDown,
   Compass,
   Dumbbell,
@@ -15,6 +14,7 @@ import {
   Newspaper,
   RefreshCw,
   ShieldCheck,
+  TrendingUp,
   User,
   Users,
   type LucideIcon,
@@ -63,84 +63,90 @@ type NavigationGroup = {
 
 const userNavigationGroups: NavigationGroup[] = [
   {
-    label: "Features",
+    label: "Tính năng",
     icon: Activity,
     items: [
       {
-        title: "Smart Form Corrector",
-        description: "AI posture feedback for safer movement.",
-        url: ROUTES.EXERCISES.LIST,
-        icon: Camera,
+        title: "Tiến bộ sức mạnh",
+        description: "Biểu đồ tạ, 1RM và kỷ lục cá nhân (PR).",
+        url: ROUTES.PROGRESS,
+        icon: TrendingUp,
       },
       {
-        title: "Vitals Analyzer",
-        description: "BMI, TDEE, calories, and training signals.",
+        title: "Phân tích chỉ số cơ thể",
+        description: "BMI, TDEE, calo và chỉ số tập luyện.",
         url: ROUTES.HOME,
         icon: HeartPulse,
       },
     ],
   },
   {
-    label: "Journey",
+    label: "Hành trình",
     icon: Compass,
     items: [
       {
         title: "Danh sách bài tập",
-        description: "Browse the movement library.",
+        description: "Khám phá thư viện động tác.",
         url: ROUTES.EXERCISES.LIST,
         icon: Dumbbell,
       },
       {
         title: "Kế hoạch mẫu",
-        description: "Start from guided workout plans.",
+        description: "Bắt đầu với giáo án có sẵn.",
         url: ROUTES.WORKOUTS.SAMPLE_LIST,
         icon: LayoutDashboard,
       },
       {
         title: "Kế hoạch của tôi",
-        description: "Continue your personal roadmap.",
+        description: "Tiếp tục lộ trình cá nhân.",
         url: ROUTES.WORKOUTS.MY_LIST,
         icon: ShieldCheck,
       },
     ],
   },
   {
-    label: "Nutrition",
+    label: "Dinh dưỡng",
     icon: Apple,
     items: [
       {
         title: "Thực đơn mẫu",
-        description: "Balanced menus for clear goals.",
+        description: "Thực đơn cân bằng theo mục tiêu.",
         url: ROUTES.NUTRITION.SAMPLE,
         icon: Apple,
       },
       {
         title: "Thực đơn của tôi",
-        description: "Review your saved meal plans.",
+        description: "Xem lại thực đơn đã lưu.",
         url: ROUTES.NUTRITION.MY_MEALS,
         icon: Flame,
       },
       {
+        title: "Nhật ký ăn uống",
+        description: "Ghi món đã ăn, theo dõi macro theo ngày.",
+        url: ROUTES.NUTRITION.DIARY,
+        icon: HeartPulse,
+      },
+      {
         title: "Danh sách món ăn",
-        description: "Explore dishes and nutrition details.",
+        description: "Khám phá món ăn và thông tin dinh dưỡng.",
         url: ROUTES.DISHES.LIST,
         icon: HeartPulse,
       },
     ],
   },
   {
-    label: "Community",
+    label: "Cộng đồng",
     icon: Users,
     items: [
       {
         title: "Bảng feed",
-        description: "See updates from the fitness community.",
+        description: "Cập nhật từ cộng đồng tập luyện.",
         url: ROUTES.COMMUNITY.FEED,
         icon: Newspaper,
       },
       {
         title: "Bài viết của tôi",
-        description: "Manage your shared progress.",
+        description: "Quản lý các bài chia sẻ của bạn.",
         url: ROUTES.COMMUNITY.MY_POSTS,
         icon: User,
       },
@@ -150,72 +156,72 @@ const userNavigationGroups: NavigationGroup[] = [
 
 const adminNavigationGroups: NavigationGroup[] = [
   {
-    label: "Admin",
+    label: "Quản trị",
     icon: LayoutDashboard,
     items: [
       {
-        title: "Dashboard",
-        description: "Overview of platform activity.",
+        title: "Bảng điều khiển",
+        description: "Tổng quan hoạt động hệ thống.",
         url: ROUTES.ADMIN.DASHBOARD,
         icon: LayoutDashboard,
       },
       {
         title: "Quản lý người dùng",
-        description: "Review members and account status.",
+        description: "Xem thành viên và trạng thái tài khoản.",
         url: ROUTES.ADMIN.USERS,
         icon: Users,
       },
     ],
   },
   {
-    label: "Journey",
+    label: "Hành trình",
     icon: Compass,
     items: [
       {
         title: "Danh sách bài tập",
-        description: "Manage the exercise library.",
+        description: "Quản lý thư viện bài tập.",
         url: ROUTES.EXERCISES.LIST,
         icon: Dumbbell,
       },
       {
         title: "Kế hoạch mẫu",
-        description: "Review sample workout plans.",
+        description: "Xem lại các giáo án mẫu.",
         url: ROUTES.WORKOUTS.SAMPLE_LIST,
         icon: ShieldCheck,
       },
     ],
   },
   {
-    label: "Nutrition",
+    label: "Dinh dưỡng",
     icon: Apple,
     items: [
       {
         title: "Thực đơn mẫu",
-        description: "Review curated meal plans.",
+        description: "Xem lại các thực đơn được tuyển chọn.",
         url: ROUTES.NUTRITION.SAMPLE,
         icon: Apple,
       },
       {
         title: "Danh sách món ăn",
-        description: "Manage dishes and nutrition data.",
+        description: "Quản lý món ăn và dữ liệu dinh dưỡng.",
         url: ROUTES.DISHES.LIST,
         icon: HeartPulse,
       },
       {
         title: "Danh sách nguyên liệu",
-        description: "Maintain ingredient records.",
+        description: "Duy trì dữ liệu nguyên liệu.",
         url: ROUTES.INGREDIENTS.LIST,
         icon: Flame,
       },
     ],
   },
   {
-    label: "Community",
+    label: "Cộng đồng",
     icon: Users,
     items: [
       {
         title: "Bảng feed",
-        description: "Moderate community activity.",
+        description: "Kiểm duyệt hoạt động cộng đồng.",
         url: ROUTES.COMMUNITY.FEED,
         icon: Newspaper,
       },

@@ -90,4 +90,26 @@ public interface WorkoutLogRepository extends JpaRepository<WorkoutLogs, Long> {
                                          @Param("endDate") LocalDateTime endDate);
 
     boolean existsByUserIdAndCreatedAtBetween(Long userId, LocalDateTime start, LocalDateTime end);
+
+    // ===== Feature: Theo dõi tiến bộ sức mạnh (Progress + PR) =====
+    // Gom theo ngày: tạ nặng nhất, reps nhiều nhất, 1RM ước tính (Epley), tổng volume.
+    @Query("SELECT CAST(w.createdAt AS date) as day, " +
+            "MAX(COALESCE(w.actualWeights, 0)) as maxWeight, " +
+            "MAX(COALESCE(w.actualReps, 0)) as maxReps, " +
+            "MAX(COALESCE(w.actualWeights, 0) * (1 + COALESCE(w.actualReps, 0) / 30.0)) as maxOneRm, " +
+            "SUM(COALESCE(w.actualReps, 0) * COALESCE(w.actualWeights, 0)) as volume " +
+            "FROM WorkoutLogs w " +
+            "WHERE w.user.id = :userId AND w.exercise.id = :exerciseId " +
+            "AND (:startDate IS NULL OR w.createdAt >= :startDate) " +
+            "AND (:endDate IS NULL OR w.createdAt <= :endDate) " +
+            "GROUP BY CAST(w.createdAt AS date) " +
+            "ORDER BY CAST(w.createdAt AS date) ASC")
+    List<Object[]> getExerciseProgress(@Param("userId") Long userId,
+                                       @Param("exerciseId") Long exerciseId,
+                                       @Param("startDate") LocalDateTime startDate,
+                                       @Param("endDate") LocalDateTime endDate);
+
+    // Danh sách id các bài tập mà user đã từng log (để đổ vào dropdown chọn bài xem tiến bộ)
+    @Query("SELECT DISTINCT w.exercise.id, w.exercise.name FROM WorkoutLogs w WHERE w.user.id = :userId")
+    List<Object[]> findLoggedExercisesByUser(@Param("userId") Long userId);
 }

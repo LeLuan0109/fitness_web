@@ -110,6 +110,38 @@ public class WorkoutLogController {
         }
     }
 
+    @GetMapping("/logged-exercises")
+    @Operation(summary = "Danh sách bài tập đã từng log", description = "Dùng cho dropdown chọn bài xem tiến bộ")
+    public ResponseEntity<?> getLoggedExercises() {
+        try {
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(true)
+                    .data(workoutLogService.getLoggedExercises())
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .status(false).data(e.getMessage()).build());
+        }
+    }
+
+    @GetMapping("/progress/{exerciseId}")
+    @Operation(summary = "Tiến bộ sức mạnh của 1 bài tập", description = "Chuỗi thời gian tạ/1RM/volume + kỷ lục cá nhân (PR)")
+    public ResponseEntity<?> getExerciseProgress(
+            @PathVariable Long exerciseId,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate toDate
+    ) {
+        try {
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(true)
+                    .data(workoutLogService.getExerciseProgress(exerciseId, fromDate, toDate))
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .status(false).data(e.getMessage()).build());
+        }
+    }
+
     @GetMapping("/statistics")
     public ResponseEntity<?> getWorkoutLogStatistics() {
         try {

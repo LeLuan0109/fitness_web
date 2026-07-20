@@ -1,6 +1,5 @@
-import { createBrowserRouter } from "react-router-dom"
+import { createBrowserRouter, Navigate } from "react-router-dom"
 
-import { ErrorFallback } from "@/components/shared/common/error-fallback"
 import { GuestRoute } from "@/components/shared/routes/GuestRoute"
 import { ProtectedRoute } from "@/components/shared/routes/ProtectedRoute"
 import { ROLE_ADMIN, ROLE_USER } from "@/constants/roles.constant"
@@ -49,6 +48,8 @@ const { Dashboard } = lazyImport(() => import("@/pages/dashboard/DashboardPage")
 const { SimpleTablePage } = lazyImport(() => import("@/pages/table/simple-table-page"), "SimpleTablePage")
 const { SelectedTablePage } = lazyImport(() => import("@/pages/table/selected-table-page"), "SelectedTablePage")
 const { HistoryPage } = lazyImport(() => import("@/pages/history/HistoryPage"), "HistoryPage")
+const { ProgressPage } = lazyImport(() => import("@/pages/progress/ProgressPage"), "ProgressPage")
+const { FoodDiaryPage } = lazyImport(() => import("@/pages/nutrition/FoodDiaryPage"), "FoodDiaryPage")
 
 export const router = createBrowserRouter([
   {
@@ -176,6 +177,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: ROUTES.PROGRESS,
+        element: (
+          <ProtectedRoute allowedRoles={[ROLE_USER]}>
+            <ProgressPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: ROUTES.NUTRITION.SAMPLE,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
@@ -188,6 +197,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER]}>
             <MyMenuPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: ROUTES.NUTRITION.DIARY,
+        element: (
+          <ProtectedRoute allowedRoles={[ROLE_USER]}>
+            <FoodDiaryPage />
           </ProtectedRoute>
         ),
       },
@@ -367,7 +384,8 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    // Mọi đường dẫn không khớp -> điều hướng về trang đăng nhập.
     path: "*",
-    element: <ErrorFallback error={404} />,
+    element: <Navigate to={ROUTES.AUTH.LOGIN} replace />,
   },
 ])

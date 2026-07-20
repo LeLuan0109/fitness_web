@@ -1,4 +1,4 @@
-import { sendChatMessage } from "@/api/chatbot.api"
+import { analyzeTraining, sendChatMessage } from "@/api/chatbot.api"
 import { Button } from "@/components/shared/ui/button"
 import { Card, CardHeader, CardTitle } from "@/components/shared/ui/card"
 import { ScrollArea } from "@/components/shared/ui/scroll-area"
@@ -94,6 +94,44 @@ export const ChatWindow = ({ onClose }: ChatWindowProps) => {
     }
   }
 
+  // Phân tích AI từ số liệu thật (prompt có sẵn)
+  const handleAnalyze = async (type: "PROGRESS" | "NUTRITION" | "OVERALL", label: string) => {
+    if (isLoading) return
+    const userMessage: ChatMessageType = {
+      id: Date.now().toString(),
+      content: label,
+      role: "user",
+      timestamp: new Date(),
+    }
+    const botLoadingId = (Date.now() + 1).toString()
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+      { id: botLoadingId, content: "", role: "assistant", timestamp: new Date(), isLoading: true },
+    ])
+    setIsLoading(true)
+    try {
+      if (!auth?.id) throw new Error("Vui lòng đăng nhập")
+      const res = await analyzeTraining(auth.id, type)
+      const message = res?.data?.message ?? "Chưa có dữ liệu để phân tích."
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === botLoadingId ? { ...msg, content: message, isLoading: false } : msg)),
+      )
+    } catch (error) {
+      console.error(error)
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === botLoadingId
+            ? { ...msg, content: "Hệ thống đang bận, vui lòng thử lại sau.", isLoading: false }
+            : msg,
+        ),
+      )
+      toast.error("Phân tích thất bại")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleClearChat = () => {
     setMessages([
       {
@@ -141,6 +179,31 @@ export const ChatWindow = ({ onClose }: ChatWindowProps) => {
             <div ref={messagesEndRef} className="h-1" />
           </div>
         </ScrollArea>
+      </div>
+
+      {/* Nút phân tích AI từ số liệu thật */}
+      <div className="shrink-0 flex flex-wrap gap-1.5 px-3 pb-1 pt-2 border-t">
+        <button
+          onClick={() => handleAnalyze("PROGRESS", "📊 Phân tích tiến bộ tập luyện của tôi")}
+          disabled={isLoading}
+          className="rounded-full border border-primary/30 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/10 disabled:opacity-50"
+        >
+          📊 Tiến bộ
+        </button>
+        <button
+          onClick={() => handleAnalyze("NUTRITION", "🍎 Phân tích dinh dưỡng hôm nay của tôi")}
+          disabled={isLoading}
+          className="rounded-full border border-primary/30 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/10 disabled:opacity-50"
+        >
+          🍎 Dinh dưỡng
+        </button>
+        <button
+          onClick={() => handleAnalyze("OVERALL", "🔥 Đánh giá tổng quan tập luyện của tôi")}
+          disabled={isLoading}
+          className="rounded-full border border-primary/30 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/10 disabled:opacity-50"
+        >
+          🔥 Tổng quan
+        </button>
       </div>
 
       <div className="shrink-0">

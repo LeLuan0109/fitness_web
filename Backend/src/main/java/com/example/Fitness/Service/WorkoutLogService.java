@@ -260,4 +260,78 @@ public class WorkoutLogService {
                     .build();
         }).collect(Collectors.toList());
     }
+
+    // ===== Feature: Theo dõi tiến bộ sức mạnh (Progress + PR) =====
+
+    /** Danh sách bài tập mà user đã từng log (đổ vào dropdown chọn bài xem tiến bộ). */
+    public List<Map<String, Object>> getLoggedExercises() {
+        User user = getCurrentUserOrThrow();
+        List<Object[]> rows = workoutLogRepository.findLoggedExercisesByUser(user.getId());
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Object[] r : rows) {
+            Map<String, Object> m = new HashMap<>();
+            m.put("id", ((Number) r[0]).longValue());
+            m.put("name", r[1]);
+            result.add(m);
+        }
+        return result;
+    }
+
+    /** Tiến bộ của 1 bài tập theo thời gian + kỷ lục cá nhân (PR). */
+    public com.example.Fitness.DTO.response.workout_logs.ExerciseProgressResponse getExerciseProgress(
+            Long exerciseId, LocalDate fromDate, LocalDate toDate) throws DataNotFoundException {
+        User user = getCurrentUserOrThrow();
+        Exercises exercise = exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new DataNotFoundException("Không tìm thấy bài tập"));
+
+        LocalDateTime start = (fromDate != null) ? fromDate.atStartOfDay() : null;
+        LocalDateTime end = (toDate != null) ? toDate.atTime(LocalTime.MAX) : null;
+
+        List<Object[]> rows = workoutLogRepository.getExerciseProgress(user.getId(), exerciseId, start, end);
+
+        List<com.example.Fitness.DTO.response.workout_logs.ExerciseProgressResponse.ProgressPoint> points = new ArrayList<>();
+        double bestWeight = 0;
+        int bestReps = 0;
+        double bestOneRm = 0;
+        String bestDate = null;
+
+        for (Object[] r : rows) {
+            String day = String.valueOf(r[0]);
+            double maxWeight = (r[1] != null) ? ((Number) r[1]).doubleValue() : 0;
+            int maxReps = (r[2] != null) ? ((Number) r[2]).intValue() : 0;
+            double oneRm = (r[3] != null) ? ((Number) r[3]).doubleValue() : 0;
+            double volume = (r[4] != null) ? ((Number) r[4]).doubleValue() : 0;
+
+            points.add(com.example.Fitness.DTO.response.workout_logs.ExerciseProgressResponse.ProgressPoint.builder()
+                    .date(day)
+                    .maxWeight(maxWeight)
+                    .maxReps(maxReps)
+                    .estimatedOneRm(Math.round(oneRm * 10) / 10.0)
+                    .volume(volume)
+                    .build());
+
+            if (maxWeight > bestWeight) {
+                bestWeight = maxWeight;
+                bestDate = day;
+            }
+            if (maxReps > bestReps) bestReps = maxReps;
+            if (oneRm > bestOneRm) bestOneRm = oneRm;
+        }
+
+        return com.example.Fitness.DTO.response.workout_logs.ExerciseProgressResponse.builder()
+                .exerciseId(exerciseId)
+                .exerciseName(exercise.getName())
+                .points(points)
+                .bestWeight(bestWeight)
+                .bestReps(bestReps)
+                .bestEstimatedOneRm(Math.round(bestOneRm * 10) / 10.0)
+                .bestDate(bestDate)
+                .build();
+    }
+
+    private User getCurrentUserOrThrow() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+    }
 }

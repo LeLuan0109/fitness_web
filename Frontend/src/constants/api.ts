@@ -52,6 +52,8 @@ export const API_ENDPOINTS = {
     LOG_SET: "/workout-logs",
     HISTORY: "/workout-logs/history",
     STATS: "/workout-logs/statistics",
+    LOGGED_EXERCISES: "/workout-logs/logged-exercises",
+    PROGRESS: "/workout-logs/progress/:exerciseId",
   },
   NOTIFICATIONS: {
     REGISTER_TOKEN: "/notifications/register-token",
@@ -68,6 +70,12 @@ export const API_ENDPOINTS = {
     CREATE: "/dishes",
     UPDATE: "/dishes/:id",
     DELETE: "/dishes/:id",
+  },
+  FOOD_LOGS: {
+    LIST: "/food-logs",
+    ADD: "/food-logs",
+    DELETE: "/food-logs/:id",
+    SUMMARY: "/food-logs/summary",
   },
   INGREDIENTS: {
     LIST: "/ingredients",
@@ -108,6 +116,7 @@ export const API_ENDPOINTS = {
   },
   CHATBOT: {
     CHAT: "/chat/:userId",
+    ANALYZE: "/chat/:userId/analyze",
   },
   ADMIN_DASHBOARD: {
     STATS: "/admin/dashboard/stats",

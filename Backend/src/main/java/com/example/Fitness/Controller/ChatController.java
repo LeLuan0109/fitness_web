@@ -32,4 +32,18 @@ public class ChatController {
                 .data(response)
                 .build());
     }
+
+    /**
+     * Phân tích số liệu tập luyện/dinh dưỡng bằng AI (Gemini) từ prompt có sẵn.
+     * type: PROGRESS | NUTRITION | OVERALL
+     */
+    @PostMapping("/{userId}/analyze")
+    public ResponseEntity<?> analyze(@PathVariable Long userId, @RequestBody(required = false) ChatRequest request) {
+        String type = (request != null && request.getMessage() != null) ? request.getMessage() : "OVERALL";
+        ChatResponse response = chatbotService.analyzeTraining(userId, type);
+        return ResponseEntity.ok(ApiResponse.<ChatResponse>builder()
+                .status(true)
+                .data(response)
+                .build());
+    }
 }

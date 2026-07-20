@@ -20,3 +20,10 @@ export const sendChatMessage = (userId: string | number, message: string) => {
     data: { message },
   })
 }
+
+// Phân tích số liệu tập luyện/dinh dưỡng bằng AI. type: PROGRESS | NUTRITION | OVERALL
+export const analyzeTraining = (userId: string | number, type: string) => {
+  return http.post<ChatResponse>(API_ENDPOINTS.CHATBOT.ANALYZE.replace(":userId", userId.toString()), {
+    data: { message: type },
+  })
+}

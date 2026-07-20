@@ -39,11 +39,13 @@ export const ROUTES = {
     EDIT: "/workouts/edit/:id",
   },
   HISTORY: "/history",
+  PROGRESS: "/progress",
   NUTRITION: {
     SAMPLE: "/nutrition/sample-meals",
     SAMPLE_DETAIL: "/nutrition/sample-meals/:id",
     MY_MEALS: "/nutrition/my-meals",
     MY_MEALS_DETAIL: "/nutrition/my-meals/:id",
+    DIARY: "/nutrition/diary",
     CREATE_MENU: "/nutrition/menu/create",
     EDIT_MENU: "/nutrition/menu/edit/:id",
   },

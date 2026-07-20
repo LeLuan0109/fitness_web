@@ -218,7 +218,9 @@ public class MenuService {
 
         Long currentUserId = getSafeCurrentUserId();
 
-        boolean isOwner = currentUserId != null && menu.getUser().getId().equals(currentUserId);
+        boolean isOwner = currentUserId != null
+                && menu.getUser() != null
+                && menu.getUser().getId().equals(currentUserId);
 
         if (actionType.equals("READ")) {
             if (Boolean.TRUE.equals(menu.getIsDefault()) || isOwner) {
