@@ -13,7 +13,7 @@ import { useDetailPlan } from "@/hooks/queries/workout-plan/useDetailPlan"
 import authStore from "@/stores/auth.store"
 import { PlanDayResponse } from "@/types/workout-plan.type"
 import { getDifficultyColor, getGoalColor, getLevelName } from "@/utils/utils"
-import { getDayName, getFitnessGoalName } from "@/utils/workout-plan.util"
+import { getFitnessGoalName } from "@/utils/workout-plan.util"
 import {
   Calendar,
   CheckCheckIcon,
@@ -299,8 +299,7 @@ export const WorkoutDetail = () => {
                               {/* Day Header */}
                               <div className="rounded-xl border border-sand/60 bg-earth p-3 text-cream flex items-center justify-between">
                                 <h4 className="font-medium">
-                                  {getDayName(day.dayOfWeek)}
-                                  {day.dayInNumber && ` - Ngày ${day.dayInNumber}`}
+                                  {`Buổi ${dayIdx + 1}`}
                                 </h4>
                                 {!dataDetailPlan.isDefault && (
                                   <Button
