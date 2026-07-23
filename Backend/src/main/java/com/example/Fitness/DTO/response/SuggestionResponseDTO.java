@@ -14,7 +14,15 @@ public class SuggestionResponseDTO {
     private double tdee;
     private double targetCalories;
 
-    private List<PlanResponse> suggestedWorkoutPlans;
+    // Nhãn user dùng để đề xuất (minh bạch cho FE hiển thị)
+    private String difficulty;         // độ khó phù hợp của user
+    private boolean usedFallback;      // có phải nới điều kiện không (kho thiếu tổ hợp)
 
+    // Giữ để tương thích ngược (đã sắp theo điểm giảm dần)
+    private List<PlanResponse> suggestedWorkoutPlans;
     private List<MenuResponse> suggestedMenus;
+
+    // Mới: kèm điểm khớp + lý do khớp
+    private List<ScoredPlanSuggestion> workoutPlanSuggestions;
+    private List<ScoredMenuSuggestion> menuSuggestions;
 }

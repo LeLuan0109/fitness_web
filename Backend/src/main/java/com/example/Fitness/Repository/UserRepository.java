@@ -28,6 +28,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> searchUsers(String keyword, Pageable pageable);
 
     long countByIsLockedFalse();
+
+    // User đã hoàn tất mục tiêu (để nhắc ghi nhật ký ăn)
+    @Query("SELECT u FROM User u WHERE u.fitnessGoal IS NOT NULL AND u.isLocked = false")
+    List<User> findActiveUsersWithGoal();
     long countByCreatedAtAfter(LocalDateTime date);
 
     @Query("SELECT u.fitnessGoal, COUNT(u) " +
@@ -46,7 +50,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Lay danh sach nguoi dung chua tap
     @Query(value = """
         SELECT DISTINCT u.id, u.current_streak
-        FROM users u
+        FROM user u
         JOIN workoutplan p ON u.id = p.user_id
         JOIN workoutday d ON p.id = d.workout_plan_id
         WHERE d.day_of_week = :dayOfWeek
@@ -62,7 +66,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query(value = """
-        UPDATE users u
+        UPDATE user u
         SET u.current_streak = 0
         WHERE u.current_streak > 0
         AND u.id NOT IN (

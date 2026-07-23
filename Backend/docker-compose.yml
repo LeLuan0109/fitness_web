@@ -4,6 +4,18 @@
 # - MySQL tự khởi tạo database 'fitness_db'
 # - Flyway trong backend tự tạo toàn bộ bảng + seed dữ liệu chung (V1..V21) khi start
 # - Backend phục vụ tại http://localhost:8055  (prefix API: /api)
+#
+# ---- LAPTOP LÀM SERVER (điện thoại/APK gọi qua WiFi) --------------------------
+# Cổng backend được publish trên 0.0.0.0 nên MỌI thiết bị cùng WiFi truy cập được:
+#   Laptop:      http://localhost:8055/swagger-ui/index.html
+#   Điện thoại:  http://<IP-LAN-CỦA-LAPTOP>:8055/swagger-ui/index.html
+# Lấy IP laptop:  ipconfig  ->  dòng "IPv4 Address" (vd 192.168.1.10)
+# APK đặt BASE_URL = http://<IP-LAN>:8055/  (KHÔNG dùng localhost/10.0.2.2 khi chạy máy thật)
+#
+# ⚠️ compose KHÔNG mở được Windows Firewall. Nếu điện thoại không vào được, chạy 1 lần
+#    trong PowerShell (Admin) trên laptop:
+#    netsh advfirewall firewall add rule name="Fitness 8055" dir=in action=allow protocol=TCP localport=8055
+# -----------------------------------------------------------------------------
 
 services:
   mysql:
@@ -44,7 +56,8 @@ services:
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "fitness123"
     ports:
-      - "8055:8080"
+      # Bind rõ trên mọi card mạng (0.0.0.0) để điện thoại cùng WiFi gọi được qua IP LAN.
+      - "0.0.0.0:8055:8080"
 
 volumes:
   mysql_data:

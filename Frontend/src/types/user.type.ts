@@ -88,6 +88,9 @@ export type OnboardingDTO = {
   height: number
   fitnessGoal: string
   activityLevel: string
+  experienceLevel?: string
+  daysPerWeekAvailable?: number
+  targetWeight?: number
 }
 
 export type UserSearchParams = {

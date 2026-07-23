@@ -35,9 +35,18 @@ export function OnboardingForm() {
       height: "",
       fitnessGoal: FitnessGoal.SHAPE_BODY,
       activityLevel: "",
+      experienceLevel: "",
+      daysPerWeekAvailable: "",
+      targetWeight: "",
     },
     mode: "onBlur",
   })
+
+  const EXPERIENCE_OPTIONS = [
+    { label: "Người mới (< 6 tháng)", value: "NEW" },
+    { label: "Trung bình (6 tháng - 2 năm)", value: "INTERMEDIATE" },
+    { label: "Lâu năm (> 2 năm)", value: "EXPERT" },
+  ]
 
   const { mutate: mutateOnboarding } = useUpdateOnboarding({
     config: {
@@ -61,6 +70,9 @@ export function OnboardingForm() {
       height: Number(data.height),
       fitnessGoal: data.fitnessGoal,
       activityLevel: data.activityLevel,
+      experienceLevel: data.experienceLevel || undefined,
+      daysPerWeekAvailable: data.daysPerWeekAvailable ? Number(data.daysPerWeekAvailable) : undefined,
+      targetWeight: data.targetWeight ? Number(data.targetWeight) : undefined,
     }
     mutateOnboarding(payload)
   }
@@ -149,6 +161,33 @@ export function OnboardingForm() {
               )}
             </SimpleField>
           </div>
+          <div className="flex flex-col gap-4">
+            <TypographyH3>Kinh nghiệm tập luyện? (tùy chọn)</TypographyH3>
+            <SimpleField control={form.control} name="experienceLevel" hideLabel>
+              {(field) => (
+                <CustomSelect
+                  options={EXPERIENCE_OPTIONS}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Chọn trình độ (giúp gợi ý độ khó chính xác hơn)"
+                />
+              )}
+            </SimpleField>
+          </div>
+          <div className="flex flex-col gap-4">
+            <TypographyH3>Số buổi rảnh tập/tuần? (tùy chọn)</TypographyH3>
+            <SimpleField control={form.control} name="daysPerWeekAvailable" hideLabel>
+              {(field) => <Input type="number" min={1} max={7} placeholder="VD: 3" {...field} />}
+            </SimpleField>
+          </div>
+          <div className="flex flex-col gap-4">
+            <TypographyH3>Cân nặng mục tiêu? (kg, tùy chọn)</TypographyH3>
+            <SimpleField control={form.control} name="targetWeight" hideLabel>
+              {(field) => <Input type="number" placeholder="VD: 65" {...field} />}
+            </SimpleField>
+          </div>
+          <div className="hidden md:block" />
+
           <div className="flex items-center gap-8 col-span-2 justify-center mt-8">
             <Button
               variant="outline"

@@ -31,8 +31,19 @@ public class FoodLogService {
 
     public FoodDiaryResponse addLog(AddFoodLogRequest request) throws DataNotFoundException {
         User user = getCurrentUser();
-        Dish dish = dishRepository.findById(request.getDishId())
-                .orElseThrow(() -> new DataNotFoundException("Không tìm thấy món ăn"));
+
+        // Món tham chiếu là tùy chọn (có thể ăn món ngoài catalog)
+        Dish dish = null;
+        if (request.getDishId() != null) {
+            dish = dishRepository.findById(request.getDishId())
+                    .orElseThrow(() -> new DataNotFoundException("Không tìm thấy món ăn"));
+        }
+
+        // Bắt buộc: hoặc có món catalog, hoặc nhập calo thực tế, hoặc có tên món tự nhập
+        if (dish == null && request.getActualCalories() == null
+                && (request.getCustomName() == null || request.getCustomName().isBlank())) {
+            throw new IllegalArgumentException("Cần chọn món, hoặc nhập tên món + số calo thực tế.");
+        }
 
         LocalDate date = (request.getDate() != null) ? request.getDate() : LocalDate.now();
         int qty = (request.getQuantity() != null && request.getQuantity() > 0) ? request.getQuantity() : 1;
@@ -40,7 +51,12 @@ public class FoodLogService {
         FoodLog log = FoodLog.builder()
                 .user(user)
                 .dish(dish)
+                .customName(request.getCustomName())
                 .quantity(qty)
+                .actualCalories(request.getActualCalories())
+                .actualProtein(request.getActualProtein())
+                .actualCarbs(request.getActualCarbs())
+                .actualFat(request.getActualFat())
                 .logDate(date)
                 .mealType(request.getMealType() != null ? request.getMealType() : "OTHER")
                 .build();
@@ -60,18 +76,19 @@ public class FoodLogService {
         for (FoodLog log : logs) {
             Dish dish = log.getDish();
             int q = log.getQuantity() != null ? log.getQuantity() : 1;
-            double cal = nz(dish.getCalories()) * q;
-            double pro = nz(dish.getProtein()) * q;
-            double carb = nz(dish.getCarbs()) * q;
-            double fat = nz(dish.getFat()) * q;
+            // Ưu tiên calo/macro THỰC TẾ người dùng nhập; nếu không có thì lấy dish×quantity
+            double cal = log.getActualCalories() != null ? log.getActualCalories() : nz(dish != null ? dish.getCalories() : null) * q;
+            double pro = log.getActualProtein() != null ? log.getActualProtein() : nz(dish != null ? dish.getProtein() : null) * q;
+            double carb = log.getActualCarbs() != null ? log.getActualCarbs() : nz(dish != null ? dish.getCarbs() : null) * q;
+            double fat = log.getActualFat() != null ? log.getActualFat() : nz(dish != null ? dish.getFat() : null) * q;
 
             totalCal += cal; totalPro += pro; totalCarb += carb; totalFat += fat;
 
             items.add(FoodDiaryResponse.FoodLogItem.builder()
                     .id(log.getId())
-                    .dishId(dish.getId())
-                    .dishName(dish.getName())
-                    .image(dish.getImage())
+                    .dishId(dish != null ? dish.getId() : null)
+                    .dishName(dish != null ? dish.getName() : log.getCustomName())
+                    .image(dish != null ? dish.getImage() : null)
                     .quantity(q)
                     .mealType(log.getMealType())
                     .calories(round1(cal))

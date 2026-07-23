@@ -48,6 +48,8 @@ public class WorkoutPlantService {
     private final WorkoutDayMapper workoutDayMapper;
     private final WorkoutLogMapper workoutLogMapper;
 
+    private final PlanLabelSuggestionService planLabelSuggestionService;
+
     public WorkoutPlan createWorkoutPlan(CreatePlanRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
@@ -56,6 +58,17 @@ public class WorkoutPlantService {
         WorkoutPlan workoutPlan = workoutPlanMapper.toWorkoutPlan(request);
         workoutPlan.setUser(user);
         workoutPlan.setIsDefault(user.getRole().getName().equalsIgnoreCase("ADMIN"));
+
+        // GÁN NHÃN = code đề xuất + người chốt:
+        // Nếu người tạo KHÔNG chọn độ khó (override) → hệ thống tự suy từ nội dung bài tập.
+        // Nếu có chọn → tôn trọng lựa chọn của người tạo (admin/user).
+        if (workoutPlan.getDifficultyLevel() == null && request.getSchedule() != null) {
+            var suggestion = planLabelSuggestionService.suggest(request.getSchedule());
+            workoutPlan.setDifficultyLevel(suggestion.getSuggestedDifficulty());
+            if (workoutPlan.getDaysPerWeek() == null) {
+                workoutPlan.setDaysPerWeek(suggestion.getDaysPerWeek());
+            }
+        }
 
         WorkoutPlan savedPlan = workoutPlanRepository.save(workoutPlan);
         System.out.println(workoutPlan.getStartDate());

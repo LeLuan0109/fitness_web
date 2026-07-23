@@ -45,4 +45,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long>, JpaSpecificat
                                           Pageable pageable);
 
     Long countByIsDefaultTrueAndIsDeletedFalse();
+
+    /** Toàn bộ thực đơn mẫu còn hiệu lực — pool ứng viên cho scoring engine. */
+    List<Menu> findByIsDefaultTrueAndIsDeletedFalse();
 }

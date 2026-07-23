@@ -23,6 +23,20 @@ public interface WorkoutLogRepository extends JpaRepository<WorkoutLogs, Long> {
     @Query("SELECT COUNT(DISTINCT DATE(w.createdAt)) FROM WorkoutLogs w WHERE w.user.id = :userId")
     Integer countTotalWorkoutsByUserId(@Param("userId") Long userId);
 
+    // Số buổi tập (ngày khác nhau) trong khoảng [start,end] — cho tính tuân thủ
+    @Query("SELECT COUNT(DISTINCT DATE(w.createdAt)) FROM WorkoutLogs w " +
+            "WHERE w.user.id = :userId AND w.createdAt BETWEEN :start AND :end")
+    Integer countWorkoutDaysInRange(@Param("userId") Long userId,
+                                    @Param("start") LocalDateTime start,
+                                    @Param("end") LocalDateTime end);
+
+    // Tổng calo đốt trong khoảng [start,end]
+    @Query("SELECT COALESCE(SUM(w.caloriesBurned), 0) FROM WorkoutLogs w " +
+            "WHERE w.user.id = :userId AND w.createdAt BETWEEN :start AND :end")
+    Double sumCaloriesInRange(@Param("userId") Long userId,
+                              @Param("start") LocalDateTime start,
+                              @Param("end") LocalDateTime end);
+
     // Lấy logs trong khoảng thời gian (Ví dụ: từ đầu tháng đến cuối tháng)
     @Query("SELECT w FROM WorkoutLogs w WHERE w.user.id = :userId AND w.createdAt BETWEEN :startDate AND :endDate ORDER BY w.createdAt DESC")
     List<WorkoutLogs> findLogsByUserIdAndDateRange(@Param("userId") Long userId,

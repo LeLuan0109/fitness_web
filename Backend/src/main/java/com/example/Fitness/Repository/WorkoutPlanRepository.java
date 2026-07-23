@@ -31,6 +31,12 @@ public interface WorkoutPlanRepository extends JpaRepository<WorkoutPlan, Long>,
 
     Long countByIsDefaultTrueAndIsDeletedFalse();
 
+    /** Toàn bộ kế hoạch mẫu còn hiệu lực — pool ứng viên cho scoring engine. */
+    List<WorkoutPlan> findByIsDefaultTrueAndIsDeletedFalse();
+
+    /** Kế hoạch cá nhân mới nhất (proxy "kế hoạch đang theo" cho tính tuân thủ). */
+    java.util.Optional<WorkoutPlan> findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByStartDateDesc(Long userId);
+
     @Query("SELECT DISTINCT p FROM WorkoutPlan p " +
             "LEFT JOIN FETCH p.workoutDays wd " +
             "WHERE p.user.id = :userId " +

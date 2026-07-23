@@ -37,6 +37,22 @@ export const createWorkoutPlan = (data: WorkoutPlanRequest) => {
   return http.post<Response<number>>(API_ENDPOINTS.WORKOUT_PLANS.CREATE, { data })
 }
 
+export type PlanLabelSuggestion = {
+  suggestedDifficulty: string
+  daysPerWeek: number
+  estimatedDurationMinutes: number
+  requiredEquipment: string[]
+  muscleGroups: string[]
+  difficultyReasoning: string[]
+}
+
+// Đề xuất nhãn (độ khó, buổi/tuần, thời lượng...) từ lịch tập đang soạn — người tạo có thể giữ hoặc đổi.
+export const suggestPlanLabels = (schedule: WorkoutPlanRequest["schedule"]) => {
+  return http.post<Response<PlanLabelSuggestion>>(API_ENDPOINTS.WORKOUT_PLANS.SUGGEST_LABELS, {
+    data: { schedule },
+  })
+}
+
 export const updateWorkoutPlan = (id: string, data: WorkoutPlanRequest) => {
   return http.put<Response<number>>(generatePath(API_ENDPOINTS.WORKOUT_PLANS.UPDATE, { id }), { data })
 }

@@ -70,6 +70,10 @@ public class UserService {
         user.setHeight(request.getHeight());
         user.setFitnessGoal(request.getFitnessGoal());
         user.setActivityLevel(request.getActivityLevel());
+        // Trường mở rộng (tùy chọn) — chỉ set khi client gửi lên
+        if (request.getExperienceLevel() != null) user.setExperienceLevel(request.getExperienceLevel());
+        if (request.getDaysPerWeekAvailable() != null) user.setDaysPerWeekAvailable(request.getDaysPerWeekAvailable());
+        if (request.getTargetWeight() != null) user.setTargetWeight(request.getTargetWeight());
 
         User updatedUser = userRepository.save(user);
         return userMapper.userToUserResponse(updatedUser);

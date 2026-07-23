@@ -1,4 +1,5 @@
-export const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL + "/api"
+// Bỏ dấu "/" thừa ở cuối VITE_REACT_APP_API_URL để tránh URL "//api" (gây lỗi CORS/403).
+export const API_BASE_URL = (import.meta.env.VITE_REACT_APP_API_URL ?? "").replace(/\/+$/, "") + "/api"
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID
 export const GOOGLE_CLIENT_SECRET = import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_SECRET
 export const FACEBOOK_APP_ID = import.meta.env.VITE_REACT_APP_FACEBOOK_APP_ID
@@ -47,6 +48,7 @@ export const API_ENDPOINTS = {
     DELETE: "/workout-plan/:id",
     COPY: "/workout-plan/:id/copy",
     OUTSTANDING: "/workout-plan/outstanding",
+    SUGGEST_LABELS: "/workout-plan/suggest-labels",
   },
   WORKOUT_LOGS: {
     LOG_SET: "/workout-logs",
@@ -76,6 +78,11 @@ export const API_ENDPOINTS = {
     ADD: "/food-logs",
     DELETE: "/food-logs/:id",
     SUMMARY: "/food-logs/summary",
+  },
+  PROGRESS: {
+    OVERVIEW: "/progress/overview",
+    WEIGHT: "/progress/weight",
+    CHECKIN: "/progress/checkin",
   },
   INGREDIENTS: {
     LIST: "/ingredients",

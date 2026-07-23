@@ -51,6 +51,9 @@ export function FoodDiary() {
   const [period, setPeriod] = useState<Period>("day")
   const [dishId, setDishId] = useState<string>("")
   const [quantity, setQuantity] = useState<number>(1)
+  const [mode, setMode] = useState<"catalog" | "custom">("catalog")
+  const [customName, setCustomName] = useState<string>("")
+  const [customCalories, setCustomCalories] = useState<string>("")
 
   // Khoảng ngày cho chế độ tuần/tháng
   const range = useMemo(() => {
@@ -85,10 +88,20 @@ export function FoodDiary() {
   })
 
   const addMutation = useMutation({
-    mutationFn: () => addFoodLog({ dishId: Number(dishId), quantity, date: today, mealType: "OTHER" }),
+    mutationFn: () =>
+      mode === "custom"
+        ? addFoodLog({
+            customName: customName || "Món tự nhập",
+            actualCalories: Number(customCalories),
+            date: today,
+            mealType: "OTHER",
+          })
+        : addFoodLog({ dishId: Number(dishId), quantity, date: today, mealType: "OTHER" }),
     onSuccess: () => {
       setDishId("")
       setQuantity(1)
+      setCustomName("")
+      setCustomCalories("")
       queryClient.invalidateQueries({ queryKey: ["food-diary", today] })
     },
   })
@@ -186,35 +199,79 @@ export function FoodDiary() {
       <>
       <div className="rounded-xl border border-border bg-card p-5">
         <h3 className="mb-3 text-base font-semibold text-foreground">Thêm món đã ăn</h3>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label className="mb-1 block text-sm text-text-secondary">Món ăn</label>
-            <Select value={dishId} onValueChange={setDishId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn món ăn" />
-              </SelectTrigger>
-              <SelectContent>
-                {dishes.map((d) => (
-                  <SelectItem key={d.id} value={String(d.id)}>
-                    {d.name} ({d.calories} kcal)
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="w-full sm:w-28">
-            <label className="mb-1 block text-sm text-text-secondary">Số phần</label>
-            <Input
-              type="number"
-              min={1}
-              value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-            />
-          </div>
-          <Button onClick={() => addMutation.mutate()} disabled={!dishId || addMutation.isPending}>
-            <Plus className="mr-1 h-4 w-4" /> Thêm
-          </Button>
+
+        {/* Chọn chế độ: từ thực đơn/catalog HOẶC tự nhập calo (ăn món khác / lượng khác) */}
+        <div className="mb-3 inline-flex w-fit rounded-lg border border-border p-0.5">
+          {([
+            { k: "catalog", label: "Chọn món có sẵn" },
+            { k: "custom", label: "Tự nhập calo" },
+          ] as const).map((opt) => (
+            <button
+              key={opt.k}
+              onClick={() => setMode(opt.k)}
+              className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+                mode === opt.k ? "bg-primary text-primary-foreground" : "text-text-secondary hover:bg-muted"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
+
+        {mode === "catalog" ? (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <label className="mb-1 block text-sm text-text-secondary">Món ăn</label>
+              <Select value={dishId} onValueChange={setDishId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn món ăn" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dishes.map((d) => (
+                    <SelectItem key={d.id} value={String(d.id)}>
+                      {d.name} ({d.calories} kcal)
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-full sm:w-28">
+              <label className="mb-1 block text-sm text-text-secondary">Số phần</label>
+              <Input
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+              />
+            </div>
+            <Button onClick={() => addMutation.mutate()} disabled={!dishId || addMutation.isPending}>
+              <Plus className="mr-1 h-4 w-4" /> Thêm
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <label className="mb-1 block text-sm text-text-secondary">Tên món (tự nhập)</label>
+              <Input value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="VD: Cơm mẹ nấu" />
+            </div>
+            <div className="w-full sm:w-36">
+              <label className="mb-1 block text-sm text-text-secondary">Calo thực tế (kcal)</label>
+              <Input
+                type="number"
+                min={0}
+                value={customCalories}
+                onChange={(e) => setCustomCalories(e.target.value)}
+                placeholder="VD: 550"
+              />
+            </div>
+            <Button onClick={() => addMutation.mutate()} disabled={!customCalories || addMutation.isPending}>
+              <Plus className="mr-1 h-4 w-4" /> Thêm
+            </Button>
+          </div>
+        )}
+        <p className="mt-2 text-xs text-text-secondary">
+          Ăn đúng thực đơn nhưng lượng khác, hoặc ăn món khác? Chọn "Tự nhập calo" và điền số calo thực tế đã nạp.
+        </p>
       </div>
 
       {/* Danh sách món đã ăn */}

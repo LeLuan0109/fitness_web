@@ -15,6 +15,7 @@ import { ROLES } from "@/constants/roles.constant"
 import { daysPerWeekOptions, durationOptions } from "@/constants/workout-plan.constant"
 import { useGetExerciseOptions } from "@/hooks/queries/exercises/useGetExerciseOptions"
 import { useCreatePlan } from "@/hooks/queries/workout-plan/useCreatePlan"
+import { suggestPlanLabels } from "@/api/workout-plan.api"
 import { ExerciseSelected, ScheduleItem, WorkoutPlanFormSchema } from "@/schemas/workout-plan.schema"
 import authStore from "@/stores/auth.store"
 import { WorkoutFormData } from "@/types/workout-plan.type"
@@ -42,6 +43,7 @@ const getDayOfWeekNumber = (dayId: string): number => {
 
 export const WorkoutFormCreate = () => {
   const [selectedDays, setSelectedDays] = useState<string[]>([])
+  const [isSuggesting, setIsSuggesting] = useState(false)
   const auth = authStore.use.auth()
   const isAdmin = auth?.role?.name === ROLES.ADMIN
 
@@ -83,6 +85,35 @@ export const WorkoutFormCreate = () => {
       },
     },
   })
+
+  const handleSuggestLabels = async () => {
+    const values = form.getValues()
+    if (!values.schedule || values.schedule.length === 0) {
+      toast.warning("Hãy thêm bài tập vào lịch tập trước khi lấy đề xuất.")
+      return
+    }
+    try {
+      setIsSuggesting(true)
+      const dto = transformWorkoutPlanDTO(values)
+      const res = await suggestPlanLabels(dto.schedule)
+      const s = res.data
+      const diffMap: Record<string, string> = {
+        BEGINNER: "Người mới",
+        INTERMEDIATE: "Trung bình",
+        ADVANCED: "Nâng cao",
+      }
+      form.setValue("level", s.suggestedDifficulty)
+      if (s.daysPerWeek) form.setValue("daysPerWeek", String(s.daysPerWeek))
+      toast.success(`Đề xuất độ khó: ${diffMap[s.suggestedDifficulty] ?? s.suggestedDifficulty}`, {
+        description: s.difficultyReasoning?.join(" · "),
+        duration: 8000,
+      })
+    } catch {
+      toast.error("Không lấy được đề xuất, vui lòng thử lại.")
+    } finally {
+      setIsSuggesting(false)
+    }
+  }
 
   const initializeSchedule = () => {
     const requiredDaysCount = Number(watchedDaysPerWeek)
@@ -277,12 +308,31 @@ export const WorkoutFormCreate = () => {
 
               <SimpleField name="level" control={form.control} label="Cấp độ" required>
                 {(field) => (
-                  <CustomSelect
-                    options={LEVEL_OPTIONS}
-                    placeholder="Chọn cấp độ"
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <CustomSelect
+                          options={LEVEL_OPTIONS}
+                          placeholder="Chọn cấp độ"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isSuggesting}
+                        onClick={handleSuggestLabels}
+                        title="Hệ thống phân tích các bài tập bên trong và đề xuất độ khó (bạn có thể đổi lại)"
+                      >
+                        {isSuggesting ? <Loader2 className="size-4 animate-spin" /> : "🎯 Đề xuất"}
+                      </Button>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      Chọn tay, hoặc bấm "Đề xuất" để hệ thống gợi ý theo nội dung bài tập.
+                    </span>
+                  </div>
                 )}
               </SimpleField>
 

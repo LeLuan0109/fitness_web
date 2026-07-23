@@ -2,6 +2,7 @@ package com.example.Fitness.Model;
 
 import com.example.Fitness.Constants.AuthProvider;
 import com.example.Fitness.Enum.ActivityLevel;
+import com.example.Fitness.Enum.ExperienceLevel;
 import com.example.Fitness.Enum.FitnessGoal;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 @SuperBuilder
 @Data
 @AllArgsConstructor
@@ -62,6 +63,16 @@ public class User extends BaseEntity implements UserDetails{
     @Enumerated(EnumType.STRING)
     @Column(name = "activity_level")
     private ActivityLevel activityLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "experience_level")
+    private ExperienceLevel experienceLevel;
+
+    @Column(name = "days_per_week_available")
+    private Integer daysPerWeekAvailable;
+
+    @Column(name = "target_weight")
+    private Double targetWeight;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

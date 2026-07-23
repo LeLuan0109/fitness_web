@@ -11,6 +11,10 @@ export const ONBOARDING_FORM_SCHEMA = z.object({
   height: vStringRequired("Chiều cao"),
   fitnessGoal: vStringRequired("Mục tiêu tập luyện"),
   activityLevel: vStringRequired("Mức độ hoạt động"),
+  // Trường mở rộng (tùy chọn) — giúp đề xuất chính xác hơn
+  experienceLevel: z.string().optional(),
+  daysPerWeekAvailable: z.string().optional(),
+  targetWeight: z.string().optional(),
 })
 
 export type OnboardingFormData = z.infer<typeof ONBOARDING_FORM_SCHEMA>

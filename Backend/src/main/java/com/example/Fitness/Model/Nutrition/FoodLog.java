@@ -31,6 +31,23 @@ public class FoodLog {
 
     private Integer quantity;
 
+    /** Tên món tự nhập khi không chọn từ catalog (ăn món khác). */
+    @Column(name = "custom_name")
+    private String customName;
+
+    /** Số calo THỰC TẾ người dùng nạp (ưu tiên dùng nếu có, thay cho dish×quantity). */
+    @Column(name = "actual_calories")
+    private Float actualCalories;
+
+    @Column(name = "actual_protein")
+    private Float actualProtein;
+
+    @Column(name = "actual_carbs")
+    private Float actualCarbs;
+
+    @Column(name = "actual_fat")
+    private Float actualFat;
+
     @Column(name = "log_date")
     private LocalDate logDate;
 

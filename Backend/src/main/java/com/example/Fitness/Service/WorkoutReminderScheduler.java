@@ -1,5 +1,7 @@
 package com.example.Fitness.Service;
 
+import com.example.Fitness.Model.User;
+import com.example.Fitness.Repository.RNutrition.FoodLogRepository;
 import com.example.Fitness.Repository.UserRepository;
 import com.example.Fitness.Repository.WorkoutDayRepository;
 import com.example.Fitness.Utils.NotificationMessages;
@@ -21,6 +23,26 @@ public class WorkoutReminderScheduler {
     private final NotificationService notificationService;
     private final WorkoutDayRepository workoutDayRepository;
     private final UserRepository userRepository;
+    private final FoodLogRepository foodLogRepository;
+
+    /** Nhắc ghi nhật ký ăn + nước mỗi tối 20:30 cho ai chưa ghi hôm nay. */
+    @Scheduled(cron = "0 30 20 * * ?")
+    public void sendFoodLogReminders() {
+        LocalDate today = LocalDate.now();
+        List<User> users = userRepository.findActiveUsersWithGoal();
+        int count = 0;
+        for (User u : users) {
+            if (!foodLogRepository.existsByUserIdAndLogDate(u.getId(), today)) {
+                notificationService.createAndSendNotification(
+                        u.getId(),
+                        "Hôm nay bạn ăn gì? 🍽️",
+                        "Ghi lại calo đã nạp & lượng nước hôm nay để theo dõi tiến độ so với mục tiêu.",
+                        "FOOD_LOG_REMINDER", null, "/nutrition/food-diary");
+                count++;
+            }
+        }
+        log.info("Đã gửi {} nhắc nhở ghi nhật ký ăn.", count);
+    }
 
     @Scheduled(cron = "0 0 7 * * ?")
     public void sendMorningWorkoutReminders() {

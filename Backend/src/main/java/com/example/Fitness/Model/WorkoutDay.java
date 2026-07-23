@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.List;
 
 @Entity
-@Table(name = "WorkoutDay")
+@Table(name = "workoutday")
 @Getter
 @Setter
 @ToString

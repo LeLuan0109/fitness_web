@@ -1,6 +1,6 @@
 export interface FoodLogItem {
   id: number
-  dishId: number
+  dishId: number | null
   dishName: string
   image: string | null
   quantity: number
@@ -25,8 +25,13 @@ export interface FoodDiary {
 }
 
 export interface AddFoodLogRequest {
-  dishId: number
-  quantity: number
+  dishId?: number | null
+  customName?: string
+  quantity?: number
+  actualCalories?: number // số calo thực tế người dùng nhập (ưu tiên)
+  actualProtein?: number
+  actualCarbs?: number
+  actualFat?: number
   date?: string // dd/MM/yyyy
   mealType?: string
 }

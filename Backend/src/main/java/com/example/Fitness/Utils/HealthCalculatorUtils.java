@@ -14,7 +14,10 @@ public class HealthCalculatorUtils {
         if (weight == null || height == null) return 0;
 
         // Công thức: (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) + s
-        double s = (sex != null && sex.equalsIgnoreCase("Male")) ? 5 : -161;
+        // Chấp nhận "MALE"/"Male"/"male"/"nam" đều tính là nam (+5), còn lại nữ (-161).
+        boolean isMale = sex != null &&
+                (sex.equalsIgnoreCase("MALE") || sex.equalsIgnoreCase("Nam") || sex.equalsIgnoreCase("M"));
+        double s = isMale ? 5 : -161;
 
         return (10 * weight) + (6.25 * height) - (5 * age) + s;
     }

@@ -1,6 +1,7 @@
 package com.example.Fitness.DTO.request;
 
 import com.example.Fitness.Enum.ActivityLevel;
+import com.example.Fitness.Enum.ExperienceLevel;
 import com.example.Fitness.Enum.FitnessGoal;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
@@ -39,4 +40,17 @@ public class OnboardingRequest {
 
     @NotNull(message = "Mức độ vận động không được để trống")
     private ActivityLevel activityLevel;
+
+    // --- Các trường mở rộng (tùy chọn) phục vụ đề xuất chính xác hơn ---
+
+    /** Kinh nghiệm tập: NEW | INTERMEDIATE | EXPERT. Nếu có → dùng thay PAL để suy độ khó. */
+    private ExperienceLevel experienceLevel;
+
+    /** Số buổi rảnh tập trong tuần (1-7) → khớp lịch kế hoạch. */
+    @Min(value = 1, message = "Số buổi/tuần không hợp lệ")
+    private Integer daysPerWeekAvailable;
+
+    /** Cân nặng mục tiêu (kg) → tính lộ trình, cảnh báo ép cân. */
+    @Min(value = 1, message = "Cân nặng mục tiêu không hợp lệ")
+    private Double targetWeight;
 }

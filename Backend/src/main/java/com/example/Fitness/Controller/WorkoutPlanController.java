@@ -2,6 +2,7 @@ package com.example.Fitness.Controller;
 
 import com.example.Fitness.DTO.request.CreatePlanRequest;
 import com.example.Fitness.DTO.request.PlanSearchRequest;
+import com.example.Fitness.DTO.request.SuggestPlanLabelRequest;
 import com.example.Fitness.DTO.response.common.ApiResponse;
 import com.example.Fitness.DTO.response.common.Pagination;
 import com.example.Fitness.DTO.response.errors.ErrorResponse;
@@ -12,6 +13,7 @@ import com.example.Fitness.DTO.response.workout_plans.WorkoutDayDetailResponse;
 import com.example.Fitness.Enum.DifficultyLevel;
 import com.example.Fitness.Enum.FitnessGoal;
 import com.example.Fitness.Model.WorkoutPlan;
+import com.example.Fitness.Service.PlanLabelSuggestionService;
 import com.example.Fitness.Service.WorkoutPlantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,11 +33,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkoutPlanController {
     private final WorkoutPlantService workoutPlanService;
+    private final PlanLabelSuggestionService planLabelSuggestionService;
 
     @PostMapping
     public ResponseEntity<?> createPlan(@RequestBody CreatePlanRequest request) {
         WorkoutPlan savedPlan = workoutPlanService.createWorkoutPlan(request);
         return ResponseEntity.ok(ApiResponse.builder().status(true).data(savedPlan.getId()).build());
+    }
+
+    @Operation(summary = "Đề xuất nhãn (độ khó, buổi/tuần, thời lượng, dụng cụ, nhóm cơ) cho kế hoạch đang soạn. Người tạo có thể giữ hoặc chọn nhãn khác.")
+    @PostMapping("/suggest-labels")
+    public ResponseEntity<?> suggestLabels(@RequestBody SuggestPlanLabelRequest request) {
+        return ResponseEntity.ok(ApiResponse.builder()
+                .status(true)
+                .data(planLabelSuggestionService.suggest(request.getSchedule()))
+                .build());
     }
 
     @GetMapping(value = "/samples")
