@@ -10,7 +10,8 @@ import { ROUTES } from "@/constants/routes"
 import { useDisclosure } from "@/hooks/common/use-disclosure"
 import { useDeletePlan } from "@/hooks/queries/workout-plan/useDeletePlan"
 import { useGetMyPlans } from "@/hooks/queries/workout-plan/useGetMyPlans"
-import { WorkoutPlanSearchParams } from "@/types/workout-plan.type"
+import { useSetPlanActiveStatus } from "@/hooks/queries/workout-plan/useSetPlanActiveStatus"
+import { PlanListResponse, WorkoutPlanSearchParams } from "@/types/workout-plan.type"
 import { Calendar, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { generatePath, useNavigate } from "react-router-dom"
@@ -26,6 +27,7 @@ export const MyWorkout = () => {
   })
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const [deletingPlanId, setDeletingPlanId] = useState<number | undefined>()
+  const [togglingPlanId, setTogglingPlanId] = useState<number | undefined>()
 
   const { data: myPlansData, isFetching: isFetchingMyPlans, refetch: refetchMyPlans } = useGetMyPlans(searchParams)
   const { mutate: deletePlan } = useDeletePlan({
@@ -39,6 +41,21 @@ export const MyWorkout = () => {
       },
       onSettled: () => {
         setDeletingPlanId(undefined)
+      },
+    },
+  })
+
+  const { mutate: setPlanActiveStatus } = useSetPlanActiveStatus({
+    config: {
+      onSuccess: (_res, variables) => {
+        toast.success(variables.isActive ? "Đã kích hoạt lại kế hoạch" : "Đã bỏ kế hoạch này")
+        refetchMyPlans()
+      },
+      onError: () => {
+        toast.error("Không thể thay đổi trạng thái kế hoạch. Vui lòng thử lại sau.")
+      },
+      onSettled: () => {
+        setTogglingPlanId(undefined)
       },
     },
   })
@@ -77,6 +94,11 @@ export const MyWorkout = () => {
   const handleCancelDelete = () => {
     setDeletingPlanId(undefined)
     onOpenChange(false)
+  }
+
+  const handleToggleActive = (plan: PlanListResponse) => {
+    setTogglingPlanId(plan.id)
+    setPlanActiveStatus({ id: plan.id.toString(), isActive: !(plan.isActive ?? true) })
   }
 
   const handleSearch = (params: WorkoutPlanSearchParams) => {
@@ -143,6 +165,8 @@ export const MyWorkout = () => {
                     onEdit={handleEditPlan}
                     onDelete={handleDeletePlan}
                     onViewDetail={handleViewDetail}
+                    onToggleActive={handleToggleActive}
+                    isTogglingActive={togglingPlanId === plan.id}
                   />
                 ))}
               </div>

@@ -35,6 +35,10 @@ public class WorkoutLogs extends BaseEntity{
     @Column(name = "calories_burned")
     private Float caloriesBurned;
 
+    /** Chất lượng nhận diện tư thế camera AI cho set này: "OK" / "UNCERTAIN_ORIENTATION" / null (không xác định, VD ghi tay). Chỉ để ghi nhận, không chặn log. */
+    @Column(name = "pose_quality")
+    private String poseQuality;
+
     @Column(name = "set_number")
     private Integer setNumber;
 

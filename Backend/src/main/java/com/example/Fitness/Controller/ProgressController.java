@@ -8,8 +8,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
 
 @RestController
 @RequestMapping("${api.prefix}/progress")
@@ -38,5 +42,22 @@ public class ProgressController {
     public ResponseEntity<?> checkin(@RequestBody DailyCheckinRequest request) {
         progressService.checkin(request.getWaterMl(), request.getFollowedMenu(), request.getDate());
         return ResponseEntity.ok(ApiResponse.builder().status(true).data(true).build());
+    }
+
+    @Operation(summary = "Lịch tiến độ theo tháng: mỗi ngày gắn trạng thái tập + calo ăn/mục tiêu + cân nặng")
+    @GetMapping("/calendar")
+    public ResponseEntity<?> calendar(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth month) {
+        return ResponseEntity.ok(ApiResponse.builder()
+                .status(true).data(progressService.getCalendar(month)).build());
+    }
+
+    @Operation(summary = "Chi tiết 1 ngày trong lịch tiến độ (bài tập + món ăn) — dùng cho tooltip khi click 1 ô")
+    @GetMapping("/day-detail")
+    public ResponseEntity<?> dayDetail(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+            @RequestParam(required = false) Long workoutDayId) {
+        return ResponseEntity.ok(ApiResponse.builder()
+                .status(true).data(progressService.getDayDetail(date, workoutDayId)).build());
     }
 }

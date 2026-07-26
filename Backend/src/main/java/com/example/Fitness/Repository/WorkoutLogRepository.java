@@ -126,4 +126,11 @@ public interface WorkoutLogRepository extends JpaRepository<WorkoutLogs, Long> {
     // Danh sách id các bài tập mà user đã từng log (để đổ vào dropdown chọn bài xem tiến bộ)
     @Query("SELECT DISTINCT w.exercise.id, w.exercise.name FROM WorkoutLogs w WHERE w.user.id = :userId")
     List<Object[]> findLoggedExercisesByUser(@Param("userId") Long userId);
+
+    // Các log của user cho 1 buổi tập (workoutDay) cụ thể — dùng để tính trạng thái Hoàn thành/Một phần cho lịch tiến độ
+    List<WorkoutLogs> findByUserIdAndWorkoutDayId(Long userId, Long workoutDayId);
+
+    // Tạ nặng nhất user từng đạt cho 1 bài tập TRƯỚC 1 thời điểm — dùng để phát hiện PR (kỷ lục mới) của 1 buổi tập
+    @Query("SELECT MAX(w.actualWeights) FROM WorkoutLogs w WHERE w.user.id = :userId AND w.exercise.id = :exerciseId AND w.createdAt < :before")
+    Double findMaxWeightBefore(@Param("userId") Long userId, @Param("exerciseId") Long exerciseId, @Param("before") LocalDateTime before);
 }

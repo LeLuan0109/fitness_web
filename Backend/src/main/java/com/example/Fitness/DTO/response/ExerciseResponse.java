@@ -9,6 +9,7 @@ public class ExerciseResponse {
     private Long id;
     private String name;
     private String level;
+    private String aiExerciseKey; // Key nhận diện AI camera (VD "SQUAT"); null = chưa hỗ trợ đếm AI
     private String thumbnail;
     private String videoUrl;
     private String description;

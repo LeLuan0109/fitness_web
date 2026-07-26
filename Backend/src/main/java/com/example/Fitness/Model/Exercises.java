@@ -21,6 +21,10 @@ public class Exercises {
     private String thumbnail;
     private String level;
 
+    /** Key cố định để app Android chọn đúng thuật toán đếm rep/chấm tư thế qua camera AI (VD "SQUAT", "PUSHUP"). Null = chưa hỗ trợ AI, chỉ ghi log thủ công. */
+    @Column(name = "ai_exercise_key")
+    private String aiExerciseKey;
+
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 

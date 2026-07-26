@@ -59,6 +59,10 @@ public class WorkoutPlan extends BaseEntity{
      @Column(name = "is_deleted")
      private boolean isDeleted;
 
+     /** Kế hoạch cá nhân đang hoạt động (đang theo) hay đã bỏ — chỉ có ý nghĩa với kế hoạch cá nhân (isDefault=false). */
+     @Column(name = "is_active")
+     private Boolean isActive;
+
     @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<WorkoutDay> workoutDays;
 }

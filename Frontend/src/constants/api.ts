@@ -47,6 +47,7 @@ export const API_ENDPOINTS = {
     UPDATE: "/workout-plan/:id",
     DELETE: "/workout-plan/:id",
     COPY: "/workout-plan/:id/copy",
+    ACTIVE_STATUS: "/workout-plan/:id/active-status",
     OUTSTANDING: "/workout-plan/outstanding",
     SUGGEST_LABELS: "/workout-plan/suggest-labels",
   },
@@ -56,6 +57,8 @@ export const API_ENDPOINTS = {
     STATS: "/workout-logs/statistics",
     LOGGED_EXERCISES: "/workout-logs/logged-exercises",
     PROGRESS: "/workout-logs/progress/:exerciseId",
+    SESSIONS: "/workout-logs/sessions",
+    SESSION_DETAIL: "/workout-logs/session-detail",
   },
   NOTIFICATIONS: {
     REGISTER_TOKEN: "/notifications/register-token",
@@ -78,11 +81,15 @@ export const API_ENDPOINTS = {
     ADD: "/food-logs",
     DELETE: "/food-logs/:id",
     SUMMARY: "/food-logs/summary",
+    DIARY_CALENDAR: "/food-logs/diary-calendar",
+    DAY_DETAIL: "/food-logs/day-detail",
   },
   PROGRESS: {
     OVERVIEW: "/progress/overview",
     WEIGHT: "/progress/weight",
     CHECKIN: "/progress/checkin",
+    CALENDAR: "/progress/calendar",
+    DAY_DETAIL: "/progress/day-detail",
   },
   INGREDIENTS: {
     LIST: "/ingredients",

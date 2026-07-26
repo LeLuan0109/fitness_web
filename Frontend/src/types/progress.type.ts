@@ -73,3 +73,68 @@ export interface DailyCheckinRequest {
   followedMenu?: boolean
   date?: string // dd/MM/yyyy
 }
+
+// ===== Lịch tiến độ theo tháng (calendar dashboard) =====
+export type DayCellStatus = "COMPLETED" | "PARTIAL" | "MISSED" | "PLANNED" | "REST" | "NONE"
+
+export interface ProgressCalendarSummary {
+  currentWeight: number | null
+  weightChangeTotal: number | null
+  weeklyRate: number | null
+  avgCalories: number
+  targetCalories: number
+  workoutSessionsDone: number
+  workoutSessionsTotal: number
+  workoutAdherencePercent: number
+  mealDaysLogged: number
+  mealDaysTotal: number
+  mealAdherencePercent: number
+  progressScore: number
+  progressScoreLabel: string
+}
+
+export interface ProgressDaySession {
+  planId: number
+  planName: string
+  workoutDayId: number
+  sessionLabel: string
+  status: Exclude<DayCellStatus, "REST" | "NONE">
+}
+
+export interface ProgressDayCell {
+  date: string // yyyy-MM-dd
+  sessions: ProgressDaySession[] // rỗng = Nghỉ (không kế hoạch nào có buổi tập ngày đó)
+  caloriesEaten: number | null
+  caloriesTarget: number
+  weight: number | null
+}
+
+export interface ProgressCalendar {
+  summary: ProgressCalendarSummary
+  days: ProgressDayCell[]
+}
+
+export interface ProgressDayDetailExercise {
+  exerciseId: number
+  exerciseName: string
+  setsPlanned: number
+  setsLogged: number
+  done: boolean
+}
+
+export interface ProgressDayDetailMeal {
+  name: string
+  calories: number
+  mealType: string
+}
+
+export interface ProgressDayDetail {
+  date: string
+  status: DayCellStatus
+  planDayLabel: string | null
+  exercises: ProgressDayDetailExercise[]
+  meals: ProgressDayDetailMeal[]
+  caloriesEaten: number
+  caloriesTarget: number
+  weight: number | null
+}

@@ -57,3 +57,49 @@ export interface FoodDiarySummary {
   targetCarbs: number
   targetFat: number
 }
+
+// ===== Lịch nhật ký ăn (carousel % hoàn thành theo ngày) =====
+export interface FoodDiaryDayCell {
+  date: string // yyyy-MM-dd
+  completionPercent: number
+  mealsLogged: number
+  mealsPlanned: number
+}
+
+export interface FoodDiaryCalendar {
+  days: FoodDiaryDayCell[]
+}
+
+export type MealSlotStatus = "MATCH" | "CHANGED" | "SKIPPED" | "PLANNED"
+
+export interface FoodDiaryMealSlot {
+  mealType: string
+  mealTypeLabel: string
+  time: string
+  plannedDishName: string | null
+  actualItemName: string | null
+  actualCalories: number | null
+  actualProtein: number | null
+  actualCarbs: number | null
+  actualFat: number | null
+  status: MealSlotStatus
+}
+
+export interface FoodDiaryDayDetail {
+  date: string
+  completionPercent: number
+  mealsLogged: number
+  mealsPlanned: number
+  totalCalories: number
+  targetCalories: number
+  totalProtein: number
+  targetProtein: number
+  totalCarbs: number
+  targetCarbs: number
+  totalFat: number
+  targetFat: number
+  waterMl: number | null
+  waterTarget: number
+  weekAdherencePercent: number | null
+  slots: FoodDiaryMealSlot[]
+}

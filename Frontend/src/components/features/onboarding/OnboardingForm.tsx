@@ -52,9 +52,20 @@ export function OnboardingForm() {
     config: {
       onSuccess: async () => {
         toast.success("Cập nhật thông tin thành công!")
-        await queryClient.fetchQuery({ queryKey: [QUERY_KEYS.BASIC_INFO], queryFn: () => getBasicInfo() }).then(() => {
-          navigate(ROUTES.HOME, { replace: true })
-        })
+        const resp = await queryClient.fetchQuery({ queryKey: [QUERY_KEYS.BASIC_INFO], queryFn: () => getBasicInfo() })
+        const profile = resp?.data
+        if (profile) {
+          authStore.getState().setAuth({
+            id: profile.id,
+            email: profile.email,
+            username: profile.username,
+            name: profile.name,
+            avatar: profile.avatar,
+            role: profile.role,
+            isOnboardingCompleted: profile.onboardingCompleted,
+          })
+        }
+        navigate(ROUTES.HOME, { replace: true })
       },
       onError: () => {
         toast.error("Cập nhật thông tin thất bại, vui lòng thử lại!")

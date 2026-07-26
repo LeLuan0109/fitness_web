@@ -1,14 +1,23 @@
 package com.example.Fitness.Service;
 
 import com.example.Fitness.DTO.request.AddFoodLogRequest;
+import com.example.Fitness.DTO.response.Nutrition.FoodDiaryCalendarResponse;
+import com.example.Fitness.DTO.response.Nutrition.FoodDiaryDayDetailResponse;
 import com.example.Fitness.DTO.response.Nutrition.FoodDiaryResponse;
 import com.example.Fitness.Enum.FitnessGoal;
+import com.example.Fitness.Enum.MealType;
 import com.example.Fitness.Exceptions.DataNotFoundException;
+import com.example.Fitness.Model.Nutrition.DailyCheckin;
 import com.example.Fitness.Model.Nutrition.Dish;
 import com.example.Fitness.Model.Nutrition.FoodLog;
+import com.example.Fitness.Model.Nutrition.Meal;
+import com.example.Fitness.Model.Nutrition.MealDish;
+import com.example.Fitness.Model.Nutrition.Menu;
 import com.example.Fitness.Model.User;
+import com.example.Fitness.Repository.RNutrition.DailyCheckinRepository;
 import com.example.Fitness.Repository.RNutrition.DishRepository;
 import com.example.Fitness.Repository.RNutrition.FoodLogRepository;
+import com.example.Fitness.Repository.RNutrition.MenuRepository;
 import com.example.Fitness.Repository.UserRepository;
 import com.example.Fitness.Utils.HealthCalculatorUtils;
 import lombok.RequiredArgsConstructor;
@@ -17,17 +26,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class FoodLogService {
 
+    private static final java.time.ZoneId VN_ZONE = java.time.ZoneId.of("Asia/Ho_Chi_Minh");
+    private static final MealType[] SLOT_ORDER = {MealType.BREAKFAST, MealType.LUNCH, MealType.EXTRA_MEAL, MealType.DINNER};
+    private static final Map<MealType, String> SLOT_TIME = Map.of(
+            MealType.BREAKFAST, "07:00",
+            MealType.LUNCH, "12:00",
+            MealType.EXTRA_MEAL, "15:00",
+            MealType.DINNER, "19:00"
+    );
+
     private final FoodLogRepository foodLogRepository;
     private final DishRepository dishRepository;
     private final UserRepository userRepository;
+    private final MenuRepository menuRepository;
+    private final DailyCheckinRepository dailyCheckinRepository;
 
     public FoodDiaryResponse addLog(AddFoodLogRequest request) throws DataNotFoundException {
         User user = getCurrentUser();
@@ -45,7 +68,7 @@ public class FoodLogService {
             throw new IllegalArgumentException("Cần chọn món, hoặc nhập tên món + số calo thực tế.");
         }
 
-        LocalDate date = (request.getDate() != null) ? request.getDate() : LocalDate.now();
+        LocalDate date = (request.getDate() != null) ? request.getDate() : LocalDate.now(VN_ZONE);
         int qty = (request.getQuantity() != null && request.getQuantity() > 0) ? request.getQuantity() : 1;
 
         FoodLog log = FoodLog.builder()
@@ -67,7 +90,7 @@ public class FoodLogService {
 
     public FoodDiaryResponse getDiary(LocalDate date) {
         User user = getCurrentUser();
-        LocalDate d = (date != null) ? date : LocalDate.now();
+        LocalDate d = (date != null) ? date : LocalDate.now(VN_ZONE);
         List<FoodLog> logs = foodLogRepository.findByUserAndDate(user.getId(), d);
 
         List<FoodDiaryResponse.FoodLogItem> items = new ArrayList<>();
@@ -114,12 +137,169 @@ public class FoodLogService {
                 .build();
     }
 
+    // ===== Lịch nhật ký ăn (carousel % hoàn thành theo ngày) =====
+    public FoodDiaryCalendarResponse getCalendar(LocalDate from, LocalDate to) {
+        User user = getCurrentUser();
+        LocalDate f = (from != null) ? from : LocalDate.now(VN_ZONE).minusDays(6);
+        LocalDate t = (to != null) ? to : LocalDate.now(VN_ZONE);
+
+        Menu menu = menuRepository.findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByCreatedAtDesc(user.getId())
+                .orElse(null);
+        List<MealType> plannedSlots = resolvePlannedSlots(menu);
+
+        List<FoodDiaryCalendarResponse.DayCell> days = new ArrayList<>();
+        for (LocalDate d = f; !d.isAfter(t); d = d.plusDays(1)) {
+            List<FoodLog> logs = foodLogRepository.findByUserAndDate(user.getId(), d);
+            long loggedSlots = plannedSlots.stream()
+                    .filter(slot -> logs.stream().anyMatch(l -> slot.name().equals(l.getMealType())))
+                    .count();
+            double percent = plannedSlots.isEmpty() ? 0 : round1((double) loggedSlots / plannedSlots.size() * 100);
+
+            days.add(FoodDiaryCalendarResponse.DayCell.builder()
+                    .date(d.toString())
+                    .completionPercent(percent)
+                    .mealsLogged((int) loggedSlots)
+                    .mealsPlanned(plannedSlots.size())
+                    .build());
+        }
+        return FoodDiaryCalendarResponse.builder().days(days).build();
+    }
+
+    // ===== Chi tiết 1 ngày: timeline từng bữa (dự kiến vs thực tế) =====
+    public FoodDiaryDayDetailResponse getDayDetail(LocalDate date) {
+        User user = getCurrentUser();
+        LocalDate d = (date != null) ? date : LocalDate.now(VN_ZONE);
+        LocalDate today = LocalDate.now(VN_ZONE);
+
+        Menu menu = menuRepository.findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByCreatedAtDesc(user.getId())
+                .orElse(null);
+        List<MealType> plannedSlots = resolvePlannedSlots(menu);
+        List<FoodLog> logs = foodLogRepository.findByUserAndDate(user.getId(), d);
+
+        List<FoodDiaryDayDetailResponse.MealSlot> slots = new ArrayList<>();
+        int loggedCount = 0;
+        for (MealType slot : plannedSlots) {
+            List<FoodLog> slotLogs = logs.stream()
+                    .filter(l -> slot.name().equals(l.getMealType()))
+                    .collect(Collectors.toList());
+
+            String plannedDishName = resolvePlannedDishName(menu, slot);
+            String status;
+            String actualItemName = null;
+            Double actualCal = null, actualPro = null, actualCarb = null, actualFat = null;
+
+            if (!slotLogs.isEmpty()) {
+                loggedCount++;
+                actualItemName = slotLogs.stream()
+                        .map(l -> l.getDish() != null ? l.getDish().getName() : l.getCustomName())
+                        .collect(Collectors.joining(" + "));
+                double cal = 0, pro = 0, carb = 0, fat = 0;
+                for (FoodLog l : slotLogs) {
+                    Dish dish = l.getDish();
+                    int q = l.getQuantity() != null ? l.getQuantity() : 1;
+                    cal += l.getActualCalories() != null ? l.getActualCalories() : nz(dish != null ? dish.getCalories() : null) * q;
+                    pro += l.getActualProtein() != null ? l.getActualProtein() : nz(dish != null ? dish.getProtein() : null) * q;
+                    carb += l.getActualCarbs() != null ? l.getActualCarbs() : nz(dish != null ? dish.getCarbs() : null) * q;
+                    fat += l.getActualFat() != null ? l.getActualFat() : nz(dish != null ? dish.getFat() : null) * q;
+                }
+                actualCal = round1(cal); actualPro = round1(pro); actualCarb = round1(carb); actualFat = round1(fat);
+
+                boolean matchesPlan = plannedDishName != null
+                        && slotLogs.stream().anyMatch(l -> sameDishCombo(plannedDishName,
+                                l.getDish() != null ? l.getDish().getName() : l.getCustomName()));
+                status = (plannedDishName == null || matchesPlan) ? "MATCH" : "CHANGED";
+            } else if (d.isAfter(today)) {
+                status = "PLANNED";
+            } else if (d.isEqual(today) && LocalTime.now(VN_ZONE).isBefore(LocalTime.parse(SLOT_TIME.get(slot)))) {
+                // Hôm nay nhưng chưa tới giờ ăn của bữa này -> vẫn coi là sắp tới, không phải "bỏ bữa"
+                status = "PLANNED";
+            } else {
+                status = "SKIPPED";
+            }
+
+            slots.add(FoodDiaryDayDetailResponse.MealSlot.builder()
+                    .mealType(slot.name())
+                    .mealTypeLabel(slot.getDescription())
+                    .time(SLOT_TIME.get(slot))
+                    .plannedDishName(plannedDishName)
+                    .actualItemName(actualItemName)
+                    .actualCalories(actualCal).actualProtein(actualPro).actualCarbs(actualCarb).actualFat(actualFat)
+                    .status(status)
+                    .build());
+        }
+
+        double totalCal = 0, totalPro = 0, totalCarb = 0, totalFat = 0;
+        for (FoodLog log : logs) {
+            Dish dish = log.getDish();
+            int q = log.getQuantity() != null ? log.getQuantity() : 1;
+            totalCal += log.getActualCalories() != null ? log.getActualCalories() : nz(dish != null ? dish.getCalories() : null) * q;
+            totalPro += log.getActualProtein() != null ? log.getActualProtein() : nz(dish != null ? dish.getProtein() : null) * q;
+            totalCarb += log.getActualCarbs() != null ? log.getActualCarbs() : nz(dish != null ? dish.getCarbs() : null) * q;
+            totalFat += log.getActualFat() != null ? log.getActualFat() : nz(dish != null ? dish.getFat() : null) * q;
+        }
+        double[] target = computeTarget(user);
+
+        Integer waterMl = dailyCheckinRepository.findByUserIdAndLogDate(user.getId(), d)
+                .map(DailyCheckin::getWaterMl).orElse(null);
+        int waterTarget = user.getWeight() != null ? (int) Math.round(user.getWeight() * 35) : 2000;
+
+        LocalDate weekStart = d.minusDays(6);
+        int weekTotal = 0, weekLogged = 0;
+        for (LocalDate wd = weekStart; !wd.isAfter(d); wd = wd.plusDays(1)) {
+            List<FoodLog> wLogs = foodLogRepository.findByUserAndDate(user.getId(), wd);
+            for (MealType slot : plannedSlots) {
+                weekTotal++;
+                if (wLogs.stream().anyMatch(l -> slot.name().equals(l.getMealType()))) weekLogged++;
+            }
+        }
+        Double weekAdherence = weekTotal > 0 ? round1((double) weekLogged / weekTotal * 100) : null;
+
+        return FoodDiaryDayDetailResponse.builder()
+                .date(d.toString())
+                .completionPercent(plannedSlots.isEmpty() ? 0 : round1((double) loggedCount / plannedSlots.size() * 100))
+                .mealsLogged(loggedCount)
+                .mealsPlanned(plannedSlots.size())
+                .totalCalories(round1(totalCal)).targetCalories(round1(target[0]))
+                .totalProtein(round1(totalPro)).targetProtein(round1(target[1]))
+                .totalCarbs(round1(totalCarb)).targetCarbs(round1(target[2]))
+                .totalFat(round1(totalFat)).targetFat(round1(target[3]))
+                .waterMl(waterMl).waterTarget(waterTarget)
+                .weekAdherencePercent(weekAdherence)
+                .slots(slots)
+                .build();
+    }
+
+    private List<MealType> resolvePlannedSlots(Menu menu) {
+        if (menu == null || menu.getMeals() == null || menu.getMeals().isEmpty()) {
+            return List.of(SLOT_ORDER);
+        }
+        return List.of(SLOT_ORDER).stream()
+                .filter(slot -> menu.getMeals().stream().anyMatch(m -> m.getMealType() == slot))
+                .collect(Collectors.toList());
+    }
+
+    private String resolvePlannedDishName(Menu menu, MealType slot) {
+        if (menu == null || menu.getMeals() == null) return null;
+        return menu.getMeals().stream()
+                .filter(m -> m.getMealType() == slot)
+                .findFirst()
+                .map(Meal::getMealDishes)
+                .filter(dishes -> dishes != null && !dishes.isEmpty())
+                .map(dishes -> dishes.stream()
+                        .map(MealDish::getDish)
+                        .filter(dish -> dish != null)
+                        .map(Dish::getName)
+                        .collect(Collectors.joining(" + ")))
+                .filter(s -> !s.isBlank())
+                .orElse(null);
+    }
+
     /** Tổng hợp macro theo khoảng ngày (xem theo tuần/tháng). */
     public com.example.Fitness.DTO.response.Nutrition.FoodDiarySummaryResponse getSummary(
             LocalDate from, LocalDate to) {
         User user = getCurrentUser();
-        LocalDate f = (from != null) ? from : LocalDate.now().minusDays(6);
-        LocalDate t = (to != null) ? to : LocalDate.now();
+        LocalDate f = (from != null) ? from : LocalDate.now(VN_ZONE).minusDays(6);
+        LocalDate t = (to != null) ? to : LocalDate.now(VN_ZONE);
 
         List<Object[]> rows = foodLogRepository.sumMacrosByDateRange(user.getId(), f, t);
 
@@ -191,6 +371,20 @@ public class FoodLogService {
         double carbs = targetCal * 0.40 / 4.0;
         double fat = targetCal * 0.30 / 9.0;
         return new double[]{targetCal, protein, carbs, fat};
+    }
+
+    /**
+     * So sánh 2 tên món (có thể là tổ hợp nhiều món nối bằng " + ") không phụ thuộc thứ tự —
+     * vì Menu/Meal/MealDish là Set nên thứ tự nối chuỗi giữa lúc tạo menu và lúc resolve lại có thể khác nhau,
+     * dẫn tới cùng 1 tổ hợp món bị so lệch thành "Đổi món" một cách sai lệch.
+     */
+    private boolean sameDishCombo(String a, String b) {
+        if (a == null || b == null) return false;
+        List<String> partsA = java.util.Arrays.stream(a.split("\\+"))
+                .map(String::trim).map(String::toLowerCase).sorted().collect(Collectors.toList());
+        List<String> partsB = java.util.Arrays.stream(b.split("\\+"))
+                .map(String::trim).map(String::toLowerCase).sorted().collect(Collectors.toList());
+        return partsA.equals(partsB);
     }
 
     private double nz(Float v) {

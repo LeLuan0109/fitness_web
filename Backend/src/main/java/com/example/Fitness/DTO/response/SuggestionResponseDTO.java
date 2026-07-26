@@ -18,6 +18,11 @@ public class SuggestionResponseDTO {
     private String difficulty;         // độ khó phù hợp của user
     private boolean usedFallback;      // có phải nới điều kiện không (kho thiếu tổ hợp)
 
+    // Lộ trình cân nặng (chỉ có nếu user đã khai targetWeight)
+    private Double weightGap;              // (+): cần giảm, (-): cần tăng, đơn vị kg
+    private Integer estimatedWeeksToGoal;  // số tuần ước tính đạt targetWeight với tốc độ an toàn
+    private String paceWarning;            // cảnh báo nếu targetWeight ngược hướng với fitnessGoal
+
     // Giữ để tương thích ngược (đã sắp theo điểm giảm dần)
     private List<PlanResponse> suggestedWorkoutPlans;
     private List<MenuResponse> suggestedMenus;

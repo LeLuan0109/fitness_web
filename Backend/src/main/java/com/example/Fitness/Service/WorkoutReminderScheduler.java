@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
@@ -20,15 +21,17 @@ import java.util.Locale;
 @RequiredArgsConstructor
 @Slf4j
 public class WorkoutReminderScheduler {
+    private static final ZoneId VN_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
+
     private final NotificationService notificationService;
     private final WorkoutDayRepository workoutDayRepository;
     private final UserRepository userRepository;
     private final FoodLogRepository foodLogRepository;
 
     /** Nhắc ghi nhật ký ăn + nước mỗi tối 20:30 cho ai chưa ghi hôm nay. */
-    @Scheduled(cron = "0 30 20 * * ?")
+    @Scheduled(cron = "0 30 20 * * ?", zone = "Asia/Ho_Chi_Minh")
     public void sendFoodLogReminders() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(VN_ZONE);
         List<User> users = userRepository.findActiveUsersWithGoal();
         int count = 0;
         for (User u : users) {
@@ -44,9 +47,9 @@ public class WorkoutReminderScheduler {
         log.info("Đã gửi {} nhắc nhở ghi nhật ký ăn.", count);
     }
 
-    @Scheduled(cron = "0 0 7 * * ?")
+    @Scheduled(cron = "0 0 7 * * ?", zone = "Asia/Ho_Chi_Minh")
     public void sendMorningWorkoutReminders() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(VN_ZONE);
         int dayOfWeekValue = today.getDayOfWeek().getValue();
         String dayName = today.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("vi", "VN"));
 
@@ -88,9 +91,9 @@ public class WorkoutReminderScheduler {
         log.info("Đã gửi {} thông báo nhắc nhở hợp lệ.", count);
     }
 
-    @Scheduled(cron = "0 0 20 * * ?") // 8 giờ tối hàng ngày
+    @Scheduled(cron = "0 0 20 * * ?", zone = "Asia/Ho_Chi_Minh") // 8 giờ tối hàng ngày (giờ VN)
     public void sendEveningNudges() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(VN_ZONE);
         int dayOfWeek = today.getDayOfWeek().getValue();
         List<Object[]> lazyUsers = userRepository.findUsersMissedWorkout(dayOfWeek, today);
         log.info("Tìm thấy {} user cần nhắc nhở buổi tối.", lazyUsers.size());
@@ -114,10 +117,10 @@ public class WorkoutReminderScheduler {
         }
     }
 
-    @Scheduled(cron = "1 0 0 * * ?")   //hạy lúc 00:00:01 mỗi ngày
+    @Scheduled(cron = "1 0 0 * * ?", zone = "Asia/Ho_Chi_Minh")   //chạy lúc 00:00:01 mỗi ngày (giờ VN)
     @Transactional
     public void resetStreaks() {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDate yesterday = LocalDate.now(VN_ZONE).minusDays(1);
         log.info("Bắt đầu quét reset streak cho ngày: {}", yesterday);
         userRepository.resetStreakForLazyUsers(yesterday);
         log.info("Đã reset streak các user không tập hôm qua.");

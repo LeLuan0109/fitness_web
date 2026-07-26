@@ -11,6 +11,7 @@ public class ExercisesDetailResponse {
     private Long id;
     private String name;
     private String level;
+    private String aiExerciseKey;
     private String thumbnail;
     private String videoUrl;
     private String description;

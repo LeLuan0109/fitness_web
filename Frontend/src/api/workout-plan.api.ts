@@ -33,6 +33,13 @@ export const copyWorkoutPlan = (id: string) => {
   return http.post<Response<string>>(generatePath(API_ENDPOINTS.WORKOUT_PLANS.COPY, { id }))
 }
 
+// Bật/tắt trạng thái "đang hoạt động" của 1 kế hoạch cá nhân
+export const setWorkoutPlanActiveStatus = (id: string, isActive: boolean) => {
+  return http.patch<Response<boolean>>(generatePath(API_ENDPOINTS.WORKOUT_PLANS.ACTIVE_STATUS, { id }), {
+    params: { isActive },
+  })
+}
+
 export const createWorkoutPlan = (data: WorkoutPlanRequest) => {
   return http.post<Response<number>>(API_ENDPOINTS.WORKOUT_PLANS.CREATE, { data })
 }

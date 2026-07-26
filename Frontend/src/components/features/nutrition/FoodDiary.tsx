@@ -1,23 +1,34 @@
 import { useMemo, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { format, subDays } from "date-fns"
-import { Plus, Trash2, Flame } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { addDays, format, isSameDay, isToday, parseISO, startOfWeek } from "date-fns"
+import { ChevronLeft, ChevronRight, Droplet, Plus, TrendingUp } from "lucide-react"
 
-import { addFoodLog, deleteFoodLog, getFoodDiary, getFoodDiarySummary } from "@/api/food-log.api"
-import { getDishes } from "@/api/dish.api"
+import { addFoodLog, getFoodDiaryCalendar, getFoodDiaryDayDetail } from "@/api/food-log.api"
+import { Badge } from "@/components/shared/ui/badge"
 import { Button } from "@/components/shared/ui/button"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/shared/ui/chart"
-import { Input } from "@/components/shared/ui/input"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/shared/ui/select"
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/shared/ui/dialog"
+import { Input } from "@/components/shared/ui/input"
+import { cn } from "@/lib/utils"
+import { FoodDiaryMealSlot, MealSlotStatus } from "@/types/food-diary.type"
 
-type Period = "day" | "week" | "month"
+const STATUS_META: Record<MealSlotStatus, { label: string; badge: string }> = {
+  MATCH: { label: "Đúng thực đơn", badge: "bg-success/15 text-success" },
+  CHANGED: { label: "Đổi món", badge: "bg-amber-500/15 text-amber-600" },
+  SKIPPED: { label: "Bỏ bữa", badge: "bg-destructive/15 text-destructive" },
+  PLANNED: { label: "Kế hoạch", badge: "bg-indigo-500/15 text-indigo-600" },
+}
+
+function completionColor(percent: number) {
+  if (percent >= 90) return "bg-success"
+  if (percent >= 60) return "bg-amber-500"
+  return "bg-destructive"
+}
 
 interface MacroBarProps {
   label: string
@@ -47,268 +58,250 @@ function MacroBar({ label, current, target, unit, color }: MacroBarProps) {
 
 export function FoodDiary() {
   const queryClient = useQueryClient()
-  const today = useMemo(() => format(new Date(), "dd/MM/yyyy"), [])
-  const [period, setPeriod] = useState<Period>("day")
-  const [dishId, setDishId] = useState<string>("")
-  const [quantity, setQuantity] = useState<number>(1)
-  const [mode, setMode] = useState<"catalog" | "custom">("catalog")
-  const [customName, setCustomName] = useState<string>("")
-  const [customCalories, setCustomCalories] = useState<string>("")
+  const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }))
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [addDialogSlot, setAddDialogSlot] = useState<FoodDiaryMealSlot | null>(null)
+  const [addName, setAddName] = useState("")
+  const [addCalories, setAddCalories] = useState("")
 
-  // Khoảng ngày cho chế độ tuần/tháng
-  const range = useMemo(() => {
-    const to = new Date()
-    const from = subDays(to, period === "month" ? 29 : 6)
-    return { from: format(from, "dd/MM/yyyy"), to: format(to, "dd/MM/yyyy") }
-  }, [period])
+  const weekStartStr = format(weekStart, "yyyy-MM-dd")
+  const weekEndStr = format(addDays(weekStart, 6), "yyyy-MM-dd")
+  const selectedDateStr = format(selectedDate, "yyyy-MM-dd")
+  const selectedDateApiStr = format(selectedDate, "dd/MM/yyyy")
 
-  const { data: summary } = useQuery({
-    queryKey: ["food-summary", range.from, range.to],
-    queryFn: () => getFoodDiarySummary(range.from, range.to),
+  const { data: calendar } = useQuery({
+    queryKey: ["food-diary-calendar", weekStartStr],
+    queryFn: () => getFoodDiaryCalendar(weekStartStr, weekEndStr),
     select: (res) => res?.data,
-    enabled: period !== "day",
   })
 
-  const summaryChart = useMemo(
-    () => (summary?.days ?? []).map((d) => ({ label: d.date?.slice(5), Calo: d.calories })),
-    [summary],
-  )
-
-  const { data: dishesRes } = useQuery({
-    queryKey: ["dishes-for-diary"],
-    queryFn: () => getDishes(),
-    select: (res) => res?.data ?? [],
-  })
-  const dishes = dishesRes ?? []
-
-  const { data: diary, isLoading } = useQuery({
-    queryKey: ["food-diary", today],
-    queryFn: () => getFoodDiary(today),
+  const { data: dayDetail, isFetching: isFetchingDetail } = useQuery({
+    queryKey: ["food-diary-day-detail", selectedDateStr],
+    queryFn: () => getFoodDiaryDayDetail(selectedDateStr),
     select: (res) => res?.data,
   })
 
   const addMutation = useMutation({
     mutationFn: () =>
-      mode === "custom"
-        ? addFoodLog({
-            customName: customName || "Món tự nhập",
-            actualCalories: Number(customCalories),
-            date: today,
-            mealType: "OTHER",
-          })
-        : addFoodLog({ dishId: Number(dishId), quantity, date: today, mealType: "OTHER" }),
+      addFoodLog({
+        customName: addName || addDialogSlot?.mealTypeLabel || "Món tự nhập",
+        actualCalories: Number(addCalories),
+        date: selectedDateApiStr,
+        mealType: addDialogSlot?.mealType,
+      }),
     onSuccess: () => {
-      setDishId("")
-      setQuantity(1)
-      setCustomName("")
-      setCustomCalories("")
-      queryClient.invalidateQueries({ queryKey: ["food-diary", today] })
+      setAddDialogSlot(null)
+      setAddName("")
+      setAddCalories("")
+      queryClient.invalidateQueries({ queryKey: ["food-diary-day-detail", selectedDateStr] })
+      queryClient.invalidateQueries({ queryKey: ["food-diary-calendar", weekStartStr] })
     },
   })
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteFoodLog(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["food-diary", today] }),
-  })
+  const days = calendar?.days ?? []
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold text-foreground">Nhật ký ăn uống</h1>
         <p className="text-sm text-text-secondary">
-          Ghi món đã ăn và theo dõi calo, đạm, tinh bột, chất béo so với mục tiêu — theo ngày, tuần hoặc tháng.
+          Theo dõi mức hoàn thành thực đơn mỗi ngày, calo/macro và từng bữa ăn trong ngày.
         </p>
       </div>
 
-      {/* Chọn kỳ xem */}
-      <div className="inline-flex w-fit rounded-lg border border-border p-0.5">
-        {([
-          { k: "day", label: "Hôm nay" },
-          { k: "week", label: "Tuần" },
-          { k: "month", label: "Tháng" },
-        ] as const).map((opt) => (
-          <button
-            key={opt.k}
-            onClick={() => setPeriod(opt.k)}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-              period === opt.k ? "bg-primary text-primary-foreground" : "text-text-secondary hover:bg-muted"
-            }`}
-          >
-            {opt.label}
-          </button>
-        ))}
+      {/* ===== Carousel "Hoàn thành thực đơn" theo tuần ===== */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-foreground">Hoàn thành thực đơn</h3>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 text-xs text-text-secondary">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-success" /> ≥90%
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-amber-500" /> 60-89%
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-destructive" /> &lt;60%
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setWeekStart((w) => addDays(w, -7))}
+                className="rounded-md border border-border p-1.5 hover:bg-muted"
+                aria-label="Tuần trước"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setWeekStart((w) => addDays(w, 7))}
+                className="rounded-md border border-border p-1.5 hover:bg-muted"
+                aria-label="Tuần sau"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-7 gap-2">
+          {days.map((cell) => {
+            const d = parseISO(cell.date)
+            const today = isToday(d)
+            const selected = isSameDay(d, selectedDate)
+            return (
+              <button
+                key={cell.date}
+                onClick={() => setSelectedDate(d)}
+                className={cn(
+                  "flex flex-col items-center justify-end gap-1.5 rounded-lg p-2 transition-colors hover:bg-muted",
+                  selected && "bg-primary/10",
+                )}
+              >
+                <div
+                  className={cn("w-3 rounded-full", completionColor(cell.completionPercent))}
+                  style={{ height: `${12 + cell.completionPercent * 0.5}px` }}
+                />
+                <span className={cn("text-xs font-semibold", today ? "text-destructive" : "text-foreground")}>
+                  {d.getDate()}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      {/* ===== Chế độ TUẦN / THÁNG: trung bình + biểu đồ calo mỗi ngày ===== */}
-      {period !== "day" && summary && (
-        <>
-          <div className="rounded-xl border border-border bg-card p-5">
-            <h3 className="mb-1 text-base font-semibold text-foreground">
-              Trung bình mỗi ngày ({period === "week" ? "7 ngày" : "30 ngày"})
-            </h3>
-            <p className="mb-4 text-xs text-text-secondary">
-              {summary.fromDate} → {summary.toDate}
-            </p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <MacroBar label="Calo" current={summary.avgCalories} target={summary.targetCalories} unit="kcal" color="#f97316" />
-              <MacroBar label="Đạm" current={summary.avgProtein} target={summary.targetProtein} unit="g" color="#0ea5e9" />
-              <MacroBar label="Tinh bột" current={summary.avgCarbs} target={summary.targetCarbs} unit="g" color="#8c6239" />
-              <MacroBar label="Chất béo" current={summary.avgFat} target={summary.targetFat} unit="g" color="#eab308" />
+      {/* ===== Thống kê ngày (ngày đang chọn) ===== */}
+      {dayDetail && (
+        <div className={cn("rounded-xl border border-border bg-card p-5", isFetchingDetail && "opacity-60")}>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-text-secondary">
+                {format(selectedDate, "EEEE").toUpperCase()} · {format(selectedDate, "dd/MM/yyyy")}
+              </p>
+              <h3 className="text-base font-semibold text-foreground">Thống kê ngày</h3>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-primary">{Math.round(dayDetail.completionPercent)}%</p>
+              <p className="text-xs text-text-secondary">
+                {dayDetail.mealsLogged}/{dayDetail.mealsPlanned} bữa
+              </p>
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-card p-5">
-            <h3 className="mb-4 text-base font-semibold text-foreground">Calo nạp mỗi ngày</h3>
-            {summaryChart.length === 0 ? (
-              <p className="py-6 text-center text-text-secondary">Chưa có dữ liệu trong khoảng này.</p>
-            ) : (
-              <ChartContainer config={{ Calo: { label: "Calo", color: "#f97316" } }} className="h-[300px] w-full">
-                <BarChart data={summaryChart}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(74,53,37,0.12)" />
-                  <XAxis dataKey="label" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={12} tickLine={false} axisLine={false} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="Calo" fill="#f97316" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ChartContainer>
-            )}
+          <div className="flex flex-col gap-4">
+            <MacroBar label="Calories" current={dayDetail.totalCalories} target={dayDetail.targetCalories} unit="kcal" color="#f97316" />
+            <MacroBar label="Protein" current={dayDetail.totalProtein} target={dayDetail.targetProtein} unit="g" color="#22c55e" />
+            <MacroBar label="Carbs" current={dayDetail.totalCarbs} target={dayDetail.targetCarbs} unit="g" color="#3b82f6" />
+            <MacroBar label="Fat" current={dayDetail.totalFat} target={dayDetail.targetFat} unit="g" color="#8b5cf6" />
           </div>
-        </>
+
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="rounded-lg bg-muted p-3">
+              <p className="flex items-center gap-1 text-xs text-text-secondary">
+                <Droplet className="h-3.5 w-3.5" /> Nước
+              </p>
+              <p className="text-lg font-bold text-foreground">
+                {dayDetail.waterMl != null ? (dayDetail.waterMl / 1000).toFixed(1) : "-"} / {(dayDetail.waterTarget / 1000).toFixed(1)} L
+              </p>
+            </div>
+            <div className="rounded-lg bg-muted p-3">
+              <p className="flex items-center gap-1 text-xs text-text-secondary">
+                <TrendingUp className="h-3.5 w-3.5" /> Tuần này
+              </p>
+              <p className="text-lg font-bold text-foreground">
+                {dayDetail.weekAdherencePercent != null ? Math.round(dayDetail.weekAdherencePercent) : 0}%
+              </p>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* Tổng quan macro */}
-      {period === "day" && diary && (
+      {/* ===== Nhật ký bữa ăn (timeline theo bữa) ===== */}
+      {dayDetail && (
         <div className="rounded-xl border border-border bg-card p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <Flame className="h-5 w-5 text-primary" />
-            <h3 className="text-base font-semibold text-foreground">
-              Đã nạp {Math.round(diary.totalCalories)} / {Math.round(diary.targetCalories)} kcal
-            </h3>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <MacroBar label="Calo" current={diary.totalCalories} target={diary.targetCalories} unit="kcal" color="#f97316" />
-            <MacroBar label="Đạm" current={diary.totalProtein} target={diary.targetProtein} unit="g" color="#0ea5e9" />
-            <MacroBar label="Tinh bột" current={diary.totalCarbs} target={diary.targetCarbs} unit="g" color="#8c6239" />
-            <MacroBar label="Chất béo" current={diary.totalFat} target={diary.targetFat} unit="g" color="#eab308" />
+          <h3 className="mb-4 text-base font-semibold text-foreground">Nhật ký bữa ăn</h3>
+          <div className="flex flex-col gap-3">
+            {dayDetail.slots.map((slot) => {
+              const meta = STATUS_META[slot.status]
+              const canLog = slot.actualItemName == null && slot.status !== "PLANNED"
+              return (
+                <div key={slot.mealType} className="rounded-lg border border-border p-4">
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <p className="text-xs text-text-secondary">{slot.time}</p>
+                    <Badge className={meta.badge} variant="outline">
+                      {meta.label}
+                    </Badge>
+                  </div>
+                  <p className="font-semibold text-foreground">{slot.mealTypeLabel}</p>
+                  {slot.plannedDishName && (
+                    <p className="text-xs text-text-secondary">Gợi ý: {slot.plannedDishName}</p>
+                  )}
+                  {slot.actualItemName ? (
+                    <p className="mt-1 text-sm text-foreground">
+                      {slot.actualItemName} — {Math.round(slot.actualCalories ?? 0)} kcal
+                    </p>
+                  ) : slot.status === "PLANNED" ? (
+                    <p className="mt-1 text-sm text-text-secondary">Chưa tới giờ ăn.</p>
+                  ) : (
+                    <p className="mt-1 text-sm text-destructive">Không có dữ liệu bữa này.</p>
+                  )}
+                  {canLog && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2 h-auto p-0 text-primary hover:bg-transparent hover:underline"
+                      onClick={() => {
+                        setAddDialogSlot(slot)
+                        setAddName("")
+                        setAddCalories("")
+                      }}
+                    >
+                      <Plus className="mr-1 h-3.5 w-3.5" /> Ghi món đã ăn
+                    </Button>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
 
-      {/* Thêm món (chỉ ở chế độ Hôm nay) */}
-      {period === "day" && (
-      <>
-      <div className="rounded-xl border border-border bg-card p-5">
-        <h3 className="mb-3 text-base font-semibold text-foreground">Thêm món đã ăn</h3>
-
-        {/* Chọn chế độ: từ thực đơn/catalog HOẶC tự nhập calo (ăn món khác / lượng khác) */}
-        <div className="mb-3 inline-flex w-fit rounded-lg border border-border p-0.5">
-          {([
-            { k: "catalog", label: "Chọn món có sẵn" },
-            { k: "custom", label: "Tự nhập calo" },
-          ] as const).map((opt) => (
-            <button
-              key={opt.k}
-              onClick={() => setMode(opt.k)}
-              className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-                mode === opt.k ? "bg-primary text-primary-foreground" : "text-text-secondary hover:bg-muted"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {mode === "catalog" ? (
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div className="flex-1">
-              <label className="mb-1 block text-sm text-text-secondary">Món ăn</label>
-              <Select value={dishId} onValueChange={setDishId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn món ăn" />
-                </SelectTrigger>
-                <SelectContent>
-                  {dishes.map((d) => (
-                    <SelectItem key={d.id} value={String(d.id)}>
-                      {d.name} ({d.calories} kcal)
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-full sm:w-28">
-              <label className="mb-1 block text-sm text-text-secondary">Số phần</label>
+      <Dialog open={!!addDialogSlot} onOpenChange={(open) => !open && setAddDialogSlot(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{addDialogSlot?.mealTypeLabel}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3">
+            <div>
+              <label className="mb-1 block text-sm text-text-secondary">Tên món</label>
               <Input
-                type="number"
-                min={1}
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                value={addName}
+                onChange={(e) => setAddName(e.target.value)}
+                placeholder={addDialogSlot?.plannedDishName ?? "VD: Cơm gà"}
               />
             </div>
-            <Button onClick={() => addMutation.mutate()} disabled={!dishId || addMutation.isPending}>
-              <Plus className="mr-1 h-4 w-4" /> Thêm
-            </Button>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div className="flex-1">
-              <label className="mb-1 block text-sm text-text-secondary">Tên món (tự nhập)</label>
-              <Input value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="VD: Cơm mẹ nấu" />
-            </div>
-            <div className="w-full sm:w-36">
-              <label className="mb-1 block text-sm text-text-secondary">Calo thực tế (kcal)</label>
+            <div>
+              <label className="mb-1 block text-sm text-text-secondary">Số calo thực tế (kcal)</label>
               <Input
                 type="number"
                 min={0}
-                value={customCalories}
-                onChange={(e) => setCustomCalories(e.target.value)}
+                value={addCalories}
+                onChange={(e) => setAddCalories(e.target.value)}
                 placeholder="VD: 550"
               />
             </div>
-            <Button onClick={() => addMutation.mutate()} disabled={!customCalories || addMutation.isPending}>
-              <Plus className="mr-1 h-4 w-4" /> Thêm
-            </Button>
           </div>
-        )}
-        <p className="mt-2 text-xs text-text-secondary">
-          Ăn đúng thực đơn nhưng lượng khác, hoặc ăn món khác? Chọn "Tự nhập calo" và điền số calo thực tế đã nạp.
-        </p>
-      </div>
-
-      {/* Danh sách món đã ăn */}
-      <div className="rounded-xl border border-border bg-card p-5">
-        <h3 className="mb-3 text-base font-semibold text-foreground">Món đã ăn hôm nay</h3>
-        {isLoading ? (
-          <p className="text-text-secondary">Đang tải...</p>
-        ) : !diary || diary.items.length === 0 ? (
-          <p className="py-6 text-center text-text-secondary">Chưa ghi món nào. Hãy thêm món bạn đã ăn.</p>
-        ) : (
-          <ul className="flex flex-col divide-y divide-border">
-            {diary.items.map((item) => (
-              <li key={item.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-medium text-foreground">
-                    {item.dishName} {item.quantity > 1 && `× ${item.quantity}`}
-                  </p>
-                  <p className="text-xs text-text-secondary">
-                    {Math.round(item.calories)} kcal · P {Math.round(item.protein)}g · C {Math.round(item.carbs)}g · F{" "}
-                    {Math.round(item.fat)}g
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => deleteMutation.mutate(item.id)}
-                  disabled={deleteMutation.isPending}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      </>
-      )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddDialogSlot(null)}>
+              Hủy
+            </Button>
+            <Button onClick={() => addMutation.mutate()} disabled={!addCalories || addMutation.isPending}>
+              Lưu
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

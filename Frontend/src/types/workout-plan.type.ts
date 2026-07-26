@@ -19,6 +19,7 @@ export type PlanListResponse = {
   targetGoal: string
   difficultyLevel: string
   isDefault: boolean
+  isActive: boolean | null
 }
 
 export type PlanListData = {

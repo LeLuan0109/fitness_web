@@ -58,6 +58,7 @@ public class WorkoutPlantService {
         WorkoutPlan workoutPlan = workoutPlanMapper.toWorkoutPlan(request);
         workoutPlan.setUser(user);
         workoutPlan.setIsDefault(user.getRole().getName().equalsIgnoreCase("ADMIN"));
+        workoutPlan.setIsActive(true);
 
         // GÁN NHÃN = code đề xuất + người chốt:
         // Nếu người tạo KHÔNG chọn độ khó (override) → hệ thống tự suy từ nội dung bài tập.
@@ -305,6 +306,7 @@ public class WorkoutPlantService {
         newPlan.setUser(currentUser);
         newPlan.setIsDefault(false);
         newPlan.setDeleted(false);
+        newPlan.setIsActive(true);
 
         WorkoutPlan savedNewPlan = workoutPlanRepository.save(newPlan);
 
@@ -339,6 +341,26 @@ public class WorkoutPlantService {
         }
 
         return savedNewPlan.getId();
+    }
+
+    /** Bật/tắt trạng thái "đang hoạt động" của 1 kế hoạch cá nhân — chỉ chủ sở hữu mới được đổi, không áp dụng cho kế hoạch mẫu. */
+    public void setPlanActive(Long planId, boolean active) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        WorkoutPlan plan = workoutPlanRepository.findById(planId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy kế hoạch"));
+
+        if (plan.getIsDefault() != null && plan.getIsDefault()) {
+            throw new RuntimeException("Kế hoạch mẫu không có trạng thái hoạt động");
+        }
+        if (plan.getUser() == null || !plan.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Bạn không có quyền thay đổi kế hoạch này");
+        }
+
+        plan.setIsActive(active);
+        workoutPlanRepository.save(plan);
     }
 
     private void createScheduleForPlan(WorkoutPlan plan, List<PlanDayRequest> schedule) {
@@ -465,6 +487,7 @@ public class WorkoutPlantService {
                 .name(ex.getName())
                 .description(ex.getDescription())
                 .level(ex.getLevel())
+                .aiExerciseKey(ex.getAiExerciseKey())
                 .thumbnail(ex.getThumbnail())
                 .videoUrl(ex.getVideoUrl())
                 .trainingType(ex.getTrainingType() != null ? ex.getTrainingType().getName() : null)

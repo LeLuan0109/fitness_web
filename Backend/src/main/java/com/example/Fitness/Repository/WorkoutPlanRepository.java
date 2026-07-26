@@ -37,6 +37,9 @@ public interface WorkoutPlanRepository extends JpaRepository<WorkoutPlan, Long>,
     /** Kế hoạch cá nhân mới nhất (proxy "kế hoạch đang theo" cho tính tuân thủ). */
     java.util.Optional<WorkoutPlan> findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByStartDateDesc(Long userId);
 
+    /** Toàn bộ kế hoạch cá nhân đang hiệu lực của user — dùng cho lịch tiến độ khi user theo nhiều kế hoạch song song. */
+    List<WorkoutPlan> findByUserIdAndIsDefaultFalseAndIsDeletedFalse(Long userId);
+
     @Query("SELECT DISTINCT p FROM WorkoutPlan p " +
             "LEFT JOIN FETCH p.workoutDays wd " +
             "WHERE p.user.id = :userId " +

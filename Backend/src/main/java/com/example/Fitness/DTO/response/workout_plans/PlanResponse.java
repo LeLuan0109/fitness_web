@@ -23,6 +23,7 @@ public class PlanResponse {
     private FitnessGoal targetGoal;
     private DifficultyLevel difficultyLevel;
     private Boolean isDefault;
+    private Boolean isActive;
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate startDate;
     private Long currentWorkoutDayId;   //ID của ngày tập cụ thể

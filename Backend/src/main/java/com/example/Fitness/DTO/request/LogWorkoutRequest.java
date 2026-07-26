@@ -28,4 +28,8 @@ public class LogWorkoutRequest {
 
     @Nullable
     private Float duration;
+
+    /** Chất lượng nhận diện tư thế camera AI (VD "OK"/"UNCERTAIN_ORIENTATION"); null nếu ghi tay hoặc không xác định. */
+    @Nullable
+    private String poseQuality;
 }

@@ -12,6 +12,7 @@ import java.util.List;
 public class ExerciseRequest {
     private String name;
     private String level;
+    private String aiExerciseKey; // Key nhận diện AI camera (VD "SQUAT"); để trống nếu chưa hỗ trợ
     private String description;
     private Long trainingTypeId;
     private Double met;

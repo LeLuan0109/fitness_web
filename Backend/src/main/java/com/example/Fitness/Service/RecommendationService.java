@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 public class RecommendationService {
 
     private static final int TOP_N = 5;
+    /** Tốc độ giảm/tăng cân an toàn trung bình (kg/tuần) dùng để ước lượng thời gian đạt mục tiêu. */
+    private static final double SAFE_WEEKLY_PACE_KG = 0.5;
 
     private final UserRepository userRepository;
     private final WorkoutPlanRepository workoutPlanRepository;
@@ -59,9 +61,22 @@ public class RecommendationService {
         double tdee = HealthCalculatorUtils.calculateTDEE(bmr, user.getActivityLevel());
         double bmi = user.getWeight() / Math.pow(user.getHeight() / 100.0, 2);
 
-        double targetCalories = calculateTargetCalories(tdee, user.getFitnessGoal());
+        double targetCalories = calculateTargetCalories(tdee, user.getFitnessGoal(), bmi);
         DifficultyLevel userDifficulty = resolveUserDifficulty(user);
         double proteinTarget = targetCalories * 0.30 / 4.0; // g
+        double carbsTarget = targetCalories * 0.40 / 4.0;   // g
+        double fatTarget = targetCalories * 0.30 / 9.0;     // g
+
+        Double weightGap = null;
+        Integer estimatedWeeksToGoal = null;
+        String paceWarning = null;
+        if (user.getTargetWeight() != null) {
+            weightGap = user.getWeight() - user.getTargetWeight(); // >0: cần giảm, <0: cần tăng
+            if (Math.abs(weightGap) > 0.1) {
+                estimatedWeeksToGoal = (int) Math.ceil(Math.abs(weightGap) / SAFE_WEEKLY_PACE_KG);
+            }
+            paceWarning = checkGoalConsistency(user.getFitnessGoal(), weightGap);
+        }
 
         // ===== 2. SCORING KẾ HOẠCH (goal-matched trước, fallback nếu rỗng) =====
         List<WorkoutPlan> allPlans = workoutPlanRepository.findByIsDefaultTrueAndIsDeletedFalse();
@@ -90,7 +105,7 @@ public class RecommendationService {
             menuFallback = !allMenus.isEmpty();
         }
         List<ScoredMenuSuggestion> scoredMenus = menuPool.stream()
-                .map(m -> scoreMenu(m, user.getFitnessGoal(), targetCalories, proteinTarget))
+                .map(m -> scoreMenu(m, user.getFitnessGoal(), targetCalories, proteinTarget, carbsTarget, fatTarget))
                 .sorted(Comparator.comparingInt(ScoredMenuSuggestion::getMatchScore).reversed())
                 .limit(TOP_N)
                 .collect(Collectors.toList());
@@ -101,6 +116,9 @@ public class RecommendationService {
                 .targetCalories(Math.round(targetCalories))
                 .difficulty(userDifficulty.name())
                 .usedFallback(planFallback || menuFallback)
+                .weightGap(weightGap == null ? null : Math.round(weightGap * 10.0) / 10.0)
+                .estimatedWeeksToGoal(estimatedWeeksToGoal)
+                .paceWarning(paceWarning)
                 .workoutPlanSuggestions(scoredPlans)
                 .menuSuggestions(scoredMenus)
                 .suggestedWorkoutPlans(scoredPlans.stream().map(ScoredPlanSuggestion::getPlan).collect(Collectors.toList()))
@@ -148,7 +166,8 @@ public class RecommendationService {
                 .build();
     }
 
-    private ScoredMenuSuggestion scoreMenu(Menu m, FitnessGoal goal, double targetCal, double proteinTarget) {
+    private ScoredMenuSuggestion scoreMenu(Menu m, FitnessGoal goal, double targetCal,
+                                           double proteinTarget, double carbsTarget, double fatTarget) {
         int score = 0;
         List<String> reasons = new ArrayList<>();
 
@@ -178,6 +197,18 @@ public class RecommendationService {
             if (add >= 12) reasons.add("✅ Lượng đạm phù hợp (" + Math.round(m.getProtein()) + "g)");
         }
 
+        if (m.getCarbs() != null && carbsTarget > 0) {
+            double diff = Math.abs(m.getCarbs() - carbsTarget);
+            int add = (int) Math.round(Math.max(0, 10 - (diff / 80.0) * 10));
+            score += add;
+        }
+
+        if (m.getFat() != null && fatTarget > 0) {
+            double diff = Math.abs(m.getFat() - fatTarget);
+            int add = (int) Math.round(Math.max(0, 10 - (diff / 40.0) * 10));
+            score += add;
+        }
+
         return ScoredMenuSuggestion.builder()
                 .menu(menuMapper.toMenuResponse(m))
                 .matchScore(score)
@@ -195,15 +226,32 @@ public class RecommendationService {
         return mapActivityToDifficulty(user.getActivityLevel());
     }
 
-    private double calculateTargetCalories(double tdee, FitnessGoal goal) {
+    /**
+     * targetCalories điều chỉnh theo BMI (WHO): người thừa cân/béo phì giảm cân được deficit sâu hơn
+     * (an toàn hơn vì có nhiều mỡ dự trữ); người thiếu cân bị giới hạn deficit để tránh giảm cân quá mức.
+     */
+    private double calculateTargetCalories(double tdee, FitnessGoal goal, double bmi) {
         if (goal == null) return tdee;
+        boolean underweight = bmi < 18.5;
+        boolean overweightOrObese = bmi >= 25.0;
         return switch (goal) {
-            case LOSE_WEIGHT -> tdee - 500;
-            case GAIN_WEIGHT -> tdee + 500;
-            case MUSCLE_GAIN -> tdee + 300;
+            case LOSE_WEIGHT -> tdee - (underweight ? 250 : overweightOrObese ? 700 : 500);
+            case GAIN_WEIGHT -> tdee + (underweight ? 700 : overweightOrObese ? 200 : 500);
+            case MUSCLE_GAIN -> tdee + (overweightOrObese ? 150 : 300);
             case SHAPE_BODY -> tdee;
             default -> tdee;
         };
+    }
+
+    /** Cảnh báo nếu cân mục tiêu ngược hướng với mục tiêu tập luyện đã chọn. */
+    private String checkGoalConsistency(FitnessGoal goal, double weightGap) {
+        if (goal == FitnessGoal.LOSE_WEIGHT && weightGap <= 0) {
+            return "⚠️ Cân mục tiêu không thấp hơn cân hiện tại, dù mục tiêu của bạn là giảm cân.";
+        }
+        if (goal == FitnessGoal.GAIN_WEIGHT && weightGap >= 0) {
+            return "⚠️ Cân mục tiêu không cao hơn cân hiện tại, dù mục tiêu của bạn là tăng cân.";
+        }
+        return null;
     }
 
     private DifficultyLevel mapActivityToDifficulty(ActivityLevel activityLevel) {

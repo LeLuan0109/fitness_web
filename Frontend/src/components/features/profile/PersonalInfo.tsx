@@ -11,9 +11,19 @@ import { PERSONAL_INFO_SCHEMA } from "@/schemas/personal-info.schema"
 import { PersonalInfoData, UpdateUserProfileRequest } from "@/types/user.type"
 import { formatDateddMMyyyy } from "@/utils/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { isValid, parse } from "date-fns"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+
+// Backend trả dateOfBirth dạng chuỗi "dd/MM/yyyy" — cần parse thành Date thật
+// trước khi đưa vào SimpleDatePicker (nếu không, date-fns format() sẽ throw "Invalid time value").
+function parseDateddMMyyyy(value: unknown): Date | undefined {
+  if (!value) return undefined
+  if (value instanceof Date) return value
+  const parsed = parse(String(value), "dd/MM/yyyy", new Date())
+  return isValid(parsed) ? parsed : undefined
+}
 
 type PersonalInfoProps = {
   personalInfo: PersonalInfoData
@@ -26,7 +36,7 @@ export const PersonalInfo = ({ personalInfo, avatarFile }: PersonalInfoProps) =>
     defaultValues: {
       name: personalInfo.name,
       email: personalInfo.email,
-      dateOfBirth: personalInfo?.dateOfBirth,
+      dateOfBirth: parseDateddMMyyyy(personalInfo?.dateOfBirth),
       height: personalInfo.height.toString(),
       weight: personalInfo.weight.toString(),
       activityLevel: personalInfo.activityLevel,

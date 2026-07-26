@@ -142,6 +142,40 @@ public class WorkoutLogController {
         }
     }
 
+    @GetMapping("/sessions")
+    @Operation(summary = "Nhật ký tập luyện: danh sách các buổi tập đã log trong khoảng ngày")
+    public ResponseEntity<?> getSessions(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate toDate
+    ) {
+        try {
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(true)
+                    .data(workoutLogService.getSessions(fromDate, toDate))
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .status(false).data(e.getMessage()).build());
+        }
+    }
+
+    @GetMapping("/session-detail")
+    @Operation(summary = "Nhật ký tập luyện: chi tiết 1 buổi tập (từng bài, từng set target vs thực tế/AI nhận diện)")
+    public ResponseEntity<?> getSessionDetail(
+            @RequestParam Long workoutDayId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date
+    ) {
+        try {
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(true)
+                    .data(workoutLogService.getSessionDetail(workoutDayId, date))
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .status(false).data(e.getMessage()).build());
+        }
+    }
+
     @GetMapping("/statistics")
     public ResponseEntity<?> getWorkoutLogStatistics() {
         try {

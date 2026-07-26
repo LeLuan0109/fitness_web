@@ -46,6 +46,10 @@ public interface MenuRepository extends JpaRepository<Menu, Long>, JpaSpecificat
 
     Long countByIsDefaultTrueAndIsDeletedFalse();
 
+    /** Thực đơn cá nhân đang dùng (mới tạo gần nhất) — dùng để đối chiếu nhật ký ăn theo ngày. */
+    @EntityGraph(attributePaths = {"meals", "meals.mealDishes", "meals.mealDishes.dish"})
+    Optional<Menu> findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByCreatedAtDesc(Long userId);
+
     /** Toàn bộ thực đơn mẫu còn hiệu lực — pool ứng viên cho scoring engine. */
     List<Menu> findByIsDefaultTrueAndIsDeletedFalse();
 }

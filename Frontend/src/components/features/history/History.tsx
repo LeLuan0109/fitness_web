@@ -1,12 +1,13 @@
 import { ExerciseCard } from "@/components/features/history/ExerciseCard"
 import { HistoryChart } from "@/components/features/history/HistoryChart"
 import { StatCard } from "@/components/features/history/StatCard"
+import { WorkoutSessionLog } from "@/components/features/history/WorkoutSessionLog"
 import { Button } from "@/components/shared/ui/button"
 import { CustomSelect } from "@/components/shared/ui/custom-select"
 import { Form } from "@/components/shared/ui/form"
 import { SimpleDatePicker } from "@/components/shared/ui/simple-datepicker"
 import { SimpleField } from "@/components/shared/ui/simple-field"
-import { Tabs, TabsList, TabsTrigger } from "@/components/shared/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shared/ui/tabs"
 import { TypographyH3, TypographyH5 } from "@/components/shared/ui/typography"
 import { useGetExerciseOptions } from "@/hooks/queries/exercises/useGetExerciseOptions"
 import { useGetWorkoutLogHistory } from "@/hooks/queries/workout-log/useGetWorkoutLogHistory"
@@ -107,6 +108,17 @@ export function History() {
       {/* Title */}
       <TypographyH3 variant="bold">Nhật ký</TypographyH3>
 
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList>
+          <TabsTrigger value="overview">Tổng quan</TabsTrigger>
+          <TabsTrigger value="sessions">Buổi tập</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="sessions" className="mt-6">
+          <WorkoutSessionLog />
+        </TabsContent>
+
+        <TabsContent value="overview" className="mt-6 space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
@@ -222,6 +234,8 @@ export function History() {
           )}
         </div>
       </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

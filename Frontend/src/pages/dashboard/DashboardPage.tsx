@@ -4,6 +4,7 @@ import { ROUTES } from "@/constants/routes"
 import { useGetDashboardData } from "@/hooks/queries/dashboard/useGetDashboardData"
 import { PageLayout } from "@/layouts/PageLayout"
 import authStore from "@/stores/auth.store"
+import { ScoredMenuSuggestion, ScoredPlanSuggestion } from "@/types/dashboard.type"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import {
@@ -11,6 +12,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   CirclePlay,
+  Dumbbell,
   Flame,
   HeartPulse,
   Maximize2,
@@ -18,6 +20,7 @@ import {
   MoveHorizontal,
   ScanLine,
   ShieldCheck,
+  Soup,
   Sparkles,
   Star,
   Target,
@@ -25,7 +28,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { generatePath, useNavigate } from "react-router-dom"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -336,6 +339,9 @@ function HeroSection({ navigate }: { navigate: ReturnType<typeof useNavigate> })
 
 function BodyDashboardSection({
   metrics,
+  weightGap,
+  estimatedWeeksToGoal,
+  paceWarning,
 }: {
   metrics: {
     label: string
@@ -347,6 +353,9 @@ function BodyDashboardSection({
     icon: LucideIcon
     progress: number
   }[]
+  weightGap?: number | null
+  estimatedWeeksToGoal?: number | null
+  paceWarning?: string | null
 }) {
   return (
     <section id="vitals" className="relative border-y border-sand/30 bg-white px-6 py-32 lg:px-12 lg:py-40">
@@ -398,6 +407,142 @@ function BodyDashboardSection({
               </article>
             )
           })}
+        </div>
+
+        {paceWarning && (
+          <div className="mt-8 rounded-2xl border border-[#B35F4A]/25 bg-[#FFF0ED] px-6 py-4 text-sm leading-relaxed text-[#9C4433]">
+            {paceWarning}
+          </div>
+        )}
+        {!paceWarning && weightGap != null && Math.abs(weightGap) > 0.1 && estimatedWeeksToGoal != null && (
+          <div className="mt-8 rounded-2xl border border-sand/60 bg-cream px-6 py-4 text-sm leading-relaxed text-earth/70">
+            Cần {weightGap > 0 ? "giảm" : "tăng"} khoảng <strong>{Math.abs(weightGap)}kg</strong> để đạt cân mục
+            tiêu — ước tính <strong>{estimatedWeeksToGoal} tuần</strong> với tốc độ an toàn (~0.5kg/tuần).
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+function ScoreBadge({ score }: { score: number }) {
+  const className =
+    score >= 70
+      ? "border-[#86A873]/25 bg-[#F2F7EE] text-[#587443]"
+      : score >= 40
+        ? "border-[#B88455]/25 bg-[#FBF3EA] text-[#8C6239]"
+        : "border-[#B35F4A]/25 bg-[#FFF0ED] text-[#9C4433]"
+
+  return (
+    <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium ${className}`}>
+      {score} điểm khớp
+    </span>
+  )
+}
+
+function RecommendationsSection({
+  navigate,
+  usedFallback,
+  planSuggestions,
+  menuSuggestions,
+}: {
+  navigate: ReturnType<typeof useNavigate>
+  usedFallback?: boolean
+  planSuggestions: ScoredPlanSuggestion[]
+  menuSuggestions: ScoredMenuSuggestion[]
+}) {
+  if (planSuggestions.length === 0 && menuSuggestions.length === 0) return null
+
+  return (
+    <section className="relative border-b border-sand/30 bg-cream px-6 py-32 lg:px-12 lg:py-40">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-16">
+          <SectionEyebrow>Đề Xuất Cho Bạn</SectionEyebrow>
+          <h2 className="font-display max-w-3xl text-5xl font-medium leading-[1.05] tracking-tight text-earth md:text-6xl lg:text-7xl">
+            Kế hoạch & thực đơn
+            <br />
+            <span className="italic-display text-clay">sát với bạn nhất.</span>
+          </h2>
+          {usedFallback && (
+            <p className="mt-6 max-w-xl text-sm leading-relaxed text-earth/50">
+              Kho chưa có tổ hợp khớp đúng mục tiêu của bạn — danh sách dưới đây đã được nới điều kiện để luôn có gợi
+              ý.
+            </p>
+          )}
+        </div>
+
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <div className="mb-6 flex items-center gap-3">
+              <Dumbbell className="size-5 text-clay" />
+              <h3 className="font-display text-2xl text-earth">Kế hoạch tập</h3>
+            </div>
+            <div className="space-y-4">
+              {planSuggestions.map((s) => (
+                <article
+                  key={s.plan.id}
+                  className="group rounded-3xl border border-sand/60 bg-white p-6 transition-all duration-500 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/5"
+                >
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <h4 className="font-display text-xl leading-tight text-earth">{s.plan.name}</h4>
+                    <ScoreBadge score={s.matchScore} />
+                  </div>
+                  {s.plan.description && (
+                    <p className="mb-4 text-sm leading-relaxed text-earth/60">{s.plan.description}</p>
+                  )}
+                  <ul className="mb-5 space-y-1.5 text-sm text-earth/70">
+                    {s.reasons.map((r) => (
+                      <li key={r}>{r}</li>
+                    ))}
+                  </ul>
+                  <Button
+                    variant="outline"
+                    className="h-auto rounded-full border-earth/20 px-5 py-2.5 text-sm font-medium text-earth transition-all duration-300 hover:border-earth hover:bg-earth hover:text-cream"
+                    onClick={() => navigate(generatePath(ROUTES.WORKOUTS.DETAIL, { id: String(s.plan.id) }))}
+                  >
+                    Xem chi tiết
+                    <ArrowRight className="size-3.5" />
+                  </Button>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-6 flex items-center gap-3">
+              <Soup className="size-5 text-clay" />
+              <h3 className="font-display text-2xl text-earth">Thực đơn</h3>
+            </div>
+            <div className="space-y-4">
+              {menuSuggestions.map((s) => (
+                <article
+                  key={s.menu.id}
+                  className="group rounded-3xl border border-sand/60 bg-white p-6 transition-all duration-500 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/5"
+                >
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <h4 className="font-display text-xl leading-tight text-earth">{s.menu.name}</h4>
+                    <ScoreBadge score={s.matchScore} />
+                  </div>
+                  {s.menu.description && (
+                    <p className="mb-4 text-sm leading-relaxed text-earth/60">{s.menu.description}</p>
+                  )}
+                  <ul className="mb-5 space-y-1.5 text-sm text-earth/70">
+                    {s.reasons.map((r) => (
+                      <li key={r}>{r}</li>
+                    ))}
+                  </ul>
+                  <Button
+                    variant="outline"
+                    className="h-auto rounded-full border-earth/20 px-5 py-2.5 text-sm font-medium text-earth transition-all duration-300 hover:border-earth hover:bg-earth hover:text-cream"
+                    onClick={() => navigate(generatePath(ROUTES.NUTRITION.SAMPLE_DETAIL, { id: String(s.menu.id) }))}
+                  >
+                    Xem chi tiết
+                    <ArrowRight className="size-3.5" />
+                  </Button>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1026,7 +1171,18 @@ export function Dashboard() {
       <main className="relative min-h-screen overflow-x-hidden bg-cream text-earth">
         <div className="dashboard-noise" aria-hidden="true" />
         <HeroSection navigate={navigate} />
-        <BodyDashboardSection metrics={dashboardMetrics} />
+        <BodyDashboardSection
+          metrics={dashboardMetrics}
+          weightGap={data.weightGap}
+          estimatedWeeksToGoal={data.estimatedWeeksToGoal}
+          paceWarning={data.paceWarning}
+        />
+        <RecommendationsSection
+          navigate={navigate}
+          usedFallback={data.usedFallback}
+          planSuggestions={data.workoutPlanSuggestions ?? []}
+          menuSuggestions={data.menuSuggestions ?? []}
+        />
         <ManifestoSection />
         <FeaturesSection navigate={navigate} />
         <BeginnerGuideSection navigate={navigate} />

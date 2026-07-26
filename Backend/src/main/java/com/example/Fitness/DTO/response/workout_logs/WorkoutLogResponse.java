@@ -16,4 +16,5 @@ public class WorkoutLogResponse {
     private Double weight;
     private Integer duration;
     private Float caloriesBurned;
+    private String poseQuality;
 }

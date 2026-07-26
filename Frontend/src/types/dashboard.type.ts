@@ -13,12 +13,31 @@ export type WorkoutPlanSuggested = {
   isDeleted?: boolean
 }
 
+export type ScoredPlanSuggestion = {
+  plan: WorkoutPlanSuggested
+  matchScore: number
+  reasons: string[]
+}
+
+export type ScoredMenuSuggestion = {
+  menu: MenuResponse
+  matchScore: number
+  reasons: string[]
+}
+
 export type DashboardResponse = {
   bmi: number
   tdee: number
   targetCalories: number
+  difficulty?: string
+  usedFallback?: boolean
+  weightGap?: number | null
+  estimatedWeeksToGoal?: number | null
+  paceWarning?: string | null
   suggestedMenus: MenuResponse[]
   suggestedWorkoutPlans: WorkoutPlanSuggested[]
+  workoutPlanSuggestions?: ScoredPlanSuggestion[]
+  menuSuggestions?: ScoredMenuSuggestion[]
 }
 
 export type ChartResponse = {

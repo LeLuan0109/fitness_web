@@ -74,3 +74,49 @@ export type WorkoutLogHistoryRequest = {
   toDate?: string
   exerciseId?: number
 }
+
+// ===== Nhật ký tập luyện: buổi tập đã log (session) =====
+export type WorkoutSessionSummary = {
+  workoutDayId: number
+  date: string // yyyy-MM-dd
+  sessionLabel: string
+  planName: string | null
+  startTime: string // HH:mm
+  durationMinutes: number
+  setsCompleted: number
+  setsTarget: number
+  repsCompleted: number
+  repsTarget: number
+  volumeKg: number
+  completionPercent: number
+  prExerciseName: string | null
+  prWeightGain: number | null
+}
+
+export type SetStatus = "MATCH" | "MISMATCH" | "AI_MISMATCH"
+
+export type WorkoutSessionSetDetail = {
+  setNumber: number
+  weight: number | null
+  targetReps: number | null
+  actualReps: number | null
+  matchesTarget: boolean
+  status: SetStatus
+  poseQuality: string | null
+}
+
+export type WorkoutSessionExerciseDetail = {
+  exerciseId: number
+  exerciseName: string
+  thumbnail: string | null
+  muscleGroupLabel: string | null
+  setsCompleted: number
+  setsTarget: number
+  repsPerSetTarget: number | null
+  completionPercent: number
+  sets: WorkoutSessionSetDetail[]
+}
+
+export type WorkoutSessionDetail = WorkoutSessionSummary & {
+  exercises: WorkoutSessionExerciseDetail[]
+}

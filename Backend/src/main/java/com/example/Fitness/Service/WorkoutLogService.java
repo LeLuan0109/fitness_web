@@ -7,11 +7,15 @@ import com.example.Fitness.DTO.response.workout_logs.ExerciseHistorySummary;
 import com.example.Fitness.DTO.response.workout_logs.WorkoutHistoryResponse;
 import com.example.Fitness.DTO.response.workout_logs.WorkoutLogResponse;
 import com.example.Fitness.DTO.response.workout_logs.WorkoutLogStatisticsResponse;
+import com.example.Fitness.DTO.response.workout_logs.WorkoutSessionDetailResponse;
+import com.example.Fitness.DTO.response.workout_logs.WorkoutSessionSummaryResponse;
 import com.example.Fitness.Exceptions.DataNotFoundException;
 import com.example.Fitness.Mapper.WorkoutLogMapper;
+import com.example.Fitness.Model.ExerciseMuscleGroup;
 import com.example.Fitness.Model.Exercises;
 import com.example.Fitness.Model.User;
 import com.example.Fitness.Model.WorkoutDay;
+import com.example.Fitness.Model.WorkoutDayExercises;
 import com.example.Fitness.Model.WorkoutLogs;
 import com.example.Fitness.Repository.ExerciseRepository;
 import com.example.Fitness.Repository.UserRepository;
@@ -23,9 +27,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,6 +39,8 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class WorkoutLogService {
+    private static final java.time.ZoneId VN_ZONE = java.time.ZoneId.of("Asia/Ho_Chi_Minh");
+
     private final WorkoutLogRepository workoutLogRepository;
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
@@ -67,6 +75,7 @@ public class WorkoutLogService {
                 .actualWeights(request.getWeight())
                 .actualDuration((int)(request.getDuration() != null ? request.getDuration() : 0))
                 .caloriesBurned(calories)
+                .poseQuality(request.getPoseQuality())
                 .build();
         WorkoutLogs savedWorkoutLogs = workoutLogRepository.save(log);
         return workoutLogMapper.toWorkoutLogResponse(savedWorkoutLogs);
@@ -180,7 +189,7 @@ public class WorkoutLogService {
         Double totalCalories = workoutLogRepository.sumTotalCaloriesByUserId(user.getId());
         Integer totalWorkouts = workoutLogRepository.countTotalWorkoutsByUserId(user.getId());
 
-        LocalDate endDateLog = LocalDate.now();
+        LocalDate endDateLog = LocalDate.now(VN_ZONE);
         LocalDate startDateLog = endDateLog.minusDays(9);
 
         LocalDateTime startDateTime = startDateLog.atStartOfDay();
@@ -203,7 +212,7 @@ public class WorkoutLogService {
     }
 
     private void updateUserStreak(User user) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(VN_ZONE);
         LocalDateTime startOfToday = today.atStartOfDay();
         LocalDateTime endOfToday = today.atTime(LocalTime.MAX);
         boolean hasLoggedToday = workoutLogRepository.existsByUserIdAndCreatedAtBetween(
@@ -327,6 +336,202 @@ public class WorkoutLogService {
                 .bestEstimatedOneRm(Math.round(bestOneRm * 10) / 10.0)
                 .bestDate(bestDate)
                 .build();
+    }
+
+    // ===== Feature: Nhật ký tập luyện (danh sách buổi tập đã log + chi tiết từng set) =====
+
+    /** Danh sách buổi tập đã log trong khoảng ngày, gom nhóm theo (workoutDay, ngày thực tế). */
+    public List<WorkoutSessionSummaryResponse> getSessions(LocalDate fromDate, LocalDate toDate) {
+        User user = getCurrentUserOrThrow();
+        LocalDateTime start = (fromDate != null) ? fromDate.atStartOfDay() : LocalDate.now(VN_ZONE).minusDays(30).atStartOfDay();
+        LocalDateTime end = (toDate != null) ? toDate.atTime(LocalTime.MAX) : LocalDateTime.now();
+
+        List<WorkoutLogs> rawLogs = workoutLogRepository.searchLogs(user.getId(), start, end, null)
+                .stream().filter(l -> l.getWorkoutDay() != null).collect(Collectors.toList());
+
+        Map<String, List<WorkoutLogs>> sessions = rawLogs.stream()
+                .collect(Collectors.groupingBy(l -> l.getWorkoutDay().getId() + "_" + l.getCreatedAt().toLocalDate()));
+
+        List<WorkoutSessionSummaryResponse> result = new ArrayList<>();
+        for (List<WorkoutLogs> logs : sessions.values()) {
+            result.add(buildSessionSummary(user, logs));
+        }
+        result.sort((a, b) -> b.getDate().compareTo(a.getDate()));
+        return result;
+    }
+
+    /** Chi tiết 1 buổi tập: từng bài + từng set (target vs thực tế/AI nhận diện). */
+    public WorkoutSessionDetailResponse getSessionDetail(Long workoutDayId, LocalDate date) throws DataNotFoundException {
+        User user = getCurrentUserOrThrow();
+        WorkoutDay workoutDay = workoutDayRepository.findById(workoutDayId)
+                .orElseThrow(() -> new DataNotFoundException("Không tìm thấy buổi tập"));
+
+        List<WorkoutLogs> logs = workoutLogRepository.findByUserIdAndWorkoutDayId(user.getId(), workoutDayId)
+                .stream().filter(l -> l.getCreatedAt().toLocalDate().isEqual(date)).collect(Collectors.toList());
+
+        WorkoutSessionSummaryResponse summary = logs.isEmpty()
+                ? buildEmptySessionSummary(workoutDay, date)
+                : buildSessionSummary(user, logs);
+
+        Map<Long, List<WorkoutLogs>> logsByExercise = logs.stream()
+                .collect(Collectors.groupingBy(l -> l.getExercise().getId(), LinkedHashMap::new, Collectors.toList()));
+
+        List<WorkoutSessionDetailResponse.ExerciseSessionDetail> exerciseDetails = new ArrayList<>();
+        List<WorkoutDayExercises> plannedExercises = workoutDay.getWorkoutDayExercises() != null
+                ? workoutDay.getWorkoutDayExercises() : List.of();
+
+        for (WorkoutDayExercises planned : plannedExercises) {
+            Long exId = planned.getExercises().getId();
+            List<WorkoutLogs> exLogs = logsByExercise.getOrDefault(exId, List.of());
+            int setsTarget = planned.getSets() != null ? planned.getSets() : 0;
+            Integer repsPerSetTarget = planned.getReps();
+
+            List<WorkoutSessionDetailResponse.SetDetail> setDetails = new ArrayList<>();
+            for (WorkoutLogs log : exLogs) {
+                boolean matches = repsPerSetTarget == null || (log.getActualReps() != null && log.getActualReps() >= repsPerSetTarget);
+                String status = matches ? "MATCH" : (log.getPoseQuality() != null ? "AI_MISMATCH" : "MISMATCH");
+                setDetails.add(WorkoutSessionDetailResponse.SetDetail.builder()
+                        .setNumber(log.getSetNumber() != null ? log.getSetNumber() : setDetails.size() + 1)
+                        .weight(log.getActualWeights())
+                        .targetReps(repsPerSetTarget)
+                        .actualReps(log.getActualReps())
+                        .matchesTarget(matches)
+                        .status(status)
+                        .poseQuality(log.getPoseQuality())
+                        .build());
+            }
+
+            double exCompletion = setsTarget > 0 ? round1((double) exLogs.size() / setsTarget * 100) : 0;
+            exerciseDetails.add(WorkoutSessionDetailResponse.ExerciseSessionDetail.builder()
+                    .exerciseId(exId)
+                    .exerciseName(planned.getExercises().getName())
+                    .thumbnail(planned.getExercises().getThumbnail())
+                    .muscleGroupLabel(resolvePrimaryMuscleGroup(planned.getExercises()))
+                    .setsCompleted(exLogs.size())
+                    .setsTarget(setsTarget)
+                    .repsPerSetTarget(repsPerSetTarget)
+                    .completionPercent(exCompletion)
+                    .sets(setDetails)
+                    .build());
+        }
+
+        return WorkoutSessionDetailResponse.builder()
+                .workoutDayId(summary.getWorkoutDayId())
+                .date(summary.getDate())
+                .sessionLabel(summary.getSessionLabel())
+                .planName(summary.getPlanName())
+                .startTime(summary.getStartTime())
+                .durationMinutes(summary.getDurationMinutes())
+                .setsCompleted(summary.getSetsCompleted())
+                .setsTarget(summary.getSetsTarget())
+                .repsCompleted(summary.getRepsCompleted())
+                .repsTarget(summary.getRepsTarget())
+                .volumeKg(summary.getVolumeKg())
+                .completionPercent(summary.getCompletionPercent())
+                .prExerciseName(summary.getPrExerciseName())
+                .prWeightGain(summary.getPrWeightGain())
+                .exercises(exerciseDetails)
+                .build();
+    }
+
+    /** Buổi tập chưa có log nào (vd: ngày tương lai hoặc đã bỏ lỡ) — trả dữ liệu rỗng thay vì crash. */
+    private WorkoutSessionSummaryResponse buildEmptySessionSummary(WorkoutDay workoutDay, LocalDate date) {
+        List<WorkoutDayExercises> plannedExercises = workoutDay.getWorkoutDayExercises() != null
+                ? workoutDay.getWorkoutDayExercises() : List.of();
+        int setsTarget = plannedExercises.stream().mapToInt(e -> e.getSets() != null ? e.getSets() : 0).sum();
+        int repsTarget = plannedExercises.stream()
+                .mapToInt(e -> (e.getSets() != null ? e.getSets() : 0) * (e.getReps() != null ? e.getReps() : 0)).sum();
+
+        return WorkoutSessionSummaryResponse.builder()
+                .workoutDayId(workoutDay.getId())
+                .date(date.toString())
+                .sessionLabel("Buổi " + workoutDay.getDayInNumber())
+                .planName(workoutDay.getWorkoutPlan() != null ? workoutDay.getWorkoutPlan().getName() : null)
+                .startTime(null)
+                .durationMinutes(0)
+                .setsCompleted(0)
+                .setsTarget(setsTarget)
+                .repsCompleted(0)
+                .repsTarget(repsTarget)
+                .volumeKg(0)
+                .completionPercent(0)
+                .prExerciseName(null)
+                .prWeightGain(null)
+                .build();
+    }
+
+    private WorkoutSessionSummaryResponse buildSessionSummary(User user, List<WorkoutLogs> logs) {
+        WorkoutLogs first = logs.get(0);
+        WorkoutDay workoutDay = first.getWorkoutDay();
+        LocalDate date = first.getCreatedAt().toLocalDate();
+
+        LocalDateTime sessionStart = logs.stream().map(WorkoutLogs::getCreatedAt).min(LocalDateTime::compareTo).orElse(first.getCreatedAt());
+        LocalDateTime sessionEnd = logs.stream().map(WorkoutLogs::getCreatedAt).max(LocalDateTime::compareTo).orElse(first.getCreatedAt());
+        int durationMinutes = (int) Duration.between(sessionStart, sessionEnd).toMinutes();
+
+        Map<Long, WorkoutDayExercises> plannedByExercise = (workoutDay.getWorkoutDayExercises() != null ? workoutDay.getWorkoutDayExercises() : List.<WorkoutDayExercises>of())
+                .stream().collect(Collectors.toMap(e -> e.getExercises().getId(), e -> e, (a, b) -> a));
+
+        int setsTarget = plannedByExercise.values().stream().mapToInt(e -> e.getSets() != null ? e.getSets() : 0).sum();
+        int repsTarget = plannedByExercise.values().stream()
+                .mapToInt(e -> (e.getSets() != null ? e.getSets() : 0) * (e.getReps() != null ? e.getReps() : 0)).sum();
+
+        int setsCompleted = logs.size();
+        int repsCompleted = logs.stream().mapToInt(l -> l.getActualReps() != null ? l.getActualReps() : 0).sum();
+        double volumeKg = logs.stream()
+                .mapToDouble(l -> (l.getActualReps() != null ? l.getActualReps() : 0) * (l.getActualWeights() != null ? l.getActualWeights() : 0))
+                .sum();
+        double completionPercent = setsTarget > 0 ? round1((double) setsCompleted / setsTarget * 100) : 0;
+
+        // Phát hiện PR: với mỗi bài có log tạ trong buổi, so tạ nặng nhất buổi này với lịch sử trước buổi này
+        String prExerciseName = null;
+        Double prWeightGain = null;
+        Map<Long, List<WorkoutLogs>> byExercise = logs.stream().collect(Collectors.groupingBy(l -> l.getExercise().getId()));
+        LocalDateTime beforeSession = sessionStart;
+        for (Map.Entry<Long, List<WorkoutLogs>> entry : byExercise.entrySet()) {
+            double sessionMax = entry.getValue().stream()
+                    .mapToDouble(l -> l.getActualWeights() != null ? l.getActualWeights() : 0).max().orElse(0);
+            if (sessionMax <= 0) continue;
+            Double historicalMax = workoutLogRepository.findMaxWeightBefore(user.getId(), entry.getKey(), beforeSession);
+            if (historicalMax != null && sessionMax > historicalMax) {
+                double gain = round1(sessionMax - historicalMax);
+                if (prWeightGain == null || gain > prWeightGain) {
+                    prWeightGain = gain;
+                    prExerciseName = entry.getValue().get(0).getExercise().getName();
+                }
+            }
+        }
+
+        return WorkoutSessionSummaryResponse.builder()
+                .workoutDayId(workoutDay.getId())
+                .date(date.toString())
+                .sessionLabel("Buổi " + workoutDay.getDayInNumber())
+                .planName(workoutDay.getWorkoutPlan() != null ? workoutDay.getWorkoutPlan().getName() : null)
+                .startTime(sessionStart.format(DateTimeFormatter.ofPattern("HH:mm")))
+                .durationMinutes(Math.max(durationMinutes, 1))
+                .setsCompleted(setsCompleted)
+                .setsTarget(setsTarget)
+                .repsCompleted(repsCompleted)
+                .repsTarget(repsTarget)
+                .volumeKg(round1(volumeKg))
+                .completionPercent(completionPercent)
+                .prExerciseName(prExerciseName)
+                .prWeightGain(prWeightGain)
+                .build();
+    }
+
+    private String resolvePrimaryMuscleGroup(Exercises exercise) {
+        if (exercise.getExerciseMuscleGroups() == null) return null;
+        return exercise.getExerciseMuscleGroups().stream()
+                .filter(ExerciseMuscleGroup::isPrimary)
+                .findFirst()
+                .or(() -> exercise.getExerciseMuscleGroups().stream().findFirst())
+                .map(g -> g.getMuscleGroup() != null ? g.getMuscleGroup().getName() : null)
+                .orElse(null);
+    }
+
+    private double round1(double v) {
+        return Math.round(v * 10) / 10.0;
     }
 
     private User getCurrentUserOrThrow() {

@@ -68,6 +68,39 @@ public class FoodLogController {
         }
     }
 
+    @GetMapping("/diary-calendar")
+    @Operation(summary = "Lịch nhật ký ăn theo khoảng ngày: % hoàn thành thực đơn mỗi ngày (cho carousel)")
+    public ResponseEntity<?> getDiaryCalendar(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to
+    ) {
+        try {
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(true)
+                    .data(foodLogService.getCalendar(from, to))
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .status(false).data(e.getMessage()).build());
+        }
+    }
+
+    @GetMapping("/day-detail")
+    @Operation(summary = "Chi tiết nhật ký ăn 1 ngày: timeline từng bữa (dự kiến vs thực tế) + thống kê macro/nước")
+    public ResponseEntity<?> getDayDetail(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date
+    ) {
+        try {
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(true)
+                    .data(foodLogService.getDayDetail(date))
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .status(false).data(e.getMessage()).build());
+        }
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Xóa một món khỏi nhật ký")
     public ResponseEntity<?> deleteLog(@PathVariable Long id) {

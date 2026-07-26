@@ -44,6 +44,7 @@ public class ExerciseService {
 
         ex.setName(request.getName());
         ex.setLevel(request.getLevel());
+        ex.setAiExerciseKey(request.getAiExerciseKey());
         ex.setDescription(request.getDescription());
         ex.setMet(request.getMet());
 
@@ -241,29 +242,34 @@ public class ExerciseService {
                 .id(ex.getId())
                 .name(ex.getName())
                 .level(ex.getLevel())
+                .aiExerciseKey(ex.getAiExerciseKey())
                 .thumbnail(ex.getThumbnail())
                 .videoUrl(ex.getVideoUrl())
                 .description(ex.getDescription())
                 .trainingType(ex.getTrainingType() != null ? ex.getTrainingType().getName() : "")
 
                 // Map Equipment
-                .equipments(ex.getEquipments().stream().map(Equipment::getName).collect(Collectors.toList()))
+                .equipments(nullSafe(ex.getEquipments()).stream().map(Equipment::getName).collect(Collectors.toList()))
 
                 // Map Muscle Groups (Chia làm 2 list)
-                .primaryMuscles(ex.getExerciseMuscleGroups().stream()
+                .primaryMuscles(nullSafe(ex.getExerciseMuscleGroups()).stream()
                         .filter(ExerciseMuscleGroup::isPrimary)
                         .map(emg -> emg.getMuscleGroup().getName()).collect(Collectors.toList()))
-                .secondaryMuscles(ex.getExerciseMuscleGroups().stream()
+                .secondaryMuscles(nullSafe(ex.getExerciseMuscleGroups()).stream()
                         .filter(emg -> !emg.isPrimary())
                         .map(emg -> emg.getMuscleGroup().getName()).collect(Collectors.toList()))
 
                 // Map Lists Text
-                .steps(ex.getSteps().stream().map(ExerciseStep::getInstruction).collect(Collectors.toList()))
-                .tips(ex.getTips().stream().map(ExerciseTip::getContent).collect(Collectors.toList()))
-                .mistakes(ex.getMistakes().stream().map(ExerciseMistake::getContent).collect(Collectors.toList()))
-                .benefits(ex.getBenefits().stream().map(ExerciseBenefit::getContent).collect(Collectors.toList()))
+                .steps(nullSafe(ex.getSteps()).stream().map(ExerciseStep::getInstruction).collect(Collectors.toList()))
+                .tips(nullSafe(ex.getTips()).stream().map(ExerciseTip::getContent).collect(Collectors.toList()))
+                .mistakes(nullSafe(ex.getMistakes()).stream().map(ExerciseMistake::getContent).collect(Collectors.toList()))
+                .benefits(nullSafe(ex.getBenefits()).stream().map(ExerciseBenefit::getContent).collect(Collectors.toList()))
 
                 .build();
+    }
+
+    private static <T> java.util.Collection<T> nullSafe(java.util.Collection<T> collection) {
+        return collection != null ? collection : java.util.Collections.emptyList();
     }
 
     public List<ExerciseResponse> getRelatedExercises(Long exerciseId) {

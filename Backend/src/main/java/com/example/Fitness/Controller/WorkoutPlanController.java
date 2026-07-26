@@ -216,4 +216,15 @@ public class WorkoutPlanController {
             return ResponseEntity.badRequest().body(ErrorResponse.builder().error(tError).build());
         }
     }
+
+    @PatchMapping("/{id}/active-status")
+    public ResponseEntity<?> setActiveStatus(@PathVariable Long id, @RequestParam boolean isActive) {
+        try {
+            workoutPlanService.setPlanActive(id, isActive);
+            return ResponseEntity.ok(ApiResponse.builder().status(true).data(true).build());
+        } catch (Exception e) {
+            TError tError = TError.builder().code("RUN_TIME_ERROR").message(e.getMessage()).build();
+            return ResponseEntity.badRequest().body(ErrorResponse.builder().error(tError).build());
+        }
+    }
 }
