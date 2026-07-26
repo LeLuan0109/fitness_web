@@ -1,11 +1,15 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { addDays, format, isSameDay, isToday, parseISO, startOfWeek } from "date-fns"
-import { ChevronLeft, ChevronRight, Droplet, Plus, TrendingUp } from "lucide-react"
+import { ChevronLeft, ChevronRight, Droplet, Plus, Search, TrendingUp, UtensilsCrossed } from "lucide-react"
+import { toast } from "sonner"
 
-import { addFoodLog, getFoodDiaryCalendar, getFoodDiaryDayDetail } from "@/api/food-log.api"
+import { applyMenuToDate, addFoodLog, getFoodDiaryCalendar, getFoodDiaryDayDetail } from "@/api/food-log.api"
+import { getDishes } from "@/api/dish.api"
+import { getMyMenus } from "@/api/menu.api"
 import { Badge } from "@/components/shared/ui/badge"
 import { Button } from "@/components/shared/ui/button"
+import { ConfirmDialog } from "@/components/shared/ui/confirm-dialog"
 import {
   Dialog,
   DialogContent,
@@ -14,6 +18,14 @@ import {
   DialogTitle,
 } from "@/components/shared/ui/dialog"
 import { Input } from "@/components/shared/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/shared/ui/select"
+import { Tabs, TabsList, TabsTrigger } from "@/components/shared/ui/tabs"
 import { cn } from "@/lib/utils"
 import { FoodDiaryMealSlot, MealSlotStatus } from "@/types/food-diary.type"
 
@@ -63,6 +75,12 @@ export function FoodDiary() {
   const [addDialogSlot, setAddDialogSlot] = useState<FoodDiaryMealSlot | null>(null)
   const [addName, setAddName] = useState("")
   const [addCalories, setAddCalories] = useState("")
+  const [logMode, setLogMode] = useState<"manual" | "catalog">("manual")
+  const [dishSearch, setDishSearch] = useState("")
+  const [selectedDishId, setSelectedDishId] = useState<number | null>(null)
+
+  const [selectedMenuId, setSelectedMenuId] = useState<string>("")
+  const [applyMenuConfirmOpen, setApplyMenuConfirmOpen] = useState(false)
 
   const weekStartStr = format(weekStart, "yyyy-MM-dd")
   const weekEndStr = format(addDays(weekStart, 6), "yyyy-MM-dd")
@@ -81,22 +99,65 @@ export function FoodDiary() {
     select: (res) => res?.data,
   })
 
+  const { data: myMenus } = useQuery({
+    queryKey: ["my-menus-for-diary"],
+    queryFn: () => getMyMenus({ size: 100 }),
+    select: (res) => res?.data ?? [],
+  })
+
+  const { data: dishOptions, isFetching: isFetchingDishes } = useQuery({
+    queryKey: ["dish-picker", dishSearch],
+    queryFn: () => getDishes({ search: dishSearch || undefined, size: 20 }),
+    select: (res) => res?.data ?? [],
+    enabled: !!addDialogSlot && logMode === "catalog",
+  })
+
+  const selectedDish = dishOptions?.find((d) => d.id === selectedDishId) ?? null
+
+  const invalidateDiaryQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ["food-diary-day-detail", selectedDateStr] })
+    queryClient.invalidateQueries({ queryKey: ["food-diary-calendar", weekStartStr] })
+  }
+
   const addMutation = useMutation({
     mutationFn: () =>
-      addFoodLog({
-        customName: addName || addDialogSlot?.mealTypeLabel || "Món tự nhập",
-        actualCalories: Number(addCalories),
-        date: selectedDateApiStr,
-        mealType: addDialogSlot?.mealType,
-      }),
+      logMode === "catalog" && selectedDish
+        ? addFoodLog({
+            dishId: selectedDish.id,
+            date: selectedDateApiStr,
+            mealType: addDialogSlot?.mealType,
+          })
+        : addFoodLog({
+            customName: addName || addDialogSlot?.mealTypeLabel || "Món tự nhập",
+            actualCalories: Number(addCalories),
+            date: selectedDateApiStr,
+            mealType: addDialogSlot?.mealType,
+          }),
     onSuccess: () => {
       setAddDialogSlot(null)
-      setAddName("")
-      setAddCalories("")
-      queryClient.invalidateQueries({ queryKey: ["food-diary-day-detail", selectedDateStr] })
-      queryClient.invalidateQueries({ queryKey: ["food-diary-calendar", weekStartStr] })
+      invalidateDiaryQueries()
     },
   })
+
+  const applyMenuMutation = useMutation({
+    mutationFn: () => applyMenuToDate({ menuId: Number(selectedMenuId), date: selectedDateApiStr }),
+    onSuccess: () => {
+      toast.success("Đã áp dụng thực đơn cho ngày này — cả 4 bữa đã được ghi lại.")
+      invalidateDiaryQueries()
+    },
+    onError: () => {
+      toast.error("Không thể áp dụng thực đơn này. Vui lòng thử lại.")
+    },
+  })
+
+  const openAddDialog = (slot: FoodDiaryMealSlot) => {
+    setAddDialogSlot(slot)
+    setAddName("")
+    setAddCalories("")
+    setLogMode("manual")
+    setDishSearch("")
+    setSelectedDishId(null)
+  }
 
   const days = calendar?.days ?? []
 
@@ -108,6 +169,49 @@ export function FoodDiary() {
           Theo dõi mức hoàn thành thực đơn mỗi ngày, calo/macro và từng bữa ăn trong ngày.
         </p>
       </div>
+
+      {/* ===== Chọn thực đơn cho ngày đang xem ===== */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h3 className="mb-1 flex items-center gap-2 text-base font-semibold text-foreground">
+          <UtensilsCrossed className="h-4 w-4" /> Chọn thực đơn cho ngày {format(selectedDate, "dd/MM/yyyy")}
+        </h3>
+        <p className="mb-3 text-xs text-text-secondary">
+          Áp dụng 1 thực đơn cá nhân sẽ tự ghi lại cả 4 bữa của ngày này theo đúng món trong thực đơn đó
+          (ghi đè dữ liệu cũ nếu có).
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select value={selectedMenuId} onValueChange={setSelectedMenuId}>
+            <SelectTrigger className="w-full sm:w-72">
+              <SelectValue placeholder="Chọn thực đơn của bạn..." />
+            </SelectTrigger>
+            <SelectContent>
+              {(myMenus ?? []).map((menu) => (
+                <SelectItem key={menu.id} value={String(menu.id)}>
+                  {menu.name}
+                </SelectItem>
+              ))}
+              {(myMenus ?? []).length === 0 && (
+                <div className="px-2 py-1.5 text-sm text-text-secondary">Bạn chưa có thực đơn cá nhân nào.</div>
+              )}
+            </SelectContent>
+          </Select>
+          <Button
+            disabled={!selectedMenuId || applyMenuMutation.isPending}
+            onClick={() => setApplyMenuConfirmOpen(true)}
+          >
+            Dùng thực đơn này cho ngày này
+          </Button>
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={applyMenuConfirmOpen}
+        onOpenChange={setApplyMenuConfirmOpen}
+        title="Áp dụng thực đơn cho ngày này?"
+        content={`Dữ liệu 4 bữa đã ghi (nếu có) của ngày ${format(selectedDate, "dd/MM/yyyy")} sẽ bị ghi đè theo thực đơn đã chọn.`}
+        confirmText="Áp dụng"
+        onConfirm={() => applyMenuMutation.mutate()}
+      />
 
       {/* ===== Carousel "Hoàn thành thực đơn" theo tuần ===== */}
       <div className="rounded-xl border border-border bg-card p-5">
@@ -251,11 +355,7 @@ export function FoodDiary() {
                       variant="ghost"
                       size="sm"
                       className="mt-2 h-auto p-0 text-primary hover:bg-transparent hover:underline"
-                      onClick={() => {
-                        setAddDialogSlot(slot)
-                        setAddName("")
-                        setAddCalories("")
-                      }}
+                      onClick={() => openAddDialog(slot)}
                     >
                       <Plus className="mr-1 h-3.5 w-3.5" /> Ghi món đã ăn
                     </Button>
@@ -272,31 +372,85 @@ export function FoodDiary() {
           <DialogHeader>
             <DialogTitle>{addDialogSlot?.mealTypeLabel}</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-3">
-            <div>
-              <label className="mb-1 block text-sm text-text-secondary">Tên món</label>
-              <Input
-                value={addName}
-                onChange={(e) => setAddName(e.target.value)}
-                placeholder={addDialogSlot?.plannedDishName ?? "VD: Cơm gà"}
-              />
+
+          <Tabs value={logMode} onValueChange={(v) => setLogMode(v as "manual" | "catalog")}>
+            <TabsList className="w-full">
+              <TabsTrigger className="flex-1" value="manual">
+                Nhập tay
+              </TabsTrigger>
+              <TabsTrigger className="flex-1" value="catalog">
+                Chọn từ danh sách món ăn
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          {logMode === "manual" ? (
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="mb-1 block text-sm text-text-secondary">Tên món</label>
+                <Input
+                  value={addName}
+                  onChange={(e) => setAddName(e.target.value)}
+                  placeholder={addDialogSlot?.plannedDishName ?? "VD: Cơm gà"}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm text-text-secondary">Số calo thực tế (kcal)</label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={addCalories}
+                  onChange={(e) => setAddCalories(e.target.value)}
+                  placeholder="VD: 550"
+                />
+              </div>
             </div>
-            <div>
-              <label className="mb-1 block text-sm text-text-secondary">Số calo thực tế (kcal)</label>
-              <Input
-                type="number"
-                min={0}
-                value={addCalories}
-                onChange={(e) => setAddCalories(e.target.value)}
-                placeholder="VD: 550"
-              />
+          ) : (
+            <div className="flex flex-col gap-3">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
+                <Input
+                  className="pl-8"
+                  value={dishSearch}
+                  onChange={(e) => setDishSearch(e.target.value)}
+                  placeholder="Tìm món ăn..."
+                />
+              </div>
+              <div className="flex max-h-64 flex-col gap-1 overflow-y-auto">
+                {isFetchingDishes && (
+                  <p className="py-2 text-center text-sm text-text-secondary">Đang tìm...</p>
+                )}
+                {!isFetchingDishes && (dishOptions ?? []).length === 0 && (
+                  <p className="py-2 text-center text-sm text-text-secondary">Không tìm thấy món ăn nào.</p>
+                )}
+                {(dishOptions ?? []).map((dish) => (
+                  <button
+                    key={dish.id}
+                    type="button"
+                    onClick={() => setSelectedDishId(dish.id)}
+                    className={cn(
+                      "flex items-center justify-between rounded-lg border border-border px-3 py-2 text-left hover:bg-muted",
+                      selectedDishId === dish.id && "border-primary bg-primary/10",
+                    )}
+                  >
+                    <span className="text-sm font-medium text-foreground">{dish.name}</span>
+                    <span className="text-xs text-text-secondary">{Math.round(dish.calories)} kcal</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddDialogSlot(null)}>
               Hủy
             </Button>
-            <Button onClick={() => addMutation.mutate()} disabled={!addCalories || addMutation.isPending}>
+            <Button
+              onClick={() => addMutation.mutate()}
+              disabled={
+                addMutation.isPending || (logMode === "manual" ? !addCalories : !selectedDishId)
+              }
+            >
               Lưu
             </Button>
           </DialogFooter>

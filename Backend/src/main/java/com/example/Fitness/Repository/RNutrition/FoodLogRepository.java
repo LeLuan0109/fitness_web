@@ -2,6 +2,7 @@ package com.example.Fitness.Repository.RNutrition;
 
 import com.example.Fitness.Model.Nutrition.FoodLog;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -31,4 +32,9 @@ public interface FoodLogRepository extends JpaRepository<FoodLog, Long> {
                                         @Param("to") LocalDate to);
 
     boolean existsByUserIdAndLogDate(Long userId, LocalDate logDate);
+
+    /** Xóa toàn bộ log cũ của 1 ngày trước khi ghi lại theo thực đơn vừa chọn. */
+    @Modifying
+    @Query("DELETE FROM FoodLog f WHERE f.user.id = :userId AND f.logDate = :date")
+    void deleteByUserAndDate(@Param("userId") Long userId, @Param("date") LocalDate date);
 }

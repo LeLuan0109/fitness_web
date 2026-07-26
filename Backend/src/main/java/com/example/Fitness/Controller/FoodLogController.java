@@ -1,6 +1,7 @@
 package com.example.Fitness.Controller;
 
 import com.example.Fitness.DTO.request.AddFoodLogRequest;
+import com.example.Fitness.DTO.request.ApplyMenuRequest;
 import com.example.Fitness.DTO.response.common.ApiResponse;
 import com.example.Fitness.Service.FoodLogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +45,20 @@ public class FoodLogController {
             return ResponseEntity.ok(ApiResponse.builder()
                     .status(true)
                     .data(foodLogService.getDiary(date))
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.builder()
+                    .status(false).data(e.getMessage()).build());
+        }
+    }
+
+    @PostMapping("/apply-menu")
+    @Operation(summary = "Dùng 1 thực đơn cho 1 ngày: tự ghi log cả 4 bữa theo món trong thực đơn")
+    public ResponseEntity<?> applyMenu(@Valid @RequestBody ApplyMenuRequest request) {
+        try {
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(true)
+                    .data(foodLogService.applyMenu(request))
                     .build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.builder()

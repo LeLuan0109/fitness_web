@@ -36,6 +36,11 @@ export interface AddFoodLogRequest {
   mealType?: string
 }
 
+export interface ApplyMenuRequest {
+  menuId: number
+  date?: string // dd/MM/yyyy
+}
+
 export interface DayMacro {
   date: string
   calories: number

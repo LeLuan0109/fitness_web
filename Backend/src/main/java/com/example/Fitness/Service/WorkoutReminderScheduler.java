@@ -1,7 +1,9 @@
 package com.example.Fitness.Service;
 
+import com.example.Fitness.Model.ReminderConfig;
 import com.example.Fitness.Model.User;
 import com.example.Fitness.Repository.RNutrition.FoodLogRepository;
+import com.example.Fitness.Repository.ReminderConfigRepository;
 import com.example.Fitness.Repository.UserRepository;
 import com.example.Fitness.Repository.WorkoutDayRepository;
 import com.example.Fitness.Utils.NotificationMessages;
@@ -12,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.List;
@@ -22,15 +25,31 @@ import java.util.Locale;
 @Slf4j
 public class WorkoutReminderScheduler {
     private static final ZoneId VN_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
+    private static final String FOOD_LOG_REMINDER_KEY = "FOOD_LOG_REMINDER";
 
     private final NotificationService notificationService;
     private final WorkoutDayRepository workoutDayRepository;
     private final UserRepository userRepository;
     private final FoodLogRepository foodLogRepository;
+    private final ReminderConfigRepository reminderConfigRepository;
 
-    /** Nhắc ghi nhật ký ăn + nước mỗi tối 20:30 cho ai chưa ghi hôm nay. */
-    @Scheduled(cron = "0 30 20 * * ?", zone = "Asia/Ho_Chi_Minh")
+    /**
+     * Nhắc ghi nhật ký ăn cho ai chưa ghi hôm nay — giờ nhắc lấy từ bảng reminder_config
+     * (chỉnh được qua {@code PUT /admin/reminder-configs/FOOD_LOG_REMINDER}, không cần sửa code).
+     * Chạy mỗi phút để so khớp đúng giờ đã cấu hình.
+     */
+    @Scheduled(cron = "0 * * * * ?", zone = "Asia/Ho_Chi_Minh")
     public void sendFoodLogReminders() {
+        ReminderConfig config = reminderConfigRepository.findByReminderKey(FOOD_LOG_REMINDER_KEY).orElse(null);
+        if (config == null || !Boolean.TRUE.equals(config.getEnabled()) || config.getReminderTime() == null) {
+            return;
+        }
+        LocalTime now = LocalTime.now(VN_ZONE);
+        LocalTime target = config.getReminderTime();
+        if (now.getHour() != target.getHour() || now.getMinute() != target.getMinute()) {
+            return;
+        }
+
         LocalDate today = LocalDate.now(VN_ZONE);
         List<User> users = userRepository.findActiveUsersWithGoal();
         int count = 0;

@@ -1,6 +1,7 @@
 package com.example.Fitness.Service;
 
 import com.example.Fitness.DTO.request.AddFoodLogRequest;
+import com.example.Fitness.DTO.request.ApplyMenuRequest;
 import com.example.Fitness.DTO.response.Nutrition.FoodDiaryCalendarResponse;
 import com.example.Fitness.DTO.response.Nutrition.FoodDiaryDayDetailResponse;
 import com.example.Fitness.DTO.response.Nutrition.FoodDiaryResponse;
@@ -8,6 +9,7 @@ import com.example.Fitness.Enum.FitnessGoal;
 import com.example.Fitness.Enum.MealType;
 import com.example.Fitness.Exceptions.DataNotFoundException;
 import com.example.Fitness.Model.Nutrition.DailyCheckin;
+import com.example.Fitness.Model.Nutrition.DailyMenuSelection;
 import com.example.Fitness.Model.Nutrition.Dish;
 import com.example.Fitness.Model.Nutrition.FoodLog;
 import com.example.Fitness.Model.Nutrition.Meal;
@@ -15,6 +17,7 @@ import com.example.Fitness.Model.Nutrition.MealDish;
 import com.example.Fitness.Model.Nutrition.Menu;
 import com.example.Fitness.Model.User;
 import com.example.Fitness.Repository.RNutrition.DailyCheckinRepository;
+import com.example.Fitness.Repository.RNutrition.DailyMenuSelectionRepository;
 import com.example.Fitness.Repository.RNutrition.DishRepository;
 import com.example.Fitness.Repository.RNutrition.FoodLogRepository;
 import com.example.Fitness.Repository.RNutrition.MenuRepository;
@@ -28,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,6 +55,7 @@ public class FoodLogService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final DailyCheckinRepository dailyCheckinRepository;
+    private final DailyMenuSelectionRepository dailyMenuSelectionRepository;
 
     public FoodDiaryResponse addLog(AddFoodLogRequest request) throws DataNotFoundException {
         User user = getCurrentUser();
@@ -143,12 +148,16 @@ public class FoodLogService {
         LocalDate f = (from != null) ? from : LocalDate.now(VN_ZONE).minusDays(6);
         LocalDate t = (to != null) ? to : LocalDate.now(VN_ZONE);
 
-        Menu menu = menuRepository.findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByCreatedAtDesc(user.getId())
+        Menu fallbackMenu = menuRepository.findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByCreatedAtDesc(user.getId())
                 .orElse(null);
-        List<MealType> plannedSlots = resolvePlannedSlots(menu);
+        Map<LocalDate, Menu> selectedByDate = dailyMenuSelectionRepository.findByUserIdAndLogDateBetween(user.getId(), f, t)
+                .stream()
+                .collect(Collectors.toMap(DailyMenuSelection::getLogDate, DailyMenuSelection::getMenu, (a, b) -> b));
 
         List<FoodDiaryCalendarResponse.DayCell> days = new ArrayList<>();
         for (LocalDate d = f; !d.isAfter(t); d = d.plusDays(1)) {
+            Menu menu = selectedByDate.getOrDefault(d, fallbackMenu);
+            List<MealType> plannedSlots = resolvePlannedSlots(menu);
             List<FoodLog> logs = foodLogRepository.findByUserAndDate(user.getId(), d);
             long loggedSlots = plannedSlots.stream()
                     .filter(slot -> logs.stream().anyMatch(l -> slot.name().equals(l.getMealType())))
@@ -171,8 +180,7 @@ public class FoodLogService {
         LocalDate d = (date != null) ? date : LocalDate.now(VN_ZONE);
         LocalDate today = LocalDate.now(VN_ZONE);
 
-        Menu menu = menuRepository.findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByCreatedAtDesc(user.getId())
-                .orElse(null);
+        Menu menu = resolveMenuForDate(user, d);
         List<MealType> plannedSlots = resolvePlannedSlots(menu);
         List<FoodLog> logs = foodLogRepository.findByUserAndDate(user.getId(), d);
 
@@ -204,9 +212,7 @@ public class FoodLogService {
                 }
                 actualCal = round1(cal); actualPro = round1(pro); actualCarb = round1(carb); actualFat = round1(fat);
 
-                boolean matchesPlan = plannedDishName != null
-                        && slotLogs.stream().anyMatch(l -> sameDishCombo(plannedDishName,
-                                l.getDish() != null ? l.getDish().getName() : l.getCustomName()));
+                boolean matchesPlan = plannedDishName != null && sameDishCombo(plannedDishName, actualItemName);
                 status = (plannedDishName == null || matchesPlan) ? "MATCH" : "CHANGED";
             } else if (d.isAfter(today)) {
                 status = "PLANNED";
@@ -267,6 +273,58 @@ public class FoodLogService {
                 .weekAdherencePercent(weekAdherence)
                 .slots(slots)
                 .build();
+    }
+
+    /** Áp dụng 1 thực đơn cho 1 ngày: ghi đè log ngày đó bằng đúng món của cả 4 bữa trong thực đơn. */
+    public FoodDiaryDayDetailResponse applyMenu(ApplyMenuRequest request) throws DataNotFoundException {
+        User user = getCurrentUser();
+        if (request.getMenuId() == null) {
+            throw new IllegalArgumentException("Cần chọn thực đơn");
+        }
+        Menu menu = menuRepository.findByIdAndIsDeletedFalse(request.getMenuId())
+                .orElseThrow(() -> new DataNotFoundException("Không tìm thấy thực đơn"));
+
+        boolean isOwner = menu.getUser() != null && menu.getUser().getId().equals(user.getId());
+        if (!isOwner && !Boolean.TRUE.equals(menu.getIsDefault())) {
+            throw new RuntimeException("Bạn không có quyền dùng thực đơn này");
+        }
+
+        LocalDate date = (request.getDate() != null) ? request.getDate() : LocalDate.now(VN_ZONE);
+
+        foodLogRepository.deleteByUserAndDate(user.getId(), date);
+
+        List<FoodLog> newLogs = new ArrayList<>();
+        if (menu.getMeals() != null) {
+            for (Meal meal : menu.getMeals()) {
+                if (meal.getMealDishes() == null) continue;
+                for (MealDish md : meal.getMealDishes()) {
+                    if (md.getDish() == null) continue;
+                    newLogs.add(FoodLog.builder()
+                            .user(user)
+                            .dish(md.getDish())
+                            .quantity(md.getQuantity() != null ? md.getQuantity() : 1)
+                            .logDate(date)
+                            .mealType(meal.getMealType().name())
+                            .build());
+                }
+            }
+        }
+        foodLogRepository.saveAll(newLogs);
+
+        DailyMenuSelection selection = dailyMenuSelectionRepository.findByUserIdAndLogDate(user.getId(), date)
+                .orElse(DailyMenuSelection.builder().user(user).logDate(date).build());
+        selection.setMenu(menu);
+        dailyMenuSelectionRepository.save(selection);
+
+        return getDayDetail(date);
+    }
+
+    /** Thực đơn dùng để đối chiếu kế hoạch của 1 ngày: ưu tiên thực đơn user đã chọn riêng cho ngày đó. */
+    private Menu resolveMenuForDate(User user, LocalDate date) {
+        return dailyMenuSelectionRepository.findByUserIdAndLogDate(user.getId(), date)
+                .map(DailyMenuSelection::getMenu)
+                .orElseGet(() -> menuRepository.findFirstByUserIdAndIsDefaultFalseAndIsDeletedFalseOrderByCreatedAtDesc(user.getId())
+                        .orElse(null));
     }
 
     private List<MealType> resolvePlannedSlots(Menu menu) {

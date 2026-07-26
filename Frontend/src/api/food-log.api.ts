@@ -3,6 +3,7 @@ import { http } from "@/lib/http"
 import { Response } from "@/types/common.type"
 import {
   AddFoodLogRequest,
+  ApplyMenuRequest,
   FoodDiary,
   FoodDiaryCalendar,
   FoodDiaryDayDetail,
@@ -43,4 +44,9 @@ export const getFoodDiaryDayDetail = (date: string) => {
   return http.get<Response<FoodDiaryDayDetail>>(API_ENDPOINTS.FOOD_LOGS.DAY_DETAIL, {
     params: { date },
   })
+}
+
+// Dùng 1 thực đơn cho 1 ngày: tự ghi log cả 4 bữa theo món trong thực đơn (ghi đè log cũ của ngày đó)
+export const applyMenuToDate = (data: ApplyMenuRequest) => {
+  return http.post<Response<FoodDiaryDayDetail>>(API_ENDPOINTS.FOOD_LOGS.APPLY_MENU, { data })
 }

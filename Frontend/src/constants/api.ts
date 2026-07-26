@@ -83,6 +83,7 @@ export const API_ENDPOINTS = {
     SUMMARY: "/food-logs/summary",
     DIARY_CALENDAR: "/food-logs/diary-calendar",
     DAY_DETAIL: "/food-logs/day-detail",
+    APPLY_MENU: "/food-logs/apply-menu",
   },
   PROGRESS: {
     OVERVIEW: "/progress/overview",
