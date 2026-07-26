@@ -332,6 +332,12 @@ export function ExerciseForm({
             <CardHeader>
               <CardTitle>Các bước thực hiện</CardTitle>
               <CardDescription>Hướng dẫn từng bước chi tiết</CardDescription>
+              {form.formState.errors.steps?.message && (
+                <p className="text-sm font-medium text-destructive">{form.formState.errors.steps.message}</p>
+              )}
+              {form.formState.errors.steps?.root?.message && (
+                <p className="text-sm font-medium text-destructive">{form.formState.errors.steps.root.message}</p>
+              )}
             </CardHeader>
             <CardContent className="space-y-3">
               {stepFields.map((field, index) => (

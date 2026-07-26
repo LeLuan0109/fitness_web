@@ -6,7 +6,6 @@ import { ROLE_ADMIN, ROLE_USER } from "@/constants/roles.constant"
 import { ROUTES } from "@/constants/routes"
 import AppLayout from "@/layouts/AppLayout"
 import { lazyImport } from "@/lib/lazy-import"
-import { MyPosts } from "@/components/features/community/MyPosts"
 import { IngredientListPage } from "@/pages/ingredients/IngredientListPage"
 import { IngredientCreatePage } from "@/pages/ingredients/IngredientCreatePage"
 import { IngredientEditPage } from "@/pages/ingredients/IngredientEditPage"
@@ -334,14 +333,6 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
             <PostDetailPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: ROUTES.COMMUNITY.MY_POSTS,
-        element: (
-          <ProtectedRoute allowedRoles={[ROLE_USER]}>
-            <MyPosts />
           </ProtectedRoute>
         ),
       },
