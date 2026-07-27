@@ -11,16 +11,21 @@ interface UserGrowthChartProps {
   onYearChange: (year: number) => void
 }
 
+const ACCENT = "#8c6239" // clay
+const tickColor = "#4a3525" // earth
+const gridColor = "rgba(140,98,57,0.12)" // clay transparent
+
 export const UserGrowthChart = memo(({ data, currentYear, selectedYear, onYearChange }: UserGrowthChartProps) => {
   return (
-    <Card className="col-span-1">
+    <Card className="col-span-1 border-sand/60 bg-white shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Biểu đồ tăng trưởng người dùng</CardTitle>
+          <CardTitle className="font-display text-earth">Biểu đồ tăng trưởng người dùng</CardTitle>
           <div className="flex gap-2">
             <Button
               variant={selectedYear === currentYear - 1 ? "default" : "outline"}
               size="sm"
+              className={selectedYear === currentYear - 1 ? "bg-clay text-cream hover:bg-earth" : "border-sand text-clay hover:bg-sand/30"}
               onClick={() => onYearChange(currentYear - 1)}
             >
               {currentYear - 1}
@@ -28,6 +33,7 @@ export const UserGrowthChart = memo(({ data, currentYear, selectedYear, onYearCh
             <Button
               variant={selectedYear === currentYear ? "default" : "outline"}
               size="sm"
+              className={selectedYear === currentYear ? "bg-clay text-cream hover:bg-earth" : "border-sand text-clay hover:bg-sand/30"}
               onClick={() => onYearChange(currentYear)}
             >
               {currentYear}
@@ -40,34 +46,34 @@ export const UserGrowthChart = memo(({ data, currentYear, selectedYear, onYearCh
           <AreaChart data={data || []} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <defs>
               <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                <stop offset="0%" stopColor={ACCENT} stopOpacity={0.35} />
+                <stop offset="100%" stopColor={ACCENT} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-            <XAxis dataKey="label" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
-            <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} width={40} />
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+            <XAxis dataKey="label" stroke={tickColor} fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis stroke={tickColor} fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} width={40} />
             <Tooltip
-              cursor={{ stroke: "#10b981", strokeWidth: 1, strokeDasharray: "4 4" }}
+              cursor={{ stroke: ACCENT, strokeWidth: 1, strokeDasharray: "4 4" }}
               contentStyle={{
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: 10,
-                color: "#111827",
+                background: "#fafafa",
+                border: "1px solid #d9c3b0",
+                borderRadius: 12,
+                color: "#4a3525",
                 fontSize: 13,
-                boxShadow: "0 4px 12px rgba(17, 24, 39, 0.08)",
+                boxShadow: "0 8px 24px rgba(74,53,37,0.12)",
               }}
-              labelStyle={{ color: "#6b7280" }}
+              labelStyle={{ color: "#8c6239" }}
             />
             <Area
               type="monotone"
               dataKey="value"
               name="Số người dùng"
-              stroke="#10b981"
+              stroke={ACCENT}
               strokeWidth={2.5}
               fill="url(#growthFill)"
               dot={false}
-              activeDot={{ r: 5, fill: "#10b981", stroke: "#ffffff", strokeWidth: 2 }}
+              activeDot={{ r: 5, fill: ACCENT, stroke: "#fafafa", strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

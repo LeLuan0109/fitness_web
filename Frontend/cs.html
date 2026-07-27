@@ -1,0 +1,485 @@
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <title>Untitled 1</title>
+  <style type="text/css">
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+    }
+
+    table {
+      margin: 0 auto;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+    }
+
+    table th {
+      text-align: center;
+    }
+
+    table th,
+    table td {
+      vertical-align: center-left;
+    }
+
+    .tableContent {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid gray;
+    }
+
+    .tableContent th {
+      background-color: #EEEEEE;
+    }
+
+    .tableContent th,
+    .tableContent td {
+      padding: 10px;
+      border: 0.5px solid gray;
+    }
+
+    .header {
+      width: 100%;
+      margin-bottom: 50px;
+    }
+
+    .sectionGuide {
+      padding: 0;
+      width: 100%;
+    }
+
+    #my-div {
+      width: 10px;
+      height: 10px;
+      background: blue;
+    }
+
+    .pagebreak {
+      page-break-before: always;
+    }
+
+    footer {
+      position: absolute;
+      z-index: 10;
+      height: 3em;
+    }
+
+    .sup {
+      position: relative;
+      vertical-align: baseline;
+      top: -0.5em;
+      font-size: 8pt;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sectionGuide">
+    <table class="sectionGuide">
+      <tr>
+        <td width="40%" align="center">
+          <img src="https://vpdt.pharmedic.com.vn/plugins/servlet/sms-attachment?id=106&fileName=480_crop_logo_1.jpg"
+            height="75" /><br />
+          #if($mauin != 'Theo mẫu Đảng, Đoàn thể')
+          <b>$bophan</b><br />
+          #else
+          <b>$dvin</b><br />
+          #end
+          <b>Số: $sophieu</b>
+        </td>
+        <td width="60%" align="right" valign="top"></td>
+      </tr>
+    </table>
+    <p align="center"><b><span style="font-size:16pt;">TỜ TRÌNH</span><br /></b></p>
+    <p><br /></p>
+    <table class="sectionGuide">
+      <tr>
+        <td width="30%"> </td>
+        <td width="20%" align="left" valign="top"><b><u>Kính gửi:<br /></u></b></td>
+        <td width="50%" align="left" valign="top"><b>BAN TỔNG GIÁM ĐỐC.<br /></b></td>
+      </tr>
+    </table><br />
+    <table class="sectionGuide">
+      <tr>
+        <td align="justify">
+          <p>
+            #set($nds = $noidung.split("\n")) ## Cat chuoi de xuong dong
+            #foreach ($nd in $nds)
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            #set($c = 0)
+            #set($bs = $nd.split("'")) ## Cat chuoi trong dau '...' de in bold
+            #foreach ($b in $bs)
+            #set($c = $c+1)
+            #if($c==2 || $c==4 || $c==6 || $c==8 || $c==10)
+            <b>$b</b>
+            #else
+            $b
+            #end
+            #end
+            <br />
+            #end
+          </p>
+          <p><br /></p>
+        </td>
+      </tr>
+    </table>
+    <table border="0" colspan="0" rowspan="0" style="width: 100%">
+      <tr>
+        <td width="50%" align="center" valign="top">
+          #if($flow == 2 || $flow == 3 || $flow == 6 || $flow == 7 || $flow == 8 || $flow == 9 || $flow == 10 || $flow
+          == 13 || $flow == 14 || $flow == 17 || $flow == 19 || $flow == 20 || $flow == 21)
+          #if($BTDate != '')
+          <i>Ngày $BTDate_dd tháng $BTDate_MM năm $BTDate_YYYY</i> <br />
+          #if($mauin != 'Theo mẫu Đảng, Đoàn thể')
+          <b>PHÓ TỔNG GIÁM ĐỐC</b><br />
+          #else
+          <b>ĐẢNG ỦY</b><br />
+          #end
+          #if($BTNote != '')
+          <i>$BTNote</i><br /><br />
+          #end
+          #if($BTNote1 != '')
+          <i>$BTNote1</i><br /><br />
+          #end
+          #if($BTNote2 != '')
+          <i>$BTNote2</i><br /><br />
+          #end
+          <img src="$BTSig" height='60' /><br />
+          $BTGD.split("-")[0]<br />
+
+          #end
+          #end
+          <br /><br /><br /><br /><br /><br /><br /><br />
+
+
+        </td>
+        <td width="50%" align="justify" valign="top">
+
+          <table style="width: 99%">
+            #if($flow == 1 || $flow == 2 || $flow == 3 || $flow == 4 || $flow == 5 || $flow == 6 || $flow == 7 || $flow
+            == 8 || $flow == 9 || $flow == 10 || $flow == 11)
+            <tr>
+              <td width="99%" align="center" valign="top">
+                Ngày $NTDate_dd tháng $NTDate_MM năm $NTDate_YYYY<br />
+                #if($mauin != 'Theo mẫu Đảng, Đoàn thể')
+                <b>NGƯỜI TRÌNH</b><br />
+                #else
+                #set($cvs = $cvin.split("\n")) ## Cat chuoi de xuong dong
+                #foreach ($cv in $cvs)
+                <b>$cv</b><br />
+                #end
+                #end
+                <img src="$NTSig" height='60' /><br />
+                $NVTRINH.split("-")[0]
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3">
+                <p><br /></p>
+              </td>
+            </tr>
+            #end
+            <tr>
+              <td width="99%" align="center" valign="top">
+                #set($kt = '')
+                #if($flow == 1 || $flow == 2 || $flow == 3 || $flow == 4 || $flow == 5 || $flow == 6 || $flow == 7 ||
+                $flow == 8 || $flow == 9 || $flow == 10 || $flow == 11)
+                #if($TPDate != '')
+                <i>Ngày $TPDate_dd tháng $TPDate_MM năm $TPDate_YYYY</i><br />
+                <b>TRƯỞNG PHÒNG</b><br />
+                #if($TPNote != '')
+                <i>$TPNote</i><br /><br />
+                #end
+                #if($TPNote1 != '')
+                <i>$TPNote1</i><br /><br />
+                #end
+                #if($TPNote2 != '')
+                <i>$TPNote2</i><br /><br />
+                #end
+                #if($TPNote3 != '')
+                <i>$TPNote3</i><br /><br />
+                #end
+                <img src="$TPSig" height='60' /><br />
+                $TPBAN.split("-")[0]<br />
+                #end
+                #set($kt = $TPDate)
+                #else
+                Ngày $NTDate_dd tháng $NTDate_MM năm $NTDate_YYYY<br />
+                #if($mauin != 'Theo mẫu Đảng, Đoàn thể')
+                <b>NGƯỜI TRÌNH</b><br />
+                #else
+                #set($cvs = $cvin.split("\n")) ## Cat chuoi de xuong dong
+                #foreach ($cv in $cvs)
+                <b>$cv</b><br />
+                #end
+                #end
+                <img src="$NTSig" height='60' /><br />
+                $NVTRINH.split("-")[0]
+                #set($kt = $NTDate)
+                #end
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td></td>
+        <td align="center">
+
+          #if($TGDDate != '')
+          <i>Ngày $TGDDate_dd tháng $TGDDate_MM năm $TGDDate_YYYY </i> <br />
+          <b>PHÊ DUYỆT CỦA TỔNG GIÁM ĐỐC</b><br />
+          <i>$TGDNote</i><br /><br />
+          <img src="$TGDSig" height='60' /><br />
+          $TGD.split("-")[0]<br />
+          #end
+        </td>
+        <td></td>
+      </tr>
+    </table>
+
+    #if($PB!='')
+    <p align="center"><br /><b>Ý kiến của BP có liên quan</b></p><br />
+    <table style="width: 100%">
+      <tr>
+        <td></td>
+        <td align="center">#if($KTT!='')
+
+          #if($KTTDate != '')
+          #if($KTTNote != '')
+          <i>$KTTNote</i><br /><br />
+          #end
+          #if($KTTNote1 != '')
+          <i>$KTTNote1</i><br /><br />
+          #end
+          <img src="$KTTSig" height='60' /><br />
+          $KTT.split("-")[0]<br />
+          <i>Ngày duyệt: $KTTDate</i>
+          #end
+          #end
+        </td>
+        <td></td>
+      </tr>
+    </table>
+
+    #if($kt!='')
+    #set($dpb = 0)
+    #set($pb1 = "")
+    #set($pb2 = "")
+    #set($pb3 = "")
+    #set($pb4 = "")
+    #set($pb5 = "")
+    #set($cpbs = $PB.split(","))
+    #foreach ($cpb in $cpbs)
+    #set($dpb = $dpb+1)
+    #if ($dpb==1)
+    #set($pb1 = $cpb.split("-")[0])
+    #end
+    #if ($dpb==2)
+    #set($pb2 = $cpb.split("-")[0])
+    #end
+    #if ($dpb==3)
+    #set($pb3 = $cpb.split("-")[0])
+    #end
+    #if ($dpb==4)
+    #set($pb4 = $cpb.split("-")[0])
+    #end
+    #if ($dpb==5)
+    #set($pb5 = $cpb.split("-")[0])
+    #end
+    #end
+
+    #set($dyk = 0)
+    #set($yk1 = "")
+    #set($yk2 = "")
+    #set($yk3 = "")
+    #set($yk4 = "")
+    #set($yk5 = "")
+    #if($PBNote != '')
+    #set($yks = $PBNote.split(","))
+    #end
+    #if($PBNote1 != '')
+    #set($yks = $PBNote1.split(","))
+    #end
+    #if($PBNote2 != '')
+    #set($yks = $PBNote2.split(","))
+    #end
+    #foreach ($yk in $yks)
+    #set($dyk = $dyk+1)
+    #if ($dyk==1)
+    #set($yk1 = $yk)
+    #end
+    #if ($dyk==2)
+    #set($yk2 = $yk)
+    #end
+    #if ($dyk==3)
+    #set($yk3 = $yk)
+    #end
+    #if ($dyk==4)
+    #set($yk4 = $yk)
+    #end
+    #if ($dyk==5)
+    #set($yk5 = $yk)
+    #end
+    #end
+
+    #set($dck = 0)
+    #set($ck1 = "")
+    #set($ck2 = "")
+    #set($ck3 = "")
+    #set($ck4 = "")
+    #set($ck5 = "")
+    #set($cks = $PBSig.split(","))
+    #foreach ($ck in $cks)
+    #set($dck = $dck+1)
+    #if ($dck==1)
+    #set($ck1 = $ck)
+    #end
+    #if ($dck==2)
+    #set($ck2 = $ck)
+    #end
+    #if ($dck==3)
+    #set($ck3 = $ck)
+    #end
+    #if ($dck==4)
+    #set($ck4 = $ck)
+    #end
+    #if ($dck==5)
+    #set($ck5 = $ck)
+    #end
+    #end
+
+    #set($dda = 0)
+    #set($da1 = "")
+    #set($da2 = "")
+    #set($da3 = "")
+    #set($da4 = "")
+    #set($da5 = "")
+    #set($das = $PBDate.split(","))
+    #foreach ($da in $das)
+    #set($dda = $dda+1)
+    #if ($dda==1)
+    #set($da1 = $da)
+    #end
+    #if ($dda==2)
+    #set($da2 = $da)
+    #end
+    #if ($dda==3)
+    #set($da3 = $da)
+    #end
+    #if ($dda==4)
+    #set($da4 = $da)
+    #end
+    #if ($dda==5)
+    #set($da5 = $da)
+    #end
+    #end
+    <table style="width: 99%; table-layout: fixed;">
+      <tr>
+        <td align="center" style="width: 45%; white-space: normal;">
+          <div style="word-wrap: break-word;">
+            <i>$yk1</i>
+          </div>
+        </td>
+        <td></td>
+        <td align="center" style="width: 45%; white-space: normal;">
+          <div style="word-wrap: break-word;">
+            <i>$yk2</i>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td align="center">
+          #if($PBDate != '')
+          <img src="$ck1" height='60' />
+          #end
+        </td>
+        <td></td>
+        <td align="center">
+          #if($PBDate != '')
+          <img src="$ck2" height='60' />
+          #end
+        </td>
+      </tr>
+      <tr>
+        <td align="center">$pb1</td>
+        <td></td>
+        <td align="center">$pb2</td>
+      </tr>
+      <tr>
+        <td align="center"><i>$da1</i></td>
+        <td></td>
+        <td align="center"><i>$da2</i></td>
+      </tr>
+    </table><br />
+    <table style="width: 99%; table-layout: fixed;">
+      <tr>
+        <td align="center" style="width: 45%; white-space: normal;">
+          <div style="word-wrap: break-word;">
+            <i>$yk3</i>
+          </div>
+        </td>
+        <td></td>
+        <td align="center" style="width: 45%; white-space: normal;">
+          <div style="word-wrap: break-word;">
+            <i>$yk4</i>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td align="center">
+          #if($PBDate != '')
+          <img src="$ck3" height='60' />
+          #end
+        </td>
+        <td></td>
+        <td align="center">
+          #if($PBDate != '')
+          <img src="$ck4" height='60' />
+          #end
+        </td>
+      </tr>
+      <tr>
+        <td align="center">$pb3</td>
+        <td></td>
+        <td align="center">$pb4</td>
+      </tr>
+      <tr>
+        <td align="center"><i>$da3</i></td>
+        <td></td>
+        <td align="center"><i>$da4</i></td>
+      </tr>
+    </table><br />
+    <table style="width: 99%; table-layout: fixed;">
+      <tr>
+        <td align="center" style="width: 45%; white-space: normal;">
+          <div style="word-wrap: break-word;">
+            <i>$yk5</i>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td align="center">
+          #if($PBDate != '')
+          <img src="$ck5" height='60' />
+          #end
+        </td>
+      </tr>
+      <tr>
+        <td align="center">$pb5</td>
+      </tr>
+      <tr>
+        <td align="center"><i>$da5</i></td>
+      </tr>
+    </table>
+    #end
+    #end
+
+    <br />
+  </div>
+  <footer style="font-size:11px;"><i><u><b>Ghi chú:</b></u> Phiếu được in từ PM Văn phòng Điện tử - Ngày in: $date_pr -
+      Số phiếu: $id_tk</i></footer>
+</body>

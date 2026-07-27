@@ -3,18 +3,25 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recha
 import { ChartResponse } from "@/types/dashboard.type"
 import { memo } from "react"
 
-// Bộ màu hài hòa với theme (accent emerald + phái sinh), thay cho màu mặc định rời rạc.
-const COLORS = ["#10b981", "#14b8a6", "#f59e0b", "#6366f1", "#f43f5e", "#0ea5e9"]
-
 interface UserGoalChartProps {
   data?: ChartResponse[]
 }
 
+/** Earth/clay palette: dark → light warm browns */
+const PALETTE = [
+  "#4a3525", // earth
+  "#6b4c35", // mid-earth
+  "#8c6239", // clay
+  "#a87c55", // clay-light
+  "#c49a72", // sand-dark
+  "#d9c3b0", // sand
+]
+
 export const UserGoalChart = memo(({ data }: UserGoalChartProps) => {
   return (
-    <Card className="col-span-1">
+    <Card className="col-span-1 border-sand/60 bg-white shadow-sm">
       <CardHeader>
-        <CardTitle>Phân bố mục tiêu người dùng</CardTitle>
+        <CardTitle className="font-display text-earth">Phân bố mục tiêu người dùng</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
@@ -33,25 +40,25 @@ export const UserGoalChart = memo(({ data }: UserGoalChartProps) => {
               labelLine={false}
             >
               {(data || []).map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell key={`cell-${index}`} fill={PALETTE[index % PALETTE.length]} />
               ))}
             </Pie>
             <Tooltip
               formatter={(value) => `${value}%`}
               contentStyle={{
-                background: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: 10,
-                color: "#111827",
+                background: "#fafafa",
+                border: "1px solid #d9c3b0",
+                borderRadius: 12,
+                color: "#4a3525",
                 fontSize: 13,
-                boxShadow: "0 4px 12px rgba(17, 24, 39, 0.08)",
+                boxShadow: "0 8px 24px rgba(74,53,37,0.12)",
               }}
             />
             <Legend
               verticalAlign="bottom"
               iconType="circle"
               iconSize={10}
-              formatter={(value) => <span style={{ color: "#374151", fontSize: 13 }}>{value}</span>}
+              formatter={(value) => <span style={{ color: "#4a3525", fontSize: 13 }}>{value}</span>}
             />
           </PieChart>
         </ResponsiveContainer>

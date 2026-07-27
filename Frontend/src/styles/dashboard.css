@@ -121,6 +121,172 @@
   height: 16px;
 }
 
+/* ───── Admin shell (scoped — user layout unaffected) ───── */
+.coreform-admin {
+  --admin-glass: rgba(255, 255, 255, 0.88);
+  --admin-glass-strong: rgba(255, 255, 255, 0.95);
+  --admin-nav-hover: color-mix(in srgb, var(--foreground) 6%, transparent);
+  --admin-nav-active-bg: color-mix(in srgb, var(--accent) 18%, transparent);
+  --admin-nav-active-text: var(--foreground);
+  --admin-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  font-family: var(--font-sans);
+}
+
+.dark .coreform-admin {
+  --background: #0b1220;
+  --foreground: #f1f5f9;
+  --card: rgba(15, 23, 42, 0.62);
+  --card-foreground: #f1f5f9;
+  --popover: rgba(15, 23, 42, 0.94);
+  --popover-foreground: #f1f5f9;
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: #94a3b8;
+  --accent: rgba(255, 255, 255, 0.08);
+  --accent-foreground: #f1f5f9;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.12);
+  --input-background: rgba(15, 23, 42, 0.55);
+  --admin-glass: rgba(15, 23, 42, 0.72);
+  --admin-glass-strong: rgba(15, 23, 42, 0.88);
+  --admin-nav-hover: rgba(255, 255, 255, 0.06);
+  --admin-nav-active-bg: color-mix(in srgb, var(--accent) 22%, transparent);
+  --admin-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.coreform-admin .admin-particle-canvas {
+  opacity: 0.12;
+  transition: opacity 0.35s ease;
+}
+
+.dark .coreform-admin .admin-particle-canvas {
+  opacity: 0.55;
+}
+
+.coreform-admin [data-slot="card"] {
+  border-color: var(--border);
+  background: var(--card);
+  backdrop-filter: blur(16px);
+}
+
+.dark .coreform-admin [data-slot="card"] {
+  box-shadow: var(--admin-shadow);
+}
+
+.coreform-admin ::selection {
+  background: color-mix(in srgb, var(--accent) 55%, #ffffff);
+  color: var(--foreground);
+}
+
+.coreform-admin .admin-sidebar {
+  background: var(--admin-glass-strong);
+  border-color: var(--border);
+  box-shadow: var(--admin-shadow);
+}
+
+.dark .coreform-admin .admin-sidebar {
+  backdrop-filter: blur(20px);
+}
+
+.coreform-admin .admin-header {
+  background: var(--admin-glass);
+  border-color: var(--border);
+  backdrop-filter: blur(14px);
+}
+
+.coreform-admin .admin-search {
+  background: var(--input-background);
+  border-color: var(--input);
+  color: var(--foreground);
+}
+
+.coreform-admin .admin-search::placeholder {
+  color: var(--muted-foreground);
+}
+
+.coreform-admin .admin-search:focus {
+  border-color: var(--ring);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 25%, transparent);
+}
+
+.coreform-admin .admin-nav-item {
+  color: var(--muted-foreground);
+}
+
+.coreform-admin .admin-nav-item:hover {
+  background: var(--admin-nav-hover);
+  color: var(--foreground);
+}
+
+.coreform-admin .admin-nav-item.is-active {
+  background: var(--admin-nav-active-bg);
+  color: var(--admin-nav-active-text);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ring) 25%, transparent);
+}
+
+.dark .coreform-admin .admin-nav-item.is-active {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ring) 35%, transparent),
+    0 0 20px color-mix(in srgb, var(--ring) 12%, transparent);
+}
+
+.coreform-admin .admin-icon-btn {
+  color: var(--muted-foreground);
+}
+
+.coreform-admin .admin-icon-btn:hover {
+  background: var(--admin-nav-hover);
+  color: var(--foreground);
+}
+
+.coreform-admin .admin-profile-btn {
+  border-color: var(--border);
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.coreform-admin .admin-profile-btn:hover {
+  background: var(--admin-nav-hover);
+}
+
+.coreform-admin .admin-theme-popover {
+  backdrop-filter: blur(20px);
+}
+
+.dark .coreform-admin .admin-theme-popover {
+  background: rgba(15, 23, 42, 0.94);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.coreform-admin .admin-notification-popover {
+  background: var(--popover);
+  border-color: var(--border);
+  color: var(--popover-foreground);
+}
+
+.coreform-admin .admin-notification-header {
+  background: var(--muted);
+  border-color: var(--border);
+}
+
+.coreform-admin .admin-notification-item:hover {
+  background: var(--admin-nav-hover);
+}
+
+.coreform-admin .admin-notification-item.is-unread {
+  background: color-mix(in srgb, var(--ring) 10%, transparent);
+}
+
+.coreform-admin [data-slot="table"] th {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.coreform-admin [data-slot="table"] tr:hover td {
+  background: var(--admin-nav-hover);
+}
+
 
 /* ───── Noise overlay ───── */
 .dashboard-noise {
@@ -677,3 +843,4 @@
     transform: translate(-50%, -50%);
   }
 }
+

@@ -208,9 +208,9 @@ export const UserList = () => {
 
   return (
     <div>
-      <TypographyH3 variant="bold" className="mb-4">
+      <h2 className="font-display text-xl font-bold tracking-tight text-earth mb-4">
         Quản lý người dùng
-      </TypographyH3>
+      </h2>
       <Card>
         <CardContent>
           {isLoading ? (

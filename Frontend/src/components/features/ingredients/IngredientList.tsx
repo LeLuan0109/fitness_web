@@ -165,8 +165,8 @@ export function IngredientList() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <TypographyH3 variant="bold">Quản lý nguyên liệu</TypographyH3>
-        <Button onClick={handleCreateNew}>
+        <h2 className="font-display text-xl font-bold tracking-tight text-earth">Quản lý nguyên liệu</h2>
+        <Button onClick={handleCreateNew} className="bg-clay hover:bg-earth text-cream gap-2">
           <Plus className="mr-2 size-4" />
           Tạo mới nguyên liệu
         </Button>
