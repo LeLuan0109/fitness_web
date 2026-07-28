@@ -27,7 +27,7 @@ export function WorkoutPlans() {
         }
       />
       <OutstandingPlan />
-      <div className="border-t border-sand/40 pt-8">
+      <div className="border-t border-border/40 pt-8">
         <SampleWorkout />
       </div>
     </div>

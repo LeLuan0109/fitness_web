@@ -15,8 +15,8 @@ export function OutstandingPlan() {
   return (
     <div>
       <div className="mb-5 flex items-center gap-2">
-        <Star className="size-5 text-clay" />
-        <h3 className="font-display text-lg font-medium text-earth">Nổi bật</h3>
+        <Star className="size-5 text-primary" />
+        <h3 className="font-display text-lg font-medium text-foreground">Nổi bật</h3>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {outstandingPlans?.map((plan) => (

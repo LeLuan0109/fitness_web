@@ -81,7 +81,7 @@ export const SampleWorkout = () => {
       ) : (
         <>
           <div>
-            <h3 className="font-display mb-5 text-lg font-medium text-earth">Tất cả kế hoạch</h3>
+            <h3 className="font-display mb-5 text-lg font-medium text-foreground">Tất cả kế hoạch</h3>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {samplePlansData.data.map((plan) => (
                 <WorkoutCard

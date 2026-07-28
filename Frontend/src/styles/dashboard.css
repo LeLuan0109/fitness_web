@@ -17,10 +17,10 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Dùng màu clay thay italic — Playfair/Noto italic gây lỗi dấu tiếng Việt */
+/* Dùng màu accent của theme thay italic — Playfair/Noto italic gây lỗi dấu tiếng Việt */
 .accent-display,
 .italic-display {
-  color: #8c6239;
+  color: var(--primary, #8c6239);
   font-style: normal;
   font-weight: 500;
 }
@@ -133,24 +133,59 @@
 }
 
 .dark .coreform-admin {
-  --background: #0b1220;
-  --foreground: #f1f5f9;
-  --card: rgba(15, 23, 42, 0.62);
-  --card-foreground: #f1f5f9;
-  --popover: rgba(15, 23, 42, 0.94);
-  --popover-foreground: #f1f5f9;
-  --muted: rgba(255, 255, 255, 0.06);
-  --muted-foreground: #94a3b8;
+  --background: #202124;
+  --foreground: #e8eaed;
+  --card: rgba(45, 48, 53, 0.92);
+  --card-foreground: #e8eaed;
+  --popover: rgba(32, 33, 36, 0.96);
+  --popover-foreground: #e8eaed;
+  --primary: #8ab4f8;
+  --primary-foreground: #202124;
+  --button-primary: #8ab4f8;
+  --button-primary-foreground: #202124;
+  --muted: rgba(255, 255, 255, 0.08);
+  --muted-foreground: #bdc1c6;
   --accent: rgba(255, 255, 255, 0.08);
-  --accent-foreground: #f1f5f9;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.12);
-  --input-background: rgba(15, 23, 42, 0.55);
-  --admin-glass: rgba(15, 23, 42, 0.72);
-  --admin-glass-strong: rgba(15, 23, 42, 0.88);
-  --admin-nav-hover: rgba(255, 255, 255, 0.06);
-  --admin-nav-active-bg: color-mix(in srgb, var(--accent) 22%, transparent);
-  --admin-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --accent-foreground: #e8eaed;
+  --border: rgba(255, 255, 255, 0.16);
+  --input: rgba(255, 255, 255, 0.2);
+  --input-background: rgba(32, 33, 36, 0.78);
+  --ring: #8ab4f8;
+  --admin-glass: rgba(32, 33, 36, 0.82);
+  --admin-glass-strong: rgba(32, 33, 36, 0.94);
+  --admin-nav-hover: rgba(255, 255, 255, 0.08);
+  --admin-nav-active-bg: rgba(138, 180, 248, 0.18);
+  --admin-nav-active-text: #e8eaed;
+  --admin-shadow: 0 25px 80px rgba(0, 0, 0, 0.32);
+  --color-earth: #e8eaed;
+  --color-clay: #bdc1c6;
+  --color-sand: #cbd5e1;
+  --color-sand-light: #e2e8f0;
+  --color-sand-dark: #161e2b;
+  --color-cream: rgba(255, 255, 255, 0.06);
+}
+
+.dark .coreform-admin [class*="text-earth"],
+.dark .coreform-admin [class*="text-clay"],
+.dark .coreform-admin [class*="text-sand"],
+.dark .coreform-admin [class*="text-cream"] {
+  color: #f8fafc !important;
+}
+
+.dark .coreform-admin [class*="bg-earth"],
+.dark .coreform-admin [class*="bg-clay"],
+.dark .coreform-admin [class*="bg-sand"],
+.dark .coreform-admin [class*="bg-cream"] {
+  background-color: rgba(248, 250, 252, 0.06) !important;
+}
+
+.dark .coreform-admin [class*="border-sand"],
+.dark .coreform-admin [class*="border-earth"] {
+  border-color: rgba(248, 250, 252, 0.12) !important;
+}
+
+.dark .coreform-admin [class*="shadow-earth"] {
+  box-shadow: 0 15px 35px rgba(255, 255, 255, 0.06) !important;
 }
 
 .coreform-admin .admin-particle-canvas {
@@ -255,8 +290,26 @@
 }
 
 .dark .coreform-admin .admin-theme-popover {
-  background: rgba(15, 23, 42, 0.94);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(8, 16, 30, 0.96);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 20px 60px rgba(0, 0, 0, 0.24);
+}
+
+.dark .coreform-admin .admin-nav-item {
+  color: #cbd5e1;
+}
+
+.dark .coreform-admin .admin-nav-item:hover {
+  color: #ffffff;
+}
+
+.dark .coreform-admin .admin-nav-item.is-active {
+  background: var(--admin-nav-active-bg);
+  color: var(--admin-nav-active-text);
+  font-weight: 600;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ring) 35%, transparent),
+    0 0 18px color-mix(in srgb, var(--ring) 12%, transparent);
 }
 
 .coreform-admin .admin-notification-popover {

@@ -13,8 +13,8 @@ export function CoreformPageHeader({ title, description, action, className }: Pr
   return (
     <div className={cn("flex flex-wrap items-end justify-between gap-4", className)}>
       <div>
-        <h1 className="font-display text-3xl font-medium tracking-tight text-earth sm:text-4xl">{title}</h1>
-        {description && <p className="mt-2 text-sm leading-relaxed text-earth/60 sm:text-base">{description}</p>}
+        <h1 className="font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">{title}</h1>
+        {description && <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">{description}</p>}
       </div>
       {action}
     </div>
@@ -29,7 +29,7 @@ export function CoreformPrimaryButton({
   return (
     <Button
       className={cn(
-        "h-auto rounded-full bg-earth px-5 py-2.5 text-sm font-medium text-cream shadow-sm transition-all duration-300 hover:scale-[1.02] hover:bg-clay",
+        "h-auto rounded-full px-5 py-2.5 text-sm font-medium shadow-sm transition-all duration-300 hover:scale-[1.02] hover:bg-button-primary/90",
         className,
       )}
       {...props}
@@ -48,7 +48,7 @@ export function CoreformSearchButton({
     <Button
       variant="outline"
       className={cn(
-        "h-auto shrink-0 rounded-full border-sand bg-white px-5 py-2.5 text-sm font-medium text-earth transition-all duration-300 hover:border-clay hover:bg-sand-light/40 hover:text-earth",
+        "h-auto shrink-0 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-300",
         className,
       )}
       {...props}

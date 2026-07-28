@@ -13,13 +13,13 @@ export function CoreformFilterCard({ title, children, className, contentClassNam
   return (
     <Card
       className={cn(
-        "gap-0 rounded-3xl border-sand/60 bg-white py-0 shadow-sm shadow-earth/5",
+        "gap-0 rounded-3xl border border-border bg-card py-0 shadow-sm shadow-earth/5 dark:border-white/10 dark:bg-surface dark:shadow-slate-950/15",
         className,
       )}
     >
       <CardContent className={cn("p-6 lg:p-8", contentClassName)}>
         {title && (
-          <CardTitle className="font-display mb-5 text-lg font-medium text-earth">{title}</CardTitle>
+          <CardTitle className="font-display mb-5 text-lg font-medium text-foreground">{title}</CardTitle>
         )}
         {children}
       </CardContent>

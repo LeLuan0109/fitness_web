@@ -34,7 +34,7 @@ export function WorkoutsSearchForm({ onSearch }: Props) {
               className="w-[220px]"
               enableFormMessage={false}
             >
-              {(field) => <Input {...field} className="rounded-xl border-sand/60 bg-cream/50" />}
+              {(field) => <Input {...field} className="rounded-xl border-input bg-input-background" />}
             </SimpleField>
             <SimpleField
               label="Mục tiêu tập luyện"

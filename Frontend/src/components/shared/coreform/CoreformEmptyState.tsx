@@ -15,15 +15,15 @@ export function CoreformEmptyState({ icon: Icon, title, description, action, cla
   return (
     <div
       className={cn(
-        "rounded-3xl border border-sand/60 bg-white px-6 py-16 text-center shadow-sm shadow-earth/5",
+        "rounded-3xl border border-border bg-card px-6 py-16 text-center shadow-sm shadow-earth/5 dark:border-white/10 dark:bg-surface dark:text-foreground dark:shadow-slate-950/15",
         className,
       )}
     >
-      <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl bg-earth/5 text-clay">
+      <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary dark:bg-primary/15 dark:text-primary">
         <Icon className="size-6" />
       </div>
-      <h3 className="font-display text-xl font-medium text-earth">{title}</h3>
-      {description && <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-earth/60">{description}</p>}
+      <h3 className="font-display text-xl font-medium text-foreground">{title}</h3>
+      {description && <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">{description}</p>}
       {action && <div className="mt-6 flex justify-center">{action}</div>}
     </div>
   )

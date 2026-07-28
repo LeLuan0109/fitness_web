@@ -61,7 +61,7 @@ export const WorkoutCard = ({
   return (
     <Card
       className={cn(
-        "hover:shadow-lg transition-all cursor-pointer hover:border-primary/50 justify-between",
+        "border border-border bg-card text-card-foreground hover:shadow-[0_20px_40px_rgba(16,185,129,0.14)] transition-all cursor-pointer hover:border-primary/50 justify-between",
         variant === "personal" && !isActive && "opacity-60",
       )}
       onClick={handleViewDetail}
