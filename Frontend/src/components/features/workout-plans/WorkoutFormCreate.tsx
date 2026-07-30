@@ -59,7 +59,7 @@ export const WorkoutFormCreate = () => {
       description: "",
       schedule: [],
     },
-    mode: "onBlur",
+    mode: "onSubmit",
   })
 
   const navigate = useNavigate()
@@ -213,10 +213,18 @@ export const WorkoutFormCreate = () => {
     }
   }
 
-  const handleSavePlan = (data: WorkoutFormData) => {
+ const handleSavePlan = (data: WorkoutFormData) => {
+  console.log("✅ FORM DATA HỢP LỆ, ĐANG SUBMIT:", data)
+  
+  try {
     const payload = transformWorkoutPlanDTO(data)
+    console.log(" PAYLOAD SAU KHI TRANSFORM:", payload)
     createPlan(payload)
+  } catch (error) {
+    console.error(" LỖI TRONG transformWorkoutPlanDTO:", error)
+    toast.error("Có lỗi xảy ra khi xử lý dữ liệu trước khi lưu.")
   }
+}
 
   const handleDaySelection = (dayId: string, checked: boolean) => {
     setSelectedDays((prev) => {

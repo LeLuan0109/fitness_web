@@ -41,7 +41,15 @@ const queryConfig: DefaultOptions = {
   },
 };
 
-export const queryClient = new QueryClient({ defaultOptions: queryConfig });
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 export type ExtractFnReturnType<FnType extends (...args: any) => any> = Awaited<
   Promise<ReturnType<FnType>>

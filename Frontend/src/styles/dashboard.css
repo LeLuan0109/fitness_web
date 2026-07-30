@@ -69,7 +69,7 @@
   }
 }
 
-/* ───── COREFORM app theme overrides ───── */
+/* ───── COREFORM app theme — LIGHT ───── */
 .coreform-app {
   --background: #fafafa;
   --foreground: #4a3525;
@@ -119,6 +119,97 @@
   background: #fafafa;
   width: 16px;
   height: 16px;
+}
+
+/* ───── COREFORM app theme — DARK ───── */
+.dark .coreform-app {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #141416;
+  --card-foreground: #fafafa;
+  --popover: #141416;
+  --popover-foreground: #fafafa;
+  --primary: #c4956a;
+  --primary-foreground: #09090b;
+  --button-primary: #c4956a;
+  --button-primary-foreground: #09090b;
+  --secondary: #1c1c1f;
+  --secondary-foreground: #e4e4e7;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #1c1c1f;
+  --accent-foreground: #e4e4e7;
+  --border: #27272a;
+  --input: #27272a;
+  --input-background: #141416;
+  --ring: #c4956a;
+  --slider-track: #27272a;
+  /* Custom earth-tone tokens cho dark */
+  --color-cream: #09090b;
+  --color-earth: #fafafa;
+  --color-clay: #c4956a;
+  --color-sand: #27272a;
+  --color-sand-light: #3f3f46;
+  --color-sand-dark: #52525b;
+  background-color: #09090b;
+  color: #fafafa;
+}
+
+/* Force div/main/section con trực tiếp không giữ bg sáng */
+.dark .coreform-app > div,
+.dark .coreform-app > main,
+.dark .coreform-app > section {
+  background-color: transparent;
+}
+
+/* Card giữ bg riêng */
+.dark .coreform-app [data-slot="card"],
+.dark .coreform-app [class*="card"] {
+  background-color: var(--card, #141416);
+}
+
+.dark .coreform-app [data-slot="card"] {
+  border-color: #27272a;
+}
+
+.dark .coreform-app [data-slot="input"]:focus,
+.dark .coreform-app [data-slot="input"]:focus-visible {
+  border-color: #c4956a;
+  --tw-ring-color: rgb(196 149 106 / 0.25);
+}
+
+.dark .coreform-app [data-slot="slider-track"] {
+  background: #27272a;
+}
+
+.dark .coreform-app [data-slot="slider-range"] {
+  background: #c4956a;
+}
+
+.dark .coreform-app [data-slot="slider-thumb"] {
+  border-color: #c4956a;
+  background: #fafafa;
+}
+
+.dark .coreform-app .cursor-dot {
+  background: #fafafa;
+}
+
+.dark .coreform-app .cursor-ring {
+  border-color: rgba(250, 250, 250, 0.3);
+}
+
+.dark .coreform-app ::selection {
+  background: #c4956a;
+  color: #09090b;
+}
+
+.dark .coreform-app .pin-progress {
+  background: rgba(250, 250, 250, 0.12);
+}
+
+.dark .coreform-app .pin-progress-fill {
+  background: #c4956a;
 }
 
 /* ───── Admin shell (scoped — user layout unaffected) ───── */
@@ -339,7 +430,6 @@
 .coreform-admin [data-slot="table"] tr:hover td {
   background: var(--admin-nav-hover);
 }
-
 
 /* ───── Noise overlay ───── */
 .dashboard-noise {
@@ -897,3 +987,118 @@
   }
 }
 
+/* ══════════════════════════════════════════════
+   FORCE DARK — .coreform-app
+   ══════════════════════════════════════════════ */
+
+/* Backgrounds */
+.dark .coreform-app .bg-white { background-color: #141416 !important; }
+.dark .coreform-app .bg-gray-50,
+.dark .coreform-app .bg-slate-50,
+.dark .coreform-app .bg-neutral-50,
+.dark .coreform-app .bg-stone-50,
+.dark .coreform-app .bg-zinc-50 { background-color: #09090b !important; }
+.dark .coreform-app .bg-gray-100,
+.dark .coreform-app .bg-slate-100,
+.dark .coreform-app .bg-neutral-100,
+.dark .coreform-app .bg-stone-100,
+.dark .coreform-app .bg-zinc-100 { background-color: #18181b !important; }
+.dark .coreform-app .bg-gray-200,
+.dark .coreform-app .bg-slate-200,
+.dark .coreform-app .bg-neutral-200,
+.dark .coreform-app .bg-stone-200,
+.dark .coreform-app .bg-zinc-200 { background-color: #27272a !important; }
+
+/* Header */
+.dark .coreform-app header,
+.dark .coreform-app [class*="header"] { background-color: #09090b !important; border-color: #27272a !important; }
+
+/* Input / Select / Textarea */
+.dark .coreform-app input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+.dark .coreform-app select,
+.dark .coreform-app textarea {
+  background-color: #1c1c1f !important;
+  color: #fafafa !important;
+  border-color: #27272a !important;
+}
+
+/* Popover / Dropdown / Menu */
+.dark .coreform-app [data-radix-popper-content-wrapper],
+.dark .coreform-app [role="menu"],
+.dark .coreform-app [role="listbox"],
+.dark .coreform-app [data-state="open"] {
+  background-color: #141416 !important;
+  color: #fafafa !important;
+  border-color: #27272a !important;
+}
+
+/* Text tối → trắng */
+.dark .coreform-app .text-gray-900,
+.dark .coreform-app .text-gray-800,
+.dark .coreform-app .text-gray-700,
+.dark .coreform-app .text-slate-900,
+.dark .coreform-app .text-slate-800,
+.dark .coreform-app .text-neutral-900,
+.dark .coreform-app .text-neutral-800,
+.dark .coreform-app .text-stone-900,
+.dark .coreform-app .text-stone-800 { color: #fafafa !important; }
+
+/* Text xám nhạt */
+.dark .coreform-app .text-gray-500,
+.dark .coreform-app .text-gray-400,
+.dark .coreform-app .text-slate-500,
+.dark .coreform-app .text-slate-400,
+.dark .coreform-app .text-neutral-500,
+.dark .coreform-app .text-neutral-400 { color: #a1a1aa !important; }
+
+/* Border */
+.dark .coreform-app .border-gray-200,
+.dark .coreform-app .border-gray-300,
+.dark .coreform-app .border-slate-200,
+.dark .coreform-app .border-slate-300,
+.dark .coreform-app .border-neutral-200,
+.dark .coreform-app .border-neutral-300 { border-color: #27272a !important; }
+
+/* Custom earth-tone colors → Dark */
+.dark .coreform-app [class*="text-earth"] { color: #fafafa !important; }
+.dark .coreform-app [class*="text-clay"] { color: #c4956a !important; }
+.dark .coreform-app [class*="text-sand"] { color: #a1a1aa !important; }
+.dark .coreform-app [class*="text-cream"] { color: #a1a1aa !important; }
+
+.dark .coreform-app [class*="bg-cream"] { background-color: #09090b !important; }
+.dark .coreform-app [class*="bg-earth"] { background-color: #1c1c1f !important; }
+.dark .coreform-app [class*="bg-clay"] { background-color: #3f3f46 !important; }
+.dark .coreform-app [class*="bg-sand"] { background-color: #27272a !important; }
+.dark .coreform-app [class*="bg-sand-light"] { background-color: #3f3f46 !important; }
+.dark .coreform-app [class*="bg-sand-dark"] { background-color: #52525b !important; }
+
+.dark .coreform-app [class*="border-sand"],
+.dark .coreform-app [class*="border-earth"],
+.dark .coreform-app [class*="border-clay"] { border-color: #27272a !important; }
+
+/* Chặn màu tím / violet — cả 2 theme */
+.coreform-app [class*="bg-purple-"],
+.coreform-app [class*="bg-violet-"] {
+  background-color: var(--primary, #8c6239) !important;
+}
+.coreform-app [class*="text-purple-"],
+.coreform-app [class*="text-violet-"] {
+  color: var(--primary, #8c6239) !important;
+}
+.coreform-app [class*="border-purple-"],
+.coreform-app [class*="border-violet-"] {
+  border-color: var(--border, #d9c3b0) !important;
+}
+
+.dark .coreform-app [class*="bg-purple-"],
+.dark .coreform-app [class*="bg-violet-"] {
+  background-color: #27272a !important;
+}
+.dark .coreform-app [class*="text-purple-"],
+.dark .coreform-app [class*="text-violet-"] {
+  color: #c4956a !important;
+}
+.dark .coreform-app [class*="border-purple-"],
+.dark .coreform-app [class*="border-violet-"] {
+  border-color: #27272a !important;
+}

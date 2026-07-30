@@ -305,11 +305,11 @@ export const WorkoutFormEdit = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* ⭐ Thêm cảnh báo nếu đã bắt đầu */}
+            {/*Thêm cảnh báo nếu đã bắt đầu */}
             {hasStarted && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                 <p className="text-sm text-yellow-800">
-                  ⚠️ Kế hoạch này đã bắt đầu. Bạn không thể chỉnh sửa kế hoạch sau khi đã bắt đầu. Vui lòng xem chi tiết
+                  Kế hoạch này đã bắt đầu. Bạn không thể chỉnh sửa kế hoạch sau khi đã bắt đầu. Vui lòng xem chi tiết
                   hoặc tạo kế hoạch mới.
                 </p>
               </div>

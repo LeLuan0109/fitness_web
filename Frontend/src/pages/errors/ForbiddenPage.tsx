@@ -15,9 +15,9 @@ export const ForbiddenPage = () => {
           Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là lỗi.
         </p>
         <div className="flex gap-4 justify-center">
-          <Button onClick={() => navigate(-1)} variant="outline">
+          {/* <Button onClick={() => navigate(-1)} variant="outline">
             Quay lại
-          </Button>
+          </Button> */}
           <Button onClick={() => navigate("/")}>Về trang chủ</Button>
         </div>
       </div>

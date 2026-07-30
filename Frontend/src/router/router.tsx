@@ -82,7 +82,7 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.PROFILE,
         element: (
-          <ProtectedRoute>
+           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
             <ProfilePage />
           </ProtectedRoute>
         ),
