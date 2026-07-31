@@ -24,7 +24,7 @@ import { useForm } from "react-hook-form"
 import { Link } from "react-router"
 import { toast } from "sonner"
 
-const inputClass = "rounded-xl border-sand/60 bg-cream/50 text-earth placeholder:text-earth/40 focus-visible:border-clay"
+const inputClass = "rounded-xl border border-input bg-input-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/25"
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -35,9 +35,7 @@ export function LoginForm() {
   })
 
   const navigateAfterLogin = (route: string) => {
-    transitionStore.getState().playEnter(() => {
-      router.navigate(route)
-    })
+    router.navigate(route)
   }
 
   const { mutate: mutateLogin, isPending: isPendingLogin } = useLogin({
@@ -96,9 +94,9 @@ export function LoginForm() {
     <AuthShell>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleLogin)} className="w-full max-w-md">
-          <div className="rounded-3xl border border-sand/60 bg-white p-8 shadow-xl shadow-earth/5 sm:p-10">
-            <div className="mb-8 lg:hidden">
-              <div className="mb-4 flex items-center gap-2.5">
+          <div className="rounded-3xl border border-border bg-card text-card-foreground p-6 shadow-xl shadow-earth/5 sm:p-8">
+            <div className="mb-6 lg:hidden">
+              <div className="mb-3 flex items-center gap-2.5">
                 <span className="flex size-7 items-center justify-center rounded-full bg-earth">
                   <span className="size-2.5 rounded-full bg-clay" />
                 </span>
@@ -106,12 +104,12 @@ export function LoginForm() {
               </div>
             </div>
 
-            <div className="mb-8">
+            <div className="mb-4">
               <h1 className="font-display text-3xl font-medium text-earth">Đăng nhập</h1>
-              <p className="mt-2 text-sm text-earth/60">Chào mừng trở lại. Tiếp tục hành trình của bạn.</p>
+              <p className="mt-1 text-sm text-earth/60">Chào mừng trở lại. Tiếp tục hành trình của bạn.</p>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-2">
               <SimpleField name="username" control={form.control} label="Tên đăng nhập" required>
                 {(field) => <Input {...field} className={inputClass} autoComplete="username" disabled={isPendingLogin} />}
               </SimpleField>
@@ -150,36 +148,32 @@ export function LoginForm() {
               </div>
 
               <Button
-                className="h-auto w-full rounded-full bg-earth py-3.5 text-sm font-medium text-cream transition-all hover:scale-[1.01] hover:bg-clay disabled:opacity-70"
+                className="h-11 w-full rounded-full bg-primary text-primary-foreground text-sm font-medium transition-all hover:scale-[1.01] hover:opacity-95 disabled:opacity-70"
                 type="submit"
                 disabled={isPendingLogin}
               >
-                {isPendingLogin ? (
-                  <span className="flex items-center justify-center gap-3">
-                    <CoreformLiftLoader size="sm" />
-                    Đang đăng nhập...
+                <span className="relative flex w-full items-center justify-center">
+                  <span className="absolute left-4 flex h-5 w-5 items-center justify-center">
+                    {isPendingLogin ? <CoreformLiftLoader size="sm" /> : <ArrowRight className="size-4" />}
                   </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    Đăng nhập
-                    <ArrowRight className="size-4" />
+                  <span className="px-2">
+                    {isPendingLogin ? "Đang đăng nhập..." : "Đăng nhập"}
                   </span>
-                )}
+                </span>
               </Button>
             </div>
 
-            <div className="my-8 flex items-center gap-4">
+              <div className="my-6 flex items-center gap-4">
               <span className="h-px flex-1 bg-sand/60" />
               <span className="text-xs uppercase tracking-[0.15em] text-earth/40">Hoặc</span>
               <span className="h-px flex-1 bg-sand/60" />
             </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <GoogleLoginButton />
               <FacebookLoginButton />
             </div>
 
-            <p className="mt-8 text-center text-sm text-earth/60">
+            <p className="mt-6 text-center text-sm text-earth/60">
               Bạn chưa có tài khoản?{" "}
               <Link to="/register" className="font-medium text-clay hover:text-earth">
                 Đăng ký ngay

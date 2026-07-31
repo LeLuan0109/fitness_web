@@ -30,7 +30,6 @@ import {
   AdminParticleCanvas,
   CoreformCursor,
   CoreformLiftLoader,
-  ThemeColorCustomizer,
   ThemeModeToggle,
 } from "@/components/shared/coreform"
 import { Badge } from "@/components/shared/ui/badge"
@@ -320,17 +319,13 @@ export default function AppLayout() {
     config: {
       onSuccess: () => {
         toast.success("Đăng xuất thành công")
-        transitionStore.getState().playExit(() => {
-          clearAuth()
-          navigate(ROUTES.AUTH.LOGIN)
-        })
+        clearAuth()
+        navigate(ROUTES.AUTH.LOGIN)
       },
       onError: () => {
         toast.error("Đăng xuất thất bại")
-        transitionStore.getState().playExit(() => {
-          clearAuth()
-          navigate(ROUTES.AUTH.LOGIN)
-        })
+        clearAuth()
+        navigate(ROUTES.AUTH.LOGIN)
       },
     },
   })
@@ -482,7 +477,6 @@ export default function AppLayout() {
 
             <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
               <ThemeModeToggle triggerClassName="admin-icon-btn" />
-              <ThemeColorCustomizer />
 
               <Popover open={notificationOpen} onOpenChange={setNotificationOpen}>
                 <PopoverTrigger asChild>

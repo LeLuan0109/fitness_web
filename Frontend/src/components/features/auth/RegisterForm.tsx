@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
-const inputClass = "rounded-xl border-sand/60 bg-cream/50 text-earth placeholder:text-earth/40 focus-visible:border-clay"
+const inputClass = "rounded-xl border border-input bg-input-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/25"
 
 type RegisterFormData = {
   email: string
@@ -56,13 +56,13 @@ export function RegisterForm() {
     <AuthShell subtitle="Tạo tài khoản để bắt đầu hành trình chuẩn hóa tư thế và theo dõi chỉ số sức khỏe.">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleRegister)} className="w-full max-w-md">
-          <div className="rounded-3xl border border-sand/60 bg-white p-8 shadow-xl shadow-earth/5 sm:p-10">
+          <div className="rounded-3xl border border-border bg-card text-card-foreground p-8 shadow-xl shadow-earth/5 sm:p-10">
             <div className="mb-8">
               <h1 className="font-display text-3xl font-medium text-earth">Đăng ký</h1>
               <p className="mt-2 text-sm text-earth/60">Tạo tài khoản COREFORM miễn phí.</p>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-3">
               <SimpleField name="email" control={form.control} label="Email" required>
                 {(field) => (
                   <Input {...field} type="email" placeholder="Nhập email" className={inputClass} autoComplete="email" />

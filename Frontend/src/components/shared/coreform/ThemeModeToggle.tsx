@@ -71,13 +71,15 @@ export function ThemeModeToggle({ className, triggerClassName }: ThemeModeToggle
                 onClick={() => setTheme(value)}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors",
-                  selected ? "bg-accent text-accent-foreground" : "hover:bg-muted",
+                  selected
+                    ? "border border-border bg-transparent text-foreground"
+                    : "hover:bg-muted",
                 )}
               >
                 <span
                   className={cn(
-                    "grid size-9 shrink-0 place-items-center rounded-full",
-                    selected ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
+                    "grid size-9 shrink-0 place-items-center rounded-full border border-border bg-transparent text-foreground",
+                    selected ? "" : "text-muted-foreground",
                   )}
                 >
                   <Icon className="size-4" />
