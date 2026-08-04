@@ -76,7 +76,7 @@ export function CustomSelect({
           </button>
         )}
       </div>
-      <SelectContent className="bg-input-background text-foreground ">
+      <SelectContent className="bg-white dark:bg-[#141416] text-foreground border border-border shadow-lg">
         {searchable && (
           <div className="px-2 py-1.5 border-b">
             <Input

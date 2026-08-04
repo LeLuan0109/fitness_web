@@ -51,7 +51,7 @@ export const PostCard = ({
 
   return (
     <Card
-      className="group cursor-pointer overflow-hidden rounded-2xl border-sand/60 bg-white p-0 shadow-sm shadow-earth/5 transition-all hover:border-clay/40 hover:shadow-md"
+      className="group cursor-pointer overflow-hidden rounded-2xl border-sand/60 bg-card p-0 shadow-sm shadow-earth/5 transition-all hover:border-clay/40 hover:shadow-md"
       onClick={onClick}
     >
       <div className="p-5">

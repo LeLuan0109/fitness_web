@@ -298,7 +298,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-6">
-            <Card className="gap-0 rounded-2xl border-sand/60 bg-white py-0 shadow-sm shadow-earth/5">
+            <Card className="gap-0 rounded-2xl border-sand/60 bg-card py-0 shadow-sm shadow-earth/5">
               <CardContent className="p-6">
                 <h3 className="font-display text-lg font-medium text-earth mb-4">Danh sách món ăn</h3>
                 <div className="flex flex-wrap gap-3 mb-4">
@@ -402,7 +402,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
 
           {/* Right column - macros + menu */}
           <div className="lg:col-span-6 space-y-6">
-            <Card className="gap-0 rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
+            <Card className="gap-0 rounded-2xl border-sand/60 bg-card shadow-sm shadow-earth/5">
               <CardContent>
                 <h3 className="font-display text-lg font-medium text-earth mb-4">Tổng lượng dinh dưỡng</h3>
                 <div className="flex gap-2 mb-2 flex-wrap">
@@ -414,7 +414,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
               </CardContent>
             </Card>
 
-            <Card className="gap-0 rounded-2xl border-sand/60 bg-white p-4 shadow-sm shadow-earth/5">
+            <Card className="gap-0 rounded-2xl border-sand/60 bg-card p-4 shadow-sm shadow-earth/5">
               <CardContent className="p-4">
                 <h3 className="font-display text-lg font-medium text-earth mb-4">Thực đơn</h3>
 

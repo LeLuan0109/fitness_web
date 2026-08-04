@@ -656,7 +656,7 @@ export default function AppLayout() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="center"
-                    className="w-80 rounded-2xl border-sand bg-white p-2 text-earth shadow-xl shadow-earth/10"
+                    className="w-80 rounded-2xl border-sand bg-popover p-2 text-popover-foreground shadow-xl shadow-earth/10"
                   >
                     <DropdownMenuGroup>
                       {group.items.map((item) => {
@@ -665,15 +665,15 @@ export default function AppLayout() {
                         return (
                           <DropdownMenuItem
                             key={item.title}
-                            className="cursor-pointer rounded-xl p-3 transition duration-300 ease-in-out focus:bg-sand-light/60 focus:text-earth"
+                            className="cursor-pointer rounded-xl p-3 transition duration-300 ease-in-out focus:bg-accent focus:text-accent-foreground"
                             onClick={() => handleNavigate(item.url)}
                           >
-                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-earth/5 text-clay">
+                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                               <ItemIcon className="size-5" />
                             </div>
                             <div>
-                              <p className="font-semibold text-earth">{item.title}</p>
-                              <p className="mt-1 text-xs leading-5 text-earth/60">{item.description}</p>
+                              <p className="font-semibold text-popover-foreground">{item.title}</p>
+                              <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.description}</p>
                             </div>
                           </DropdownMenuItem>
                         )
@@ -723,7 +723,7 @@ export default function AppLayout() {
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-[min(92vw,22rem)] overflow-hidden rounded-2xl border-sand bg-white p-0 text-earth shadow-xl shadow-earth/10 sm:w-96">
+              <PopoverContent className="w-[min(92vw,22rem)] overflow-hidden rounded-2xl border-sand bg-popover p-0 text-popover-foreground shadow-xl shadow-earth/10 sm:w-96">
                 <div className="flex items-center justify-between border-b border-sand/40 bg-sand-light/40 px-5 py-4">
                   <div>
                     <h4 className="font-display text-base font-medium text-earth">Thông báo</h4>
@@ -734,7 +734,7 @@ export default function AppLayout() {
                   <button
                     onClick={handleRefreshNotifications}
                     disabled={isRefetching}
-                    className="flex size-9 items-center justify-center rounded-full text-earth/60 transition-colors hover:bg-white hover:text-clay disabled:opacity-50"
+                    className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-primary disabled:opacity-50"
                     title="Tải lại thông báo"
                   >
                     <RefreshCw className={`size-4 ${isRefetching ? "animate-spin" : ""}`} />
@@ -747,10 +747,10 @@ export default function AppLayout() {
                         {notifications.map((notification) => (
                           <li
                             key={notification.id}
-                            className={`cursor-pointer px-5 py-4 text-sm transition-all duration-200 hover:bg-sand-light/40 ${
+                            className={`cursor-pointer px-5 py-4 text-sm transition-all duration-200 hover:bg-muted ${
                               !notification.isRead
-                                ? "border-l-[3px] border-l-clay bg-sand-light/30"
-                                : "border-l-[3px] border-l-transparent bg-white"
+                                ? "border-l-[3px] border-l-clay bg-accent"
+                                : "border-l-[3px] border-l-transparent bg-popover"
                             }`}
                             onClick={() => handleNotificationClick(notification)}
                           >
@@ -811,7 +811,7 @@ export default function AppLayout() {
                   <ChevronDown className="size-4" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 rounded-2xl border-sand bg-white text-earth">
+              <DropdownMenuContent className="w-56 rounded-2xl border-sand bg-popover text-popover-foreground">
                 <DropdownMenuGroup>
                   <DropdownMenuItem className="cursor-pointer focus:bg-sand-light/60" onClick={navigateToProfile}>
                     <User />
@@ -861,7 +861,7 @@ export default function AppLayout() {
                         <button
                           key={item.title}
                           type="button"
-                          className="flex w-full items-start gap-3 rounded-2xl border border-sand/60 bg-white p-3 text-left transition duration-300 ease-in-out hover:border-clay/40 hover:bg-sand-light/40"
+                          className="flex w-full items-start gap-3 rounded-2xl border border-sand/60 bg-card p-3 text-left transition duration-300 ease-in-out hover:border-clay/40 hover:bg-sand-light/40"
                           onClick={() => handleNavigate(item.url)}
                         >
                           <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-earth/5 text-clay">

@@ -23,7 +23,7 @@ export const useNotifications = () => {
     queryKey: [QUERY_KEYS.NOTIFICATIONS],
     queryFn: ({ pageParam = 0 }) => getMyNotifications(pageParam, 10),
     getNextPageParam: (lastPage) => {
-      return lastPage.meta.hasMore ? lastPage.meta.page + 1 : undefined
+      return lastPage.meta?.hasMore ? lastPage.meta.page + 1 : undefined
     },
     initialPageParam: 0,
   })

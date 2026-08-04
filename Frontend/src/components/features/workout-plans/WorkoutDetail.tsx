@@ -376,7 +376,7 @@ export const WorkoutDetail = () => {
                                       {/* Exercise Logs (only for non-default plans) */}
                                       {!dataDetailPlan.isDefault && isExpanded && (
                                         <div className="px-3 pb-3">
-                                          <div className="rounded-lg border border-sand/50 bg-white p-2 space-y-1">
+                                          <div className="rounded-lg border border-sand/50 bg-card p-2 space-y-1">
                                             {(exercise.logs ?? []).map((log, logIdx) => (
                                               <div key={logIdx} className="text-xs text-earth/65">
                                                 [Set {log.setNumber}]: {log.reps} reps / [Calo đốt cháy]:{" "}

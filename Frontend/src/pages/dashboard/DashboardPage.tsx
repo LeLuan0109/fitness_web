@@ -185,7 +185,7 @@ function RecommendationsSection({
             {planSuggestions.map((s) => (
               <article
                 key={s.plan.id}
-                className="group rounded-3xl border border-sand/60 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/5"
+                className="group rounded-3xl border border-sand/60 bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/5"
               >
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <h4 className="font-display text-lg leading-tight text-earth">{s.plan.name}</h4>
@@ -221,7 +221,7 @@ function RecommendationsSection({
             {menuSuggestions.map((s) => (
               <article
                 key={s.menu.id}
-                className="group rounded-3xl border border-sand/60 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/5"
+                className="group rounded-3xl border border-sand/60 bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/5"
               >
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <h4 className="font-display text-lg leading-tight text-earth">{s.menu.name}</h4>
@@ -318,7 +318,7 @@ export function Dashboard() {
   if (isError || !data) {
     return (
       <PageLayout title="Trang chủ">
-        <section className="mx-auto max-w-xl rounded-3xl border border-sand bg-white p-8 text-center shadow-xl shadow-earth/5">
+        <section className="mx-auto max-w-xl rounded-3xl border border-sand bg-card p-8 text-center shadow-xl shadow-earth/5">
           <div className="mx-auto mb-5 flex size-12 items-center justify-center rounded-2xl bg-earth/5 text-clay">
             <Activity className="size-6" />
           </div>

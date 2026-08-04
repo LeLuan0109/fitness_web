@@ -39,7 +39,7 @@ const useAuthStore = create<AuthState & AuthAction>()(
       clearAuth: () => {
         localStorage.clear()
         set((state) => ({ ...state, auth: undefined }))
-        queryClient.setQueryData([QUERY_KEYS.BASIC_INFO], null)
+        queryClient.clear()
         router.navigate(ROUTES.AUTH.LOGIN)
       },
     }),

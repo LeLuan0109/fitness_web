@@ -44,7 +44,7 @@ export function ForgotPasswordForm() {
     <AuthShell subtitle="Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu.">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full max-w-md">
-          <div className="rounded-3xl border border-sand/60 bg-white p-8 shadow-xl shadow-earth/5 sm:p-10">
+          <div className="rounded-3xl border border-sand/60 bg-card p-8 shadow-xl shadow-earth/5 sm:p-10">
             <div className="mb-8 lg:hidden">
               <div className="mb-4 flex items-center gap-2.5">
                 <span className="flex size-7 items-center justify-center rounded-full bg-earth">

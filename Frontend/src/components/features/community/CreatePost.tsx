@@ -9,7 +9,7 @@ interface CreatePostProps {
 
 export const CreatePost = ({ userAvatar, userName = "User", onCreateClick }: CreatePostProps) => {
   return (
-    <div className="rounded-3xl border border-sand/60 bg-white p-5 shadow-sm shadow-earth/5">
+    <div className="rounded-3xl border border-sand/60 bg-card p-5 shadow-sm shadow-earth/5">
       <div className="flex items-center gap-3">
         <Avatar className="size-10 border border-sand/40">
           <AvatarImage src={userAvatar} alt={userName} />

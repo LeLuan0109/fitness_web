@@ -23,7 +23,7 @@ export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick }: 
   ]
 
   return (
-    <Card className="group w-full justify-between gap-0 rounded-2xl border-sand/60 bg-white py-0 text-earth shadow-sm shadow-earth/5 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/10">
+    <Card className="group w-full justify-between gap-0 rounded-2xl border-sand/60 bg-card py-0 text-card-foreground shadow-sm shadow-earth/5 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/10">
       <CardContent className="p-6">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">

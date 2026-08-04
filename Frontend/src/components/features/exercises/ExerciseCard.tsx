@@ -36,7 +36,7 @@ export const ExerciseCard = ({ title, description, muscleGroups, difficulty, ima
 
   return (
     <Card
-      className="w-full max-w-md overflow-hidden border-sand/60 bg-white py-0 text-earth cursor-pointer transition-all 
+      className="w-full max-w-md overflow-hidden border-sand/60 bg-card py-0 text-card-foreground cursor-pointer transition-all 
       duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-xl hover:shadow-earth/10 
       hover:-translate-y-1 group"
       onClick={() => navigateToExerciseDetail(id)}

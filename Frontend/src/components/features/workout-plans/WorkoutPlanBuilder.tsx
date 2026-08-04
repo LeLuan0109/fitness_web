@@ -38,8 +38,11 @@ export const WorkoutPlanBuilder = ({ exerciseOptions }: WorkoutPlanBuilderProps)
   const copyFromPreviousWeek = (weekIndex: number) => {
     if (weekIndex === 1) return
 
-    // Lấy toàn bộ schedule hiện tại từ watchedSchedule
-    const currentSchedule = [...watchedSchedule]
+    // Deep clone toàn bộ schedule để React Hook Form detect thay đổi
+    const currentSchedule = watchedSchedule.map((item) => ({
+      ...item,
+      exercises: item.exercises.map((ex) => ({ ...ex })),
+    }))
 
     // Lọc items của tuần trước
     const previousWeekItems = currentSchedule.filter((item) => item.weekNumber === weekIndex - 1)

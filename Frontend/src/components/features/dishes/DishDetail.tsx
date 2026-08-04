@@ -80,7 +80,7 @@ export function DishDetail() {
       <TypographyH3 variant="bold">Chi tiết món ăn</TypographyH3>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Card className="rounded-2xl overflow-hidden h-full p-0 border-sand/60 bg-white shadow-sm shadow-earth/5">
+          <Card className="rounded-2xl overflow-hidden h-full p-0 border-sand/60 bg-card shadow-sm shadow-earth/5">
             <div className="relative h-full min-h-[500px]">
               <ImageWithFallback src={data.image} alt={data.name} className="absolute inset-0 w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-earth/85 via-earth/35 to-transparent" />
@@ -93,7 +93,7 @@ export function DishDetail() {
         </div>
 
         <div className="lg:col-span-1 space-y-4">
-          <Card className="rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
+          <Card className="rounded-2xl border-sand/60 bg-card shadow-sm shadow-earth/5">
             <CardContent>
               <h3 className="font-display text-lg font-medium text-earth mb-4">Giá trị dinh dưỡng</h3>
               <div className="flex gap-3 flex-wrap">
@@ -105,7 +105,7 @@ export function DishDetail() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
+          <Card className="rounded-2xl border-sand/60 bg-card shadow-sm shadow-earth/5">
             <CardContent>
               <h3 className="font-display text-lg font-medium text-earth mb-4">Nguyên liệu</h3>
               <div className="space-y-3">
@@ -118,7 +118,7 @@ export function DishDetail() {
         </div>
       </div>
 
-      <Card className="rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
+      <Card className="rounded-2xl border-sand/60 bg-card shadow-sm shadow-earth/5">
         <CardContent>
           <h3 className="font-display text-lg font-medium text-earth mb-4">Cách chế biến</h3>
           <div className="space-y-3">

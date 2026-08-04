@@ -36,7 +36,7 @@ export const AdminExerciseCard = ({ title, description, muscleGroups, difficulty
 
   return (
     <Card
-      className="group w-full max-w-md cursor-pointer overflow-hidden border-sand/60 bg-white py-0 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-earth/10"
+      className="group w-full max-w-md cursor-pointer overflow-hidden border-sand/60 bg-card py-0 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl hover:shadow-earth/10"
       onClick={() => navigateToExerciseDetail(id)}
     >
       {/* Image Section */}

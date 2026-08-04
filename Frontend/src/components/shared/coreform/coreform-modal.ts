@@ -1,8 +1,8 @@
 export const coreformDialogContentClass =
-  "rounded-2xl border-sand/60 bg-white p-6 text-earth shadow-xl shadow-earth/10 selection:bg-clay selection:text-cream sm:max-w-lg"
+  "rounded-2xl border-sand/60 bg-popover p-6 text-popover-foreground shadow-xl shadow-earth/10 selection:bg-clay selection:text-cream sm:max-w-lg"
 
 export const coreformDialogContentWideClass =
-  "rounded-2xl border-sand/60 bg-white p-6 text-earth shadow-xl shadow-earth/10 selection:bg-clay selection:text-cream min-w-[min(92vw,48rem)] max-w-5xl max-h-[90vh] overflow-y-auto"
+  "rounded-2xl border-sand/60 bg-popover p-6 text-popover-foreground shadow-xl shadow-earth/10 selection:bg-clay selection:text-cream min-w-[min(92vw,48rem)] max-w-5xl max-h-[90vh] overflow-y-auto"
 
 export const coreformDialogTitleClass = "font-display text-xl font-medium text-earth"
 

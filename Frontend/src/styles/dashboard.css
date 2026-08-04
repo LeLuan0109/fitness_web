@@ -212,6 +212,25 @@
   background: #c4956a;
 }
 
+/* ───── Dark mode: Radix portals + remaining hardcoded colors ───── */
+
+/* Radix portals render outside .coreform-app tree — force dark bg/text */
+.dark [data-radix-popper-content-wrapper] [role="listbox"],
+.dark [data-radix-popper-content-wrapper] [role="menu"],
+.dark [data-radix-popper-content-wrapper] [data-radix-collection-item] {
+  color: var(--popover-foreground, #fafafa);
+}
+
+/* Ensure text-earth tokens resolve correctly in dark mode */
+.dark .coreform-app [class*="text-earth"] {
+  color: var(--color-earth) !important;
+}
+
+/* Notification / popover header backgrounds in dark */
+.dark .coreform-app [class*="bg-sand-light"] {
+  background-color: var(--color-sand-light) !important;
+}
+
 /* ───── Admin shell (scoped — user layout unaffected) ───── */
 .coreform-admin {
   --background: #fcfaf8;

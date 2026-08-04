@@ -25,7 +25,7 @@ export const AdminDishCard: React.FC<{ dish: Dish; onClick?: () => void }> = ({ 
 
   return (
     <Card
-      className="group gap-0 overflow-hidden rounded-2xl border border-sand/60 bg-white py-0 shadow-sm shadow-earth/5 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/10 cursor-pointer"
+      className="group gap-0 overflow-hidden rounded-2xl border border-sand/60 bg-card py-0 shadow-sm shadow-earth/5 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/10 cursor-pointer"
       onClick={onClick}
     >
       <div className="relative h-60 w-full overflow-hidden bg-[linear-gradient(135deg,#f4efea,#ffffff_52%,#e8ddd0)]">
