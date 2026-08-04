@@ -40,11 +40,11 @@ export const UserGoalChart = memo(({ data }: UserGoalChartProps) => {
 
   const foregroundColor = "#0a0a0a" // foreground
   const borderColor = "#e5e5e5" // border
-  
+
   return (
-    <Card className="col-span-1 border-[#e5e5e5] shadow-sm dark:border-[#404040]">
+    <Card className="col-span-1 border-border shadow-sm">
       <CardHeader>
-        <CardTitle className="font-display text-[#171717] dark:text-[#fafafa]">Phân bố mục tiêu người dùng</CardTitle>
+        <CardTitle className="font-display text-foreground">Phân bố mục tiêu người dùng</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>

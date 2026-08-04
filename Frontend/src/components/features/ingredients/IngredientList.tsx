@@ -20,8 +20,6 @@ import { DataTableCell } from "@/components/shared/data-table/data-table-cell"
 import { DataTableColumnHeader } from "@/components/shared/data-table/data-table-column-header"
 import { DataTableSkeleton } from "@/components/shared/data-table/data-table-skeleton"
 import { Button } from "@/components/shared/ui/button"
-import { Card, CardContent } from "@/components/shared/ui/card"
-import { TypographyH3 } from "@/components/shared/ui/typography"
 import { PAGINATION_KEY } from "@/constants/common"
 import { QUERY_KEYS } from "@/constants/querykeys.constant"
 import type { IngredientDetailResponse } from "@/types/ingredient.type"
@@ -163,25 +161,28 @@ export function IngredientList() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display text-xl font-bold tracking-tight text-earth">Quản lý nguyên liệu</h2>
-        <Button onClick={handleCreateNew} className="bg-clay hover:bg-earth text-cream gap-2">
-          <Plus className="mr-2 size-4" />
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">Quản lý nguyên liệu</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Duy trì dữ liệu nguyên liệu và thông tin dinh dưỡng.</p>
+        </div>
+        <Button onClick={handleCreateNew} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
+          <Plus className="size-4" />
           Tạo mới nguyên liệu
         </Button>
       </div>
-      <Card className="">
-        <CardContent>
-          {isLoading ? (
+      <div className="overflow-hidden rounded-xl border border-border bg-card/60 shadow-sm backdrop-blur-sm">
+        {isLoading ? (
+          <div className="p-4">
             <DataTableSkeleton columnCount={columns.length} rowCount={10} filterCount={1} />
-          ) : (
-            <DataTable table={table}>
-              <IngredientSearchForm isFetching={isFetching} />
-            </DataTable>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        ) : (
+          <DataTable table={table}>
+            <IngredientSearchForm isFetching={isFetching} />
+          </DataTable>
+        )}
+      </div>
 
       <IngredientDetailModal
         ingredientId={selectedIngredientId}

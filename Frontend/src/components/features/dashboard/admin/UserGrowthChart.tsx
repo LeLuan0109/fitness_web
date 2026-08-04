@@ -46,24 +46,26 @@ export const UserGrowthChart = memo(({ data, currentYear, selectedYear, onYearCh
   const tickColorValue = "#737373" // muted-foreground
   const borderColor = "#e5e5e5" // border
 
+  const isActiveBtn = (year: number) => selectedYear === year
+
   return (
-    <Card className="col-span-1 border-[#e5e5e5] shadow-sm dark:border-[#404040]">
+    <Card className="col-span-1 border-border shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="font-display text-[#171717] dark:text-[#fafafa]">Biểu đồ tăng trưởng người dùng</CardTitle>
+          <CardTitle className="font-display text-foreground">Biểu đồ tăng trưởng người dùng</CardTitle>
           <div className="flex gap-2">
             <Button
-              variant={selectedYear === currentYear - 1 ? "default" : "outline"}
+              variant={isActiveBtn(currentYear - 1) ? "default" : "outline"}
               size="sm"
-              className={selectedYear === currentYear - 1 ? "bg-[#0ea5e9] text-white hover:bg-[#0284c7]" : "border-[#e5e5e5] text-[#0a0a0a] hover:bg-[#f5f5f5] dark:border-[#404040] dark:text-[#fafafa] dark:hover:bg-[#262626]"}
+              className={isActiveBtn(currentYear - 1) ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-border text-foreground hover:bg-muted"}
               onClick={() => onYearChange(currentYear - 1)}
             >
               {currentYear - 1}
             </Button>
             <Button
-              variant={selectedYear === currentYear ? "default" : "outline"}
+              variant={isActiveBtn(currentYear) ? "default" : "outline"}
               size="sm"
-              className={selectedYear === currentYear ? "bg-[#0ea5e9] text-white hover:bg-[#0284c7]" : "border-[#e5e5e5] text-[#0a0a0a] hover:bg-[#f5f5f5] dark:border-[#404040] dark:text-[#fafafa] dark:hover:bg-[#262626]"}
+              className={isActiveBtn(currentYear) ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-border text-foreground hover:bg-muted"}
               onClick={() => onYearChange(currentYear)}
             >
               {currentYear}

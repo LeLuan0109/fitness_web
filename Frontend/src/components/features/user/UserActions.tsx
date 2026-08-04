@@ -1,7 +1,6 @@
 import { Ban, ShieldCheck } from "lucide-react"
 
 import { CoreformLiftLoader } from "@/components/shared/coreform"
-import { coreformDialogContentClass } from "@/components/shared/coreform/coreform-modal"
 import { Button } from "@/components/shared/ui/button"
 import {
   Dialog,
@@ -43,33 +42,33 @@ export const UserActions = ({ user }: UserActionsProps) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {user.isLocked ? (
-          <Button variant="outline" size="sm" className="gap-2 rounded-full border-sand">
+          <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-border hover:bg-muted">
             <ShieldCheck className="size-4" />
             Mở khóa
           </Button>
         ) : (
-          <Button variant="destructive" size="sm" className="gap-2 rounded-full">
+          <Button variant="outline" size="sm" className="gap-1.5 rounded-lg border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive">
             <Ban className="size-4" />
             Khóa
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className={coreformDialogContentClass}>
+      <DialogContent className="rounded-xl border-border bg-popover backdrop-blur-sm">
         <DialogHeader>
-          <DialogTitle>{user.isLocked ? "Mở khóa người dùng" : "Khóa người dùng"}</DialogTitle>
+          <DialogTitle className="text-foreground">{user.isLocked ? "Mở khóa người dùng" : "Khóa người dùng"}</DialogTitle>
           <DialogDescription>
             {user.isLocked
-              ? `Bạn có chắc chắn muốn mở khóa tài khoản "${user.username}"?`
-              : `Bạn có chắc chắn muốn khóa tài khoản "${user.username}"? Người dùng sẽ không thể đăng nhập sau khi bị khóa.`}
+              ? `Bạn có chắc chắn muốn mở khóa tài khoản "${user.username}"? Người dùng sẽ có thể đăng nhập lại bình thường.`
+              : `Bạn có chắc chắn muốn khóa tài khoản "${user.username}"? Người dùng sẽ không thể đăng nhập cho đến khi được mở khóa.`}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
-          <Button variant="outline" className="rounded-full border-sand" onClick={() => setOpen(false)} disabled={isPending}>
+          <Button variant="outline" className="rounded-lg border-border" onClick={() => setOpen(false)} disabled={isPending}>
             Hủy
           </Button>
           <Button
             variant={user.isLocked ? "default" : "destructive"}
-            className={user.isLocked ? "rounded-full bg-earth text-cream hover:bg-clay" : "rounded-full"}
+            className="rounded-lg"
             onClick={handleConfirm}
             disabled={isPending}
           >
@@ -78,8 +77,10 @@ export const UserActions = ({ user }: UserActionsProps) => {
                 <CoreformLiftLoader size="sm" />
                 Đang xử lý...
               </span>
+            ) : user.isLocked ? (
+              "Mở khóa"
             ) : (
-              "Xác nhận"
+              "Khóa tài khoản"
             )}
           </Button>
         </DialogFooter>

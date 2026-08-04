@@ -31,13 +31,13 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Hero Banner with Ocean Blue Gradient */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0ea5e9] via-[#0284c7] to-[#0369a1] p-8 text-white">
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-primary/80 to-primary/60 p-8 text-primary-foreground">
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Trang chủ quản trị viên</h1>
-          <p className="mt-2 text-lg text-white/90">Tổng quan hệ thống và quản lý</p>
+          <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">Trang chủ quản trị viên</h1>
+          <p className="mt-2 text-lg text-primary-foreground/90">Tổng quan hệ thống và quản lý</p>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0ea5e9]/20 via-transparent to-[#0369a1]/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-primary/20" />
       </div>
 
       {/* Stats Cards */}
