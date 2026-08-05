@@ -19,10 +19,9 @@ import { DataTableColumnHeader } from "@/components/shared/data-table/data-table
 import { DataTableSkeleton } from "@/components/shared/data-table/data-table-skeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/shared/ui/avatar"
 import { Badge } from "@/components/shared/ui/badge"
-import { Card, CardContent } from "@/components/shared/ui/card"
-import { TypographyH3 } from "@/components/shared/ui/typography"
 import { PAGINATION_KEY } from "@/constants/common"
 import { QUERY_KEYS } from "@/constants/querykeys.constant"
+import { Users, UserCheck, UserX, ShieldCheck } from "lucide-react"
 import type { UserResponse } from "@/types/user.type"
 
 export const UserList = () => {
@@ -38,50 +37,38 @@ export const UserList = () => {
   const users = data?.data || []
   const meta = data?.meta
 
+  // Derive stats from current page data
+  const totalUsers = meta?.totalItems ?? 0
+  const activeCount = users.filter((u) => !u.isLocked && u.role.name !== "ADMIN").length
+  const lockedCount = users.filter((u) => u.isLocked).length
+  const adminCount = users.filter((u) => u.role.name === "ADMIN").length
+
   const columns = React.useMemo<ColumnDef<UserResponse>[]>(
     () => [
       {
         id: "avatar",
         accessorKey: "avatar",
         header: ({ column }: { column: Column<UserResponse, unknown> }) => (
-          <DataTableColumnHeader column={column} title="Avatar" />
+          <DataTableColumnHeader column={column} title="Người dùng" />
         ),
         cell: ({ row }) => (
-          <Avatar className="size-10">
-            <AvatarImage src={row.original.avatar || undefined} alt={row.original.name || ""} />
-            <AvatarFallback>{row.original.name?.charAt(0) || row.original.username.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <div className="flex items-center gap-3">
+            <Avatar className="size-10 ring-2 ring-primary/20 ring-offset-1 ring-offset-background">
+              <AvatarImage src={row.original.avatar || undefined} alt={row.original.name || ""} />
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                {row.original.name?.charAt(0) || row.original.username.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate font-medium text-foreground">{row.original.name || "N/A"}</p>
+              <p className="truncate text-xs text-muted-foreground">@{row.original.username}</p>
+            </div>
+          </div>
         ),
         enableSorting: false,
         enableHiding: false,
         meta: {
-          className: "w-[80px]",
-        },
-      },
-      {
-        id: "name",
-        accessorKey: "name",
-        header: ({ column }: { column: Column<UserResponse, unknown> }) => (
-          <DataTableColumnHeader column={column} title="Tên" />
-        ),
-        cell: ({ row }) => <DataTableCell value={row.original.name || "N/A"} />,
-        enableSorting: false,
-        enableHiding: false,
-        meta: {
-          className: "min-w-[150px]",
-        },
-      },
-      {
-        id: "username",
-        accessorKey: "username",
-        header: ({ column }: { column: Column<UserResponse, unknown> }) => (
-          <DataTableColumnHeader column={column} title="Username" />
-        ),
-        cell: ({ row }) => <DataTableCell value={row.original.username} />,
-        enableSorting: false,
-        enableHiding: false,
-        meta: {
-          className: "min-w-[150px]",
+          className: "min-w-[220px]",
         },
       },
       {
@@ -129,7 +116,7 @@ export const UserList = () => {
         enableSorting: false,
         enableHiding: false,
         meta: {
-          className: "min-w-[120px]",
+          className: "w-[120px]",
         },
       },
       {
@@ -139,12 +126,22 @@ export const UserList = () => {
           <DataTableColumnHeader column={column} title="Vai trò" />
         ),
         cell: ({ row }) => (
-          <Badge variant={row.original.role.name === "ADMIN" ? "default" : "secondary"}>{row.original.role.name}</Badge>
+          <Badge
+            variant="outline"
+            className={
+              row.original.role.name === "ADMIN"
+                ? "border-primary/40 bg-primary/10 text-primary font-semibold"
+                : "border-border bg-muted text-muted-foreground font-medium"
+            }
+          >
+            {row.original.role.name === "ADMIN" && <ShieldCheck className="mr-1 size-3" />}
+            {row.original.role.name}
+          </Badge>
         ),
         enableSorting: false,
         enableHiding: false,
         meta: {
-          className: "w-[120px]",
+          className: "w-[130px]",
         },
       },
       {
@@ -154,14 +151,22 @@ export const UserList = () => {
           <DataTableColumnHeader column={column} title="Trạng thái" />
         ),
         cell: ({ row }) => (
-          <Badge variant={row.original.isLocked ? "destructive" : "default"}>
+          <Badge
+            variant="outline"
+            className={
+              row.original.isLocked
+                ? "border-destructive/40 bg-destructive/10 text-destructive font-medium"
+                : "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 font-medium dark:text-emerald-400"
+            }
+          >
+            <span className={`mr-1.5 inline-block size-1.5 rounded-full ${row.original.isLocked ? "bg-destructive" : "bg-emerald-500"}`} />
             {row.original.isLocked ? "Đã khóa" : "Hoạt động"}
           </Badge>
         ),
         enableSorting: false,
         enableHiding: false,
         meta: {
-          className: "w-[120px]",
+          className: "w-[130px]",
         },
       },
       {
@@ -173,7 +178,7 @@ export const UserList = () => {
         enableSorting: false,
         enableHiding: false,
         meta: {
-          className: "w-[120px]",
+          className: "w-[100px]",
         },
       },
     ],
@@ -207,21 +212,65 @@ export const UserList = () => {
   })
 
   return (
-    <div>
-      <h2 className="font-display text-xl font-bold tracking-tight text-earth mb-4">
-        Quản lý người dùng
-      </h2>
-      <Card>
-        <CardContent>
-          {isLoading ? (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">Quản lý người dùng</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Xem, tìm kiếm và quản lý tài khoản người dùng trong hệ thống.</p>
+      </div>
+
+      {/* Stats Bar */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
+          <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+            <Users className="size-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{totalUsers.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Tổng người dùng</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
+          <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-500/10">
+            <UserCheck className="size-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{activeCount.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Đang hoạt động</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
+          <div className="flex size-10 items-center justify-center rounded-lg bg-destructive/10">
+            <UserX className="size-5 text-destructive" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{lockedCount.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Đã khóa</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
+          <div className="flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
+            <ShieldCheck className="size-5 text-violet-600 dark:text-violet-400" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{adminCount.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Quản trị viên</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-hidden rounded-xl border border-border bg-card/60 shadow-sm backdrop-blur-sm">
+        {isLoading ? (
+          <div className="p-4">
             <DataTableSkeleton columnCount={columns.length} rowCount={10} filterCount={1} />
-          ) : (
-            <DataTable table={table}>
-              <UserSearchForm isFetching={isFetching} />
-            </DataTable>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        ) : (
+          <DataTable table={table}>
+            <UserSearchForm isFetching={isFetching} />
+          </DataTable>
+        )}
+      </div>
     </div>
   )
 }

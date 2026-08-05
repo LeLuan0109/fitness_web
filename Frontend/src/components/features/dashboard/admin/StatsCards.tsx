@@ -9,7 +9,7 @@ interface StatsCardsProps {
 
 export const StatsCards = memo(({ stats }: StatsCardsProps) => {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         title="Tổng người dùng đã kích hoạt"
         value={stats?.totalActivateUsers?.toLocaleString() || 0}

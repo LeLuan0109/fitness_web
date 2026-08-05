@@ -7,29 +7,29 @@ interface UserGoalChartProps {
   data?: ChartResponse[]
 }
 
-/** Get earth palette colors from CSS variables (responsive to light/dark mode) */
-function getEarthPalette(): string[] {
+/** Get Designali palette colors from CSS variables (responsive to light/dark mode) */
+function getDesignaliPalette(): string[] {
   if (typeof document === "undefined") {
-    return ["#4a3525", "#6b4c35", "#8c6239", "#a87c55", "#c49a72", "#d9c3b0"]
+    return ["#0ea5e9", "#0284c7", "#0369a1", "#0c4a6e", "#075985", "#f97316"]
   }
   const root = document.documentElement
   const style = getComputedStyle(root)
   return [
-    style.getPropertyValue("--earth-dark").trim(),
-    style.getPropertyValue("--earth-mid").trim(),
-    style.getPropertyValue("--clay").trim(),
-    style.getPropertyValue("--clay-light").trim(),
-    style.getPropertyValue("--sand-dark").trim(),
-    style.getPropertyValue("--sand").trim(),
+    style.getPropertyValue("--color-designali-brand-violet").trim() || "#0ea5e9",
+    style.getPropertyValue("--color-designali-indigo-deep").trim() || "#0284c7",
+    style.getPropertyValue("--color-designali-action-blue").trim() || "#0369a1",
+    style.getPropertyValue("--color-designali-app-orange").trim() || "#f97316",
+    style.getPropertyValue("--color-designali-app-pink").trim() || "#ec4899",
+    style.getPropertyValue("--color-designali-destructive-red").trim() || "#ef4444",
   ]
 }
 
 export const UserGoalChart = memo(({ data }: UserGoalChartProps) => {
-  const [palette, setPalette] = useState<string[]>(() => getEarthPalette())
+  const [palette, setPalette] = useState<string[]>(() => getDesignaliPalette())
   
   useEffect(() => {
     const updatePalette = () => {
-      setPalette(getEarthPalette())
+      setPalette(getDesignaliPalette())
     }
     
     const observer = new MutationObserver(updatePalette)
@@ -38,13 +38,13 @@ export const UserGoalChart = memo(({ data }: UserGoalChartProps) => {
     return () => observer.disconnect()
   }, [])
 
-  const earthColor = palette[0]
-  const sandColor = palette[5]
-  
+  const foregroundColor = "#0a0a0a" // foreground
+  const borderColor = "#e5e5e5" // border
+
   return (
-    <Card className="col-span-1 border-sand/60 shadow-sm">
+    <Card className="col-span-1 border-border shadow-sm">
       <CardHeader>
-        <CardTitle className="font-display text-earth">Phân bố mục tiêu người dùng</CardTitle>
+        <CardTitle className="font-display text-foreground">Phân bố mục tiêu người dùng</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
@@ -70,18 +70,18 @@ export const UserGoalChart = memo(({ data }: UserGoalChartProps) => {
               formatter={(value) => `${value}%`}
               contentStyle={{
                 background: "var(--card)",
-                border: `1px solid ${sandColor}`,
+                border: `1px solid ${borderColor}`,
                 borderRadius: 12,
-                color: earthColor,
+                color: foregroundColor,
                 fontSize: 13,
-                boxShadow: `0 8px 24px ${earthColor}1f`,
+                boxShadow: `0 8px 24px ${foregroundColor}1f`,
               }}
             />
             <Legend
               verticalAlign="bottom"
               iconType="circle"
               iconSize={10}
-              formatter={(value) => <span style={{ color: earthColor, fontSize: 13 }}>{value}</span>}
+              formatter={(value) => <span style={{ color: foregroundColor, fontSize: 13 }}>{value}</span>}
             />
           </PieChart>
         </ResponsiveContainer>

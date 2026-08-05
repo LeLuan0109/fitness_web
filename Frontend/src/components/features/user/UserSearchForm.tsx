@@ -35,21 +35,28 @@ export const UserSearchForm = ({ isFetching }: { isFetching?: boolean }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSearch)} className="flex w-full items-start justify-between gap-2">
+      <form onSubmit={form.handleSubmit(handleSearch)} className="flex w-full flex-col gap-3 border-b border-border bg-card/40 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-wrap items-center gap-2">
-          <div className="w-[300px] max-w-xs">
+          <div className="w-full sm:w-[340px]">
             <SimpleField control={form.control} name="keyword" label="Tìm kiếm">
-              {(field) => <Input {...field} disabled={isFetching} placeholder="Tìm theo tên, email, username" />}
+              {(field) => (
+                <Input
+                  {...field}
+                  disabled={isFetching}
+                  placeholder="Nhập tên, email hoặc username..."
+                  className="admin-search rounded-lg border-border bg-input-background"
+                />
+              )}
             </SimpleField>
           </div>
         </div>
 
-        <div className="mt-8 flex items-start gap-2">
-          <Button type="submit" disabled={isFetching} variant="secondary">
-            <SearchIcon className="mr-2 size-4" />
+        <div className="flex items-center gap-2">
+          <Button type="submit" disabled={isFetching} className="gap-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
+            <SearchIcon className="size-4" />
             Tìm kiếm
           </Button>
-          <Button type="button" variant="ghost" onClick={handleClear} disabled={isFetching}>
+          <Button type="button" variant="outline" onClick={handleClear} disabled={isFetching} className="rounded-lg border-border hover:bg-muted">
             Xóa bộ lọc
           </Button>
         </div>

@@ -45,12 +45,12 @@ export const AdminExerciseList = () => {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-earth">Danh sách bài tập</h1>
-          <p className="mt-2 text-sm text-clay/70">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">Danh sách bài tập</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             Quản lý thư viện bài tập và tinh chỉnh kỹ thuật.
           </p>
         </div>
-        <Button onClick={handleCreateExercise} className="bg-clay hover:bg-earth text-cream gap-2">
+        <Button onClick={handleCreateExercise} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
           <Plus className="size-4" /> Tạo bài tập
         </Button>
       </div>
@@ -58,16 +58,16 @@ export const AdminExerciseList = () => {
       <ExerciseSearchForm onSearch={setSearchParams} />
 
       {isFetchingExercises ? (
-        <div className="flex h-64 items-center justify-center text-clay/50">
-          <Loader2 className="size-8 animate-spin" />
+        <div className="flex h-64 items-center justify-center text-muted-foreground">
+          <Loader2 className="size-8 animate-spin text-primary" />
         </div>
       ) : !hasResults ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-sand bg-cream py-16 text-center shadow-sm">
-          <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-sand/40 text-clay">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-16 text-center backdrop-blur-sm">
+          <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted text-primary">
             <Dumbbell className="size-6" />
           </div>
-          <h3 className="text-lg font-semibold text-earth">Không tìm thấy bài tập</h3>
-          <p className="mt-2 text-sm text-clay/70">Không có bài tập nào phù hợp với từ khóa tìm kiếm. Thử điều chỉnh bộ lọc.</p>
+          <h3 className="text-lg font-semibold text-foreground">Không tìm thấy bài tập</h3>
+          <p className="mt-2 text-sm text-muted-foreground">Không có bài tập nào phù hợp với từ khóa tìm kiếm. Thử điều chỉnh bộ lọc.</p>
         </div>
       ) : (
         <>

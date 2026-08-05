@@ -5,10 +5,10 @@ import { memo } from "react"
 type StatTone = "accent" | "teal" | "amber" | "indigo"
 
 const toneMap: Record<StatTone, string> = {
-  accent: "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary",
-  teal: "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400",
-  amber: "bg-amber-500/15 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400",
-  indigo: "bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400",
+  accent: "bg-[#0ea5e9]/10 text-[#0ea5e9] dark:bg-[#0ea5e9]/20 dark:text-[#0ea5e9]",
+  teal: "bg-[#0284c7]/10 text-[#0284c7] dark:bg-[#0284c7]/20 dark:text-[#0284c7]",
+  amber: "bg-[#f97316]/15 text-[#f97316] dark:bg-[#f97316]/20 dark:text-[#f97316]",
+  indigo: "bg-[#0369a1]/10 text-[#0369a1] dark:bg-[#0369a1]/20 dark:text-[#0369a1]",
 }
 
 interface StatCardProps {
@@ -23,20 +23,20 @@ interface StatCardProps {
 export const StatCard = memo(({ title, value, description, icon: Icon, tone = "accent", trend }: StatCardProps) => {
   const positive = (trend?.value ?? 0) >= 0
   return (
-    <div className="group rounded-xl border border-border bg-card p-5 text-card-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
+    <div className="group rounded-2xl border border-[#e5e5e5] bg-white p-6 text-[#0a0a0a] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0ea5e9]/40 hover:shadow-md dark:border-[#404040] dark:bg-[#171717] dark:text-[#fafafa]">
       <div className="flex items-start justify-between">
-        <p className="text-sm font-medium text-muted-foreground">{title}</p>
-        <span className={cn("flex size-9 items-center justify-center rounded-lg", toneMap[tone])}>
+        <p className="text-sm font-medium text-[#737373] dark:text-[#a3a3a3]">{title}</p>
+        <span className={cn("flex size-10 items-center justify-center rounded-xl", toneMap[tone])}>
           <Icon className="h-5 w-5" />
         </span>
       </div>
-      <div className="mt-3 flex items-end gap-2">
-        <span className="font-display text-3xl font-bold tracking-tight text-foreground">{value}</span>
+      <div className="mt-4 flex items-end gap-2">
+        <span className="text-3xl font-bold tracking-tight text-[#0a0a0a] dark:text-[#fafafa]">{value}</span>
         {trend && (
           <span
             className={cn(
               "mb-1 inline-flex items-center gap-0.5 text-xs font-semibold",
-              positive ? "text-emerald-700" : "text-rose-600",
+              positive ? "text-[#3b82f6]" : "text-[#ef4444]",
             )}
           >
             {positive ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
@@ -44,7 +44,7 @@ export const StatCard = memo(({ title, value, description, icon: Icon, tone = "a
           </span>
         )}
       </div>
-      {description && <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{description}</p>}
+      {description && <p className="mt-2 text-xs leading-relaxed text-[#737373] dark:text-[#a3a3a3]">{description}</p>}
     </div>
   )
 })

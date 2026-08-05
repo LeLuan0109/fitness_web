@@ -11,29 +11,29 @@ interface UserGrowthChartProps {
   onYearChange: (year: number) => void
 }
 
-/** Get earth palette colors from CSS variables (responsive to light/dark mode) */
-function getEarthPalette(): string[] {
+/** Get Designali palette colors from CSS variables (responsive to light/dark mode) */
+function getDesignaliPalette(): string[] {
   if (typeof document === "undefined") {
-    return ["#4a3525", "#6b4c35", "#8c6239", "#a87c55", "#c49a72", "#d9c3b0"]
+    return ["#0ea5e9", "#0284c7", "#0369a1", "#0c4a6e", "#075985", "#f97316"]
   }
   const root = document.documentElement
   const style = getComputedStyle(root)
   return [
-    style.getPropertyValue("--earth-dark").trim(),
-    style.getPropertyValue("--earth-mid").trim(),
-    style.getPropertyValue("--clay").trim(),
-    style.getPropertyValue("--clay-light").trim(),
-    style.getPropertyValue("--sand-dark").trim(),
-    style.getPropertyValue("--sand").trim(),
+    style.getPropertyValue("--color-designali-brand-violet").trim() || "#0ea5e9",
+    style.getPropertyValue("--color-designali-indigo-deep").trim() || "#0284c7",
+    style.getPropertyValue("--color-designali-action-blue").trim() || "#0369a1",
+    style.getPropertyValue("--color-designali-app-orange").trim() || "#f97316",
+    style.getPropertyValue("--color-designali-app-pink").trim() || "#ec4899",
+    style.getPropertyValue("--color-designali-destructive-red").trim() || "#ef4444",
   ]
 }
 
 export const UserGrowthChart = memo(({ data, currentYear, selectedYear, onYearChange }: UserGrowthChartProps) => {
-  const [palette, setPalette] = useState<string[]>(() => getEarthPalette())
+  const [palette, setPalette] = useState<string[]>(() => getDesignaliPalette())
   
   useEffect(() => {
     const updatePalette = () => {
-      setPalette(getEarthPalette())
+      setPalette(getDesignaliPalette())
     }
     
     const observer = new MutationObserver(updatePalette)
@@ -42,28 +42,30 @@ export const UserGrowthChart = memo(({ data, currentYear, selectedYear, onYearCh
     return () => observer.disconnect()
   }, [])
 
-  const accentColor = palette[2] // clay
-  const tickColorValue = palette[0] // earth-dark
-  const sandColor = palette[5] // sand
+  const accentColor = palette[0] // brand-violet
+  const tickColorValue = "#737373" // muted-foreground
+  const borderColor = "#e5e5e5" // border
+
+  const isActiveBtn = (year: number) => selectedYear === year
 
   return (
-    <Card className="col-span-1 border-sand/60 shadow-sm">
+    <Card className="col-span-1 border-border shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="font-display text-earth">Biểu đồ tăng trưởng người dùng</CardTitle>
+          <CardTitle className="font-display text-foreground">Biểu đồ tăng trưởng người dùng</CardTitle>
           <div className="flex gap-2">
             <Button
-              variant={selectedYear === currentYear - 1 ? "default" : "outline"}
+              variant={isActiveBtn(currentYear - 1) ? "default" : "outline"}
               size="sm"
-              className={selectedYear === currentYear - 1 ? "bg-clay text-cream hover:bg-earth" : "border-sand text-clay hover:bg-sand/30"}
+              className={isActiveBtn(currentYear - 1) ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-border text-foreground hover:bg-muted"}
               onClick={() => onYearChange(currentYear - 1)}
             >
               {currentYear - 1}
             </Button>
             <Button
-              variant={selectedYear === currentYear ? "default" : "outline"}
+              variant={isActiveBtn(currentYear) ? "default" : "outline"}
               size="sm"
-              className={selectedYear === currentYear ? "bg-clay text-cream hover:bg-earth" : "border-sand text-clay hover:bg-sand/30"}
+              className={isActiveBtn(currentYear) ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-border text-foreground hover:bg-muted"}
               onClick={() => onYearChange(currentYear)}
             >
               {currentYear}
@@ -104,7 +106,7 @@ export const UserGrowthChart = memo(({ data, currentYear, selectedYear, onYearCh
               cursor={{ stroke: accentColor, strokeWidth: 1, strokeDasharray: "4 4" }}
               contentStyle={{
                 background: "var(--card)",
-                border: `1px solid ${sandColor}`,
+                border: `1px solid ${borderColor}`,
                 borderRadius: 12,
                 color: tickColorValue,
                 fontSize: 13,

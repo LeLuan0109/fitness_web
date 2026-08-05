@@ -11,25 +11,25 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: "Inter", "Noto Sans Vietnamese", sans-serif;
-  --sidebar: #faf7f3;
-  --sidebar-foreground: #1a1008;
-  --sidebar-primary: #8b5e3c;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #0ea5e9;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #efe6d8;
-  --sidebar-accent-foreground: #5c3a1e;
-  --sidebar-border: #e5ddd3;
-  --sidebar-ring: #8b5e3c;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #0a0a0a;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #0ea5e9;
 }
 
 .dark {
-  --sidebar: #0c0c0e;
+  --sidebar: #171717;
   --sidebar-foreground: #fafafa;
-  --sidebar-primary: #c4956a;
-  --sidebar-primary-foreground: #09090b;
-  --sidebar-accent: #1c1c1f;
-  --sidebar-accent-foreground: #e4e4e7;
-  --sidebar-border: #27272a;
-  --sidebar-ring: #c4956a;
+  --sidebar-primary: #0ea5e9;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #404040;
+  --sidebar-ring: #0ea5e9;
 }
 
 #root {
@@ -53,44 +53,45 @@ body {
 @layer base {
   :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
     h1 {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 36px;
     }
     h2 {
-      font-size: var(--text-xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 32px;
     }
     h3 {
-      font-size: var(--text-lg);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 28px;
     }
     h4 {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 28px;
+      letter-spacing: -0.45px;
     }
     p {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
     }
     label {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
     }
     button {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
     }
     input {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
     }
   }
 
@@ -105,5 +106,5 @@ body {
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #c4a882; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #a0785c; }
+::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #0284c7; }
