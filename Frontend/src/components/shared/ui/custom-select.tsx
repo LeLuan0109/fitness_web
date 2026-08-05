@@ -1,114 +1,112 @@
-import * as React from "react"
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue, SelectGroup } from "./select"
-import { cn } from "@/lib/utils"
-import { X } from "lucide-react"
-import { Option } from "@/types/common.type"
-import { Input } from "./input"
+import { Check, ChevronDown } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+
+type Option = {
+  value: string
+  label: string
+}
 
 type CustomSelectProps = {
-  options: Option[]
-  placeholder?: string
   value?: string
   onChange?: (value: string) => void
-  className?: string
-  clearable?: boolean
+  options: Option[]
+  placeholder?: string
   searchable?: boolean
-  searchPlaceholder?: string
-} & React.ComponentProps<typeof Select>
+  className?: string
+}
 
-export function CustomSelect({
-  options,
-  placeholder = "",
+export const CustomSelect = ({
   value,
   onChange,
-  className,
-  clearable = true,
+  options,
+  placeholder = "Chọn...",
   searchable = false,
-  searchPlaceholder = "Tìm kiếm...",
-  ...props
-}: CustomSelectProps) {
-  const [searchValue, setSearchValue] = React.useState("")
-  const [isOpen, setIsOpen] = React.useState(false)
+  className = "",
+}: CustomSelectProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState("")
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
-    onChange?.("")
+  const selectedOption = options.find((opt) => opt.value === value)
+  const filteredOptions = options.filter((opt) =>
+    opt.label.toLowerCase().includes(search.toLowerCase())
+  )
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+        setSearch("")
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const handleSelect = (optionValue: string) => {
+    onChange?.(optionValue)
+    setIsOpen(false)
+    setSearch("")
   }
 
-  const filteredOptions = React.useMemo(() => {
-    if (!searchable || !searchValue) return options
-    return options.filter(
-      (option) =>
-        option.label.toLowerCase().includes(searchValue.toLowerCase()) ||
-        option.value.toLowerCase().includes(searchValue.toLowerCase()),
-    )
-  }, [options, searchValue, searchable])
-
-  React.useEffect(() => {
-    if (!isOpen) {
-      setSearchValue("")
-    }
-  }, [isOpen])
-
   return (
-    <Select value={value} onValueChange={onChange} open={isOpen} onOpenChange={setIsOpen} {...props}>
-      <div className="relative flex items-center">
-        <SelectTrigger
-          className={cn(
-            "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] w-full bg-input-background text-foreground relative disabled:opacity-50 ",
-            className,
+    <div ref={containerRef} className="relative">
+      {/* Trigger Button */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex w-full items-center justify-between rounded-2xl border border-[#e5e5e5] bg-white px-4 py-2.5 text-base font-medium text-[#0a0a0a] shadow-sm transition-all hover:border-[#3b82f6] focus:border-[#3b82f6] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/20 dark:border-[#262626] dark:bg-[#171717] dark:text-[#fafafa] dark:hover:border-[#3b82f6] dark:focus:border-[#3b82f6] dark:focus:ring-[#3b82f6]/30 ${className}`}
+      >
+        <span className={selectedOption ? "text-[#0a0a0a] dark:text-[#fafafa]" : "text-[#737373] dark:text-[#a3a3a3]"}>
+          {selectedOption?.label || placeholder}
+        </span>
+        <ChevronDown
+          className={`size-4 text-[#737373] transition-transform dark:text-[#a3a3a3] ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {/* Dropdown Panel */}
+      {isOpen && (
+        <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white shadow-lg dark:border-[#262626] dark:bg-[#171717] dark:shadow-2xl">
+          {searchable && (
+            <div className="border-b border-[#e5e5e5] p-2 dark:border-[#262626]">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Tìm kiếm..."
+                className="w-full rounded-xl border border-[#e5e5e5] bg-[#fafafa] px-3 py-2 text-sm text-[#0a0a0a] placeholder:text-[#737373] focus:border-[#3b82f6] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/20 dark:border-[#262626] dark:bg-[#0a0a0a] dark:text-[#fafafa] dark:placeholder:text-[#a3a3a3] dark:focus:border-[#3b82f6]"
+              />
+            </div>
           )}
-        >
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        {clearable && value && value.trim() !== "" && (
-          <button
-            disabled={props.disabled}
-            onMouseDown={(e) => e.stopPropagation()}
-            role="button"
-            tabIndex={-1}
-            onClick={handleClear}
-            className="ml-2 rounded-full p-1 hover:bg-muted transition-colors flex-shrink-0 z-10 absolute right-7 disabled:hover:bg-transparent"
-            aria-label="Clear selection"
-          >
-            <X className="h-4 w-4 text-foreground hover:text-muted-foreground" />
-          </button>
-        )}
-      </div>
-      <SelectContent className="bg-input-background text-foreground ">
-        {searchable && (
-          <div className="px-2 py-1.5 border-b">
-            <Input
-              placeholder={searchPlaceholder}
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="h-8 w-full"
-              autoFocus
-              onKeyDown={(e) => {
-                e.stopPropagation()
-              }}
-            />
+          <div className="max-h-60 overflow-y-auto py-1">
+            {filteredOptions.length === 0 ? (
+              <div className="px-4 py-3 text-sm text-[#737373] dark:text-[#a3a3a3]">
+                Không có kết quả
+              </div>
+            ) : (
+              filteredOptions.map((option) => {
+                const isSelected = option.value === value
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleSelect(option.value)}
+                    className={`flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${
+                      isSelected
+                        ? "bg-[#3b82f6] text-white dark:bg-[#3b82f6] dark:text-white"
+                        : "text-[#0a0a0a] hover:bg-[#3b82f6]/10 hover:text-[#3b82f6] dark:text-[#fafafa] dark:hover:bg-[#3b82f6]/20 dark:hover:text-[#60a5fa]"
+                    }`}
+                  >
+                    <span>{option.label}</span>
+                    {isSelected && <Check className="size-4" />}
+                  </button>
+                )
+              })
+            )}
           </div>
-        )}
-        <SelectGroup>
-          {filteredOptions.length === 0 ? (
-            <div className="py-6 text-center text-sm text-muted-foreground">Không tìm thấy kết quả.</div>
-          ) : (
-            filteredOptions.map((opt) => (
-              <SelectItem
-                key={opt.value}
-                value={opt.value}
-                disabled={opt.disabled}
-                title={opt.label}
-                onChange={() => onChange?.(opt.value)}
-              >
-                <span>{opt.label}</span>
-              </SelectItem>
-            ))
-          )}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+        </div>
+      )}
+    </div>
   )
 }
