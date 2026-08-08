@@ -18,6 +18,9 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-input-hovered: var(--muted);
+  --color-input-focused: var(--card);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -79,6 +82,7 @@
   --destructive-foreground: #ffffff;
   --border: #e5e5e5;
   --input: #e5e5e5;
+  --input-background: #ffffff;
   --ring: #0ea5e9;
   --chart-1: #0ea5e9;
   --chart-2: #0284c7;
@@ -115,6 +119,7 @@
   --destructive-foreground: #ffffff;
   --border: #404040;
   --input: #404040;
+  --input-background: #171717;
   --ring: #0ea5e9;
   --chart-1: #0ea5e9;
   --chart-2: #0284c7;

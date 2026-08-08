@@ -656,7 +656,7 @@ export default function AppLayout() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="center"
-                    className="w-80 rounded-2xl border-sand bg-white p-2 text-earth shadow-xl shadow-earth/10"
+                    className="w-80 rounded-2xl border-border bg-popover p-2 text-popover-foreground shadow-xl"
                   >
                     <DropdownMenuGroup>
                       {group.items.map((item) => {
@@ -665,15 +665,15 @@ export default function AppLayout() {
                         return (
                           <DropdownMenuItem
                             key={item.title}
-                            className="cursor-pointer rounded-xl p-3 transition duration-300 ease-in-out focus:bg-sand-light/60 focus:text-earth"
+                            className="cursor-pointer rounded-xl p-3 transition duration-300 ease-in-out focus:bg-muted focus:text-foreground"
                             onClick={() => handleNavigate(item.url)}
                           >
-                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-earth/5 text-clay">
+                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                               <ItemIcon className="size-5" />
                             </div>
                             <div>
-                              <p className="font-semibold text-earth">{item.title}</p>
-                              <p className="mt-1 text-xs leading-5 text-earth/60">{item.description}</p>
+                              <p className="font-semibold text-popover-foreground">{item.title}</p>
+                              <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.description}</p>
                             </div>
                           </DropdownMenuItem>
                         )
@@ -723,50 +723,50 @@ export default function AppLayout() {
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-[min(92vw,22rem)] overflow-hidden rounded-2xl border-sand bg-white p-0 text-earth shadow-xl shadow-earth/10 sm:w-96">
-                <div className="flex items-center justify-between border-b border-sand/40 bg-sand-light/40 px-5 py-4">
+              <PopoverContent className="w-[min(92vw,22rem)] overflow-hidden rounded-2xl border-border bg-popover p-0 text-popover-foreground shadow-xl sm:w-96">
+                <div className="flex items-center justify-between border-b border-border bg-muted/50 px-5 py-4">
                   <div>
-                    <h4 className="font-display text-base font-medium text-earth">Thông báo</h4>
+                    <h4 className="font-display text-base font-medium text-popover-foreground">Thông báo</h4>
                     {unreadCount > 0 && (
-                      <p className="mt-0.5 text-xs text-earth/50">{unreadCount} chưa đọc</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{unreadCount} chưa đọc</p>
                     )}
                   </div>
                   <button
                     onClick={handleRefreshNotifications}
                     disabled={isRefetching}
-                    className="flex size-9 items-center justify-center rounded-full text-earth/60 transition-colors hover:bg-white hover:text-clay disabled:opacity-50"
+                    className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-50"
                     title="Tải lại thông báo"
                   >
                     <RefreshCw className={`size-4 ${isRefetching ? "animate-spin" : ""}`} />
                   </button>
                 </div>
                 <ScrollArea className="h-80 w-full" onScrollEndCapture={handleScroll}>
-                  <ul className="divide-y divide-sand/30">
+                  <ul className="divide-y divide-border">
                     {notifications.length > 0 ? (
                       <>
                         {notifications.map((notification) => (
                           <li
                             key={notification.id}
-                            className={`cursor-pointer px-5 py-4 text-sm transition-all duration-200 hover:bg-sand-light/40 ${
+                            className={`cursor-pointer px-5 py-4 text-sm transition-colors duration-200 hover:bg-muted/35 ${
                               !notification.isRead
-                                ? "border-l-[3px] border-l-clay bg-sand-light/30"
-                                : "border-l-[3px] border-l-transparent bg-white"
+                                ? "border-l-[3px] border-l-primary bg-primary/[0.06]"
+                                : "border-l-[3px] border-l-transparent bg-popover"
                             }`}
                             onClick={() => handleNotificationClick(notification)}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1">
-                                <div className={`text-earth ${!notification.isRead ? "font-semibold" : "font-medium"}`}>
+                                <div className={`text-popover-foreground ${!notification.isRead ? "font-semibold" : "font-medium"}`}>
                                   {notification.title}
                                 </div>
-                                <div className="mt-1 text-xs leading-relaxed text-earth/60">{notification.content}</div>
-                                <div className="mt-2 text-[11px] text-earth/40">{notification.createdAt}</div>
+                                <div className="mt-1 text-xs leading-relaxed text-muted-foreground">{notification.content}</div>
+                                <div className="mt-2 text-[11px] text-muted-foreground/75">{notification.createdAt}</div>
                                 {notification.referenceUrl && (
-                                  <div className="mt-2 text-xs font-medium text-clay">Nhấn để xem chi tiết →</div>
+                                  <div className="mt-2 text-xs font-medium text-primary">Nhấn để xem chi tiết →</div>
                                 )}
                               </div>
                               {!notification.isRead && (
-                                <div className="mt-1 size-2 shrink-0 animate-pulse rounded-full bg-clay" />
+                                <div className="mt-1 size-2 shrink-0 animate-pulse rounded-full bg-primary" />
                               )}
                             </div>
                           </li>
@@ -774,7 +774,7 @@ export default function AppLayout() {
 
                         {isLoadingMore && (
                           <li className="px-5 py-4 text-center">
-                            <div className="flex items-center justify-center gap-2 text-sm text-earth/50">
+                            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                               <CoreformLiftLoader size="sm" />
                               Đang tải thêm...
                             </div>
@@ -782,18 +782,18 @@ export default function AppLayout() {
                         )}
 
                         {!hasMore && notifications.length > 0 && (
-                          <li className="px-5 py-4 text-center text-xs text-earth/40">
+                          <li className="px-5 py-4 text-center text-xs text-muted-foreground">
                             Đã hiển thị tất cả thông báo
                           </li>
                         )}
                       </>
                     ) : (
                       <li className="px-5 py-12 text-center">
-                        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-earth/5 text-clay">
+                        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                           <Bell className="size-5" />
                         </div>
-                        <p className="font-display text-base font-medium text-earth">Không có thông báo</p>
-                        <p className="mt-1 text-xs text-earth/50">Bạn sẽ nhận cập nhật tại đây</p>
+                        <p className="font-display text-base font-medium text-popover-foreground">Không có thông báo</p>
+                        <p className="mt-1 text-xs text-muted-foreground">Bạn sẽ nhận cập nhật tại đây</p>
                       </li>
                     )}
                   </ul>
@@ -811,19 +811,19 @@ export default function AppLayout() {
                   <ChevronDown className="size-4" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 rounded-2xl border-sand bg-white text-earth">
+              <DropdownMenuContent className="w-56 rounded-2xl border-border bg-popover text-popover-foreground">
                 <DropdownMenuGroup>
-                  <DropdownMenuItem className="cursor-pointer focus:bg-sand-light/60" onClick={navigateToProfile}>
+                  <DropdownMenuItem className="cursor-pointer focus:bg-muted" onClick={navigateToProfile}>
                     <User />
                     <span>Hồ sơ</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer focus:bg-sand-light/60" onClick={navigateToChangePassword}>
+                  <DropdownMenuItem className="cursor-pointer focus:bg-muted" onClick={navigateToChangePassword}>
                     <LockIcon />
                     <span>Đổi mật khẩu</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer focus:bg-sand-light/60" onClick={handleLogout}>
+                <DropdownMenuItem className="cursor-pointer focus:bg-muted" onClick={handleLogout}>
                   <LogOut />
                   <span>Đăng xuất</span>
                 </DropdownMenuItem>
