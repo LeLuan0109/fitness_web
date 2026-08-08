@@ -15,7 +15,7 @@ export const editorTheme: EditorThemeClasses = {
   },
   paragraph: "leading-7 [&:not(:first-child)]:mt-6",
   quote: "mt-6 border-l-2 pl-6 italic",
-  link: "text-blue-600 hover:underline hover:cursor-pointer",
+  link: "text-primary hover:underline hover:cursor-pointer",
   list: {
     checklist: "relative",
     listitem: "mx-8",
@@ -43,7 +43,7 @@ export const editorTheme: EditorThemeClasses = {
       "list-outside !list-disc",
     ],
   },
-  hashtag: "text-blue-600 bg-blue-100 rounded-md px-1",
+  hashtag: "rounded-md bg-primary/10 px-1 text-primary",
   text: {
     bold: "font-bold",
     code: "bg-gray-100 p-1 rounded-md",
@@ -57,7 +57,7 @@ export const editorTheme: EditorThemeClasses = {
   image: "relative inline-block user-select-none cursor-default editor-image",
   inlineImage:
     "relative inline-block user-select-none cursor-default inline-editor-image",
-  keyword: "text-purple-900 font-bold",
+  keyword: "font-bold text-primary",
   code: "EditorTheme__code",
   codeHighlight: {
     atrule: "EditorTheme__tokenAttr",

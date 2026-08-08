@@ -13,7 +13,7 @@ import { useGetMuscleGroupOptions } from "@/hooks/queries/muscle-group/useGetMus
 import { useGetTrainingTypeOptions } from "@/hooks/queries/training-type/useGetTrainingTypeOptions"
 import { DEFAULT_EXERCISE_FORM, EXERCISE_SCHEMA, ExerciseFormDTO } from "@/schemas/exercise.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Image as ImageIcon, Loader2, Plus, Video, X } from "lucide-react"
+import { ArrowLeft, Image as ImageIcon, Loader2, Plus, Save, Video, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { useNavigate } from "react-router"
@@ -127,15 +127,16 @@ export function ExerciseForm({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-6xl space-y-6">
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{isEdit ? "Chỉnh sửa bài tập" : "Tạo bài tập mới"}</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-950">{isEdit ? "Chỉnh sửa bài tập" : "Tạo bài tập mới"}</h1>
+          <p className="mt-1 text-sm text-slate-500">
             {isEdit ? "Cập nhật thông tin bài tập" : "Thêm bài tập mới vào hệ thống"}
           </p>
         </div>
-        <Button variant="outline" onClick={() => navigate(ROUTES.EXERCISES.LIST)}>
+        <Button variant="outline" className="self-start border-slate-200" onClick={() => navigate(ROUTES.EXERCISES.LIST)}>
+          <ArrowLeft className="mr-2 size-4" />
           Quay lại danh sách
         </Button>
       </div>
@@ -143,9 +144,9 @@ export function ExerciseForm({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           {/* Thông tin cơ bản */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Thông tin cơ bản</CardTitle>
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg text-slate-900">Thông tin cơ bản</CardTitle>
               <CardDescription>Các thông tin chính về bài tập</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -189,9 +190,9 @@ export function ExerciseForm({
           </Card>
 
           {/* Nhóm cơ */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Nhóm cơ</CardTitle>
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg text-slate-900">Nhóm cơ</CardTitle>
               <CardDescription>Chọn các nhóm cơ được tác động</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -234,9 +235,9 @@ export function ExerciseForm({
           </Card>
 
           {/* Thiết bị */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Thiết bị</CardTitle>
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg text-slate-900">Thiết bị</CardTitle>
               <CardDescription>Dụng cụ cần thiết cho bài tập</CardDescription>
             </CardHeader>
             <CardContent>
@@ -261,9 +262,9 @@ export function ExerciseForm({
           </Card>
 
           {/* Media */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Hình ảnh & Video</CardTitle>
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg text-slate-900">Hình ảnh & Video</CardTitle>
               <CardDescription>Tải lên thumbnail và video hướng dẫn</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -281,7 +282,7 @@ export function ExerciseForm({
                         />
                         <label
                           htmlFor="thumbnail-upload"
-                          className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md cursor-pointer hover:bg-secondary/80"
+                          className="flex cursor-pointer items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
                         >
                           <ImageIcon className="w-4 h-4" />
                           Chọn ảnh
@@ -309,7 +310,7 @@ export function ExerciseForm({
                         />
                         <label
                           htmlFor="video-upload"
-                          className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md cursor-pointer hover:bg-secondary/80"
+                          className="flex cursor-pointer items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
                         >
                           <Video className="w-4 h-4" />
                           Chọn video
@@ -328,9 +329,9 @@ export function ExerciseForm({
           </Card>
 
           {/* Các bước thực hiện */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Các bước thực hiện</CardTitle>
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg text-slate-900">Các bước thực hiện</CardTitle>
               <CardDescription>Hướng dẫn từng bước chi tiết</CardDescription>
               {form.formState.errors.steps?.message && (
                 <p className="text-sm font-medium text-destructive">{form.formState.errors.steps.message}</p>
@@ -342,7 +343,7 @@ export function ExerciseForm({
             <CardContent className="space-y-3">
               {stepFields.map((field, index) => (
                 <div key={field.id} className="flex items-start gap-2">
-                  <div className="flex-shrink-0 w-8 h-10 flex items-center justify-center bg-primary/10 rounded-md font-semibold text-sm">
+                  <div className="flex h-10 w-8 flex-shrink-0 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
                     {index + 1}
                   </div>
                   <SimpleField name={`steps.${index}.value`} control={form.control} hideLabel className="flex-1">
@@ -471,12 +472,13 @@ export function ExerciseForm({
           </Card>
 
           {/* Submit buttons */}
-          <div className="flex items-center justify-end gap-4">
+          <div className="sticky bottom-4 flex items-center justify-end gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur">
             <Button type="button" variant="outline" onClick={() => navigate(ROUTES.EXERCISES.LIST)}>
               Hủy
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="bg-blue-600 text-white hover:bg-blue-700">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {!isLoading && <Save className="mr-2 size-4" />}
               {isEdit ? "Cập nhật" : "Tạo mới"}
             </Button>
           </div>

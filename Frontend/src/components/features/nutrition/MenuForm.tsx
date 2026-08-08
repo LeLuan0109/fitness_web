@@ -17,11 +17,13 @@ import { Beef, Droplet, Edit, Flame, Loader2, Plus, Search, Trash2, Wheat } from
 import { useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 type MenuFormProps = {
   initialData?: MenuResponse
   onSubmit: (data: MenuRequest) => void
   isLoading: boolean
+  appearance?: "user" | "admin"
 }
 
 type MealKey = "breakfast" | "lunch" | "dinner" | "extra"
@@ -44,7 +46,7 @@ type MenuFormData = {
   searchDish?: string
 }
 
-export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) => {
+export const MenuForm = ({ initialData, onSubmit, isLoading, appearance = "user" }: MenuFormProps) => {
   const [selectedMeal, setSelectedMeal] = useState<MealKey>("breakfast")
   const [searchQuery, setSearchQuery] = useState("")
   const [meals, setMeals] = useState<Record<MealKey, Dish[]>>({
@@ -247,17 +249,25 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
   // helpers for tab UI
   const tabClass = (meal: MealKey) =>
     selectedMeal === meal
-      ? "rounded-full border border-earth bg-earth px-4 py-2 text-sm font-semibold text-cream shadow-sm shadow-earth/10 transition-all duration-200"
-      : "rounded-full border border-sand/60 bg-cream/60 px-4 py-2 text-sm font-medium text-earth/65 transition-colors duration-200 hover:border-clay hover:text-earth"
+      ? appearance === "admin"
+        ? "rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors"
+        : "rounded-full border border-earth bg-earth px-4 py-2 text-sm font-semibold text-cream shadow-sm shadow-earth/10 transition-all duration-200"
+      : appearance === "admin"
+        ? "rounded-lg border bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+        : "rounded-full border border-sand/60 bg-cream/60 px-4 py-2 text-sm font-medium text-earth/65 transition-colors duration-200 hover:border-clay hover:text-earth"
 
   const isEdit = !!initialData
+  const isAdmin = appearance === "admin"
 
   return (
     <Form {...form}>
-      <form>
-        <div className="flex items-center justify-between mb-6">
+      <form className={cn(isAdmin && "rounded-2xl border bg-card p-5 shadow-sm sm:p-6")}>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex-1">
-            <h1 className="font-display text-3xl text-earth font-medium mb-3">{isEdit ? "Cập nhật thực đơn" : "Tạo thực đơn"}</h1>
+            <h2 className={cn(isAdmin ? "text-xl font-semibold tracking-tight" : "font-display mb-3 text-3xl font-medium text-earth")}>
+              {isAdmin ? "Thông tin thực đơn" : isEdit ? "Cập nhật thực đơn" : "Tạo thực đơn"}
+            </h2>
+            {isAdmin && <p className="mt-1 text-sm text-muted-foreground">Nhập thông tin cơ bản và sắp xếp món ăn theo từng bữa.</p>}
           </div>
 
           <div className="flex items-center gap-3">
@@ -277,7 +287,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           <SimpleField name="name" control={form.control} label="Tên thực đơn" required>
             {(field) => <Input placeholder="Tên thực đơn" {...field} />}
           </SimpleField>
@@ -291,16 +301,16 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
               />
             )}
           </SimpleField>
-          <SimpleField name="description" control={form.control} label="Mô tả" className="col-span-2">
+          <SimpleField name="description" control={form.control} label="Mô tả" className="md:col-span-2">
             {(field) => <Textarea placeholder="Mô tả" {...field} />}
           </SimpleField>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-6">
-            <Card className="gap-0 rounded-2xl border-sand/60 bg-white py-0 shadow-sm shadow-earth/5">
+            <Card className={cn("gap-0 rounded-2xl py-0", isAdmin ? "border bg-background shadow-none" : "border-sand/60 bg-white shadow-sm shadow-earth/5")}>
               <CardContent className="p-6">
-                <h3 className="font-display text-lg font-medium text-earth mb-4">Danh sách món ăn</h3>
+                <h3 className={cn("mb-4 text-lg font-semibold", !isAdmin && "font-display font-medium text-earth")}>Danh sách món ăn</h3>
                 <div className="flex flex-wrap gap-3 mb-4">
                   <SimpleField name="searchDish" control={form.control} hideLabel className="flex-1">
                     {(field) => (
@@ -325,18 +335,18 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                 <ScrollArea className="h-[400px]">
                   {isDishesLoading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="animate-spin text-clay" size={32} />
+                      <Loader2 className={cn("animate-spin", isAdmin ? "text-primary" : "text-clay")} size={32} />
                     </div>
                   ) : allDishes.length === 0 ? (
-                    <div className="text-earth/60 text-center py-8">Không tìm thấy món ăn nào.</div>
+                    <div className={cn("py-8 text-center", isAdmin ? "text-muted-foreground" : "text-earth/60")}>Không tìm thấy món ăn nào.</div>
                   ) : (
                     <div className="space-y-3">
                       {allDishes.map((dish) => (
-                        <div key={dish.id} className="flex gap-4 items-center rounded-xl border border-sand/60 bg-cream/40 p-3 transition-colors hover:border-clay/50 hover:bg-sand-light/35">
-                          <ImageWithFallback src={dish.image} alt={dish.name} className="w-36 h-20 object-cover rounded-lg" />
+                        <div key={dish.id} className={cn("flex items-center gap-4 rounded-xl border p-3 transition-colors", isAdmin ? "bg-card hover:border-primary/30 hover:bg-primary/[0.02]" : "border-sand/60 bg-cream/40 hover:border-clay/50 hover:bg-sand-light/35")}>
+                          <ImageWithFallback src={dish.image} alt={dish.name} className="h-20 w-24 rounded-lg object-cover sm:w-32" />
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-2">
-                              <div className="text-earth font-semibold">{dish.name}</div>
+                              <div className={cn("font-semibold", !isAdmin && "text-earth")}>{dish.name}</div>
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -353,20 +363,20 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
 
                             <div className="grid grid-cols-4 gap-4 text-center text-sm">
                               <div>
-                                <div className="font-semibold text-earth">{dish.calories}</div>
-                                <div className="text-earth/55">Calo</div>
+                                <div className={cn("font-semibold", !isAdmin && "text-earth")}>{dish.calories}</div>
+                                <div className={cn(isAdmin ? "text-muted-foreground" : "text-earth/55")}>Calo</div>
                               </div>
                               <div>
-                                <div className="font-semibold text-earth">{dish.protein}g</div>
-                                <div className="text-earth/55">Protein</div>
+                                <div className={cn("font-semibold", !isAdmin && "text-earth")}>{dish.protein}g</div>
+                                <div className={cn(isAdmin ? "text-muted-foreground" : "text-earth/55")}>Protein</div>
                               </div>
                               <div>
-                                <div className="font-semibold text-earth">{dish.carbs}g</div>
-                                <div className="text-earth/55">Carbs</div>
+                                <div className={cn("font-semibold", !isAdmin && "text-earth")}>{dish.carbs}g</div>
+                                <div className={cn(isAdmin ? "text-muted-foreground" : "text-earth/55")}>Carbs</div>
                               </div>
                               <div>
-                                <div className="font-semibold text-earth">{dish.fat}g</div>
-                                <div className="text-earth/55">Fat</div>
+                                <div className={cn("font-semibold", !isAdmin && "text-earth")}>{dish.fat}g</div>
+                                <div className={cn(isAdmin ? "text-muted-foreground" : "text-earth/55")}>Fat</div>
                               </div>
                             </div>
                           </div>
@@ -402,54 +412,54 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
 
           {/* Right column - macros + menu */}
           <div className="lg:col-span-6 space-y-6">
-            <Card className="gap-0 rounded-2xl border-sand/60 bg-white shadow-sm shadow-earth/5">
+            <Card className={cn("gap-0 rounded-2xl", isAdmin ? "border bg-background shadow-none" : "border-sand/60 bg-white shadow-sm shadow-earth/5")}>
               <CardContent>
-                <h3 className="font-display text-lg font-medium text-earth mb-4">Tổng lượng dinh dưỡng</h3>
+                <h3 className={cn("mb-4 text-lg font-semibold", !isAdmin && "font-display font-medium text-earth")}>Tổng lượng dinh dưỡng</h3>
                 <div className="flex gap-2 mb-2 flex-wrap">
-                  <MacroCard label="Calories" value={totalNutrition.calories} Icon={Flame} />
-                  <MacroCard label="Protein" value={`${totalNutrition.protein}g`} Icon={Beef} />
-                  <MacroCard label="Carbs" value={`${totalNutrition.carbs}g`} Icon={Wheat} />
-                  <MacroCard label="Fat" value={`${totalNutrition.fat}g`} Icon={Droplet} />
+                  <MacroCard label="Calories" value={totalNutrition.calories} Icon={Flame} appearance={appearance} />
+                  <MacroCard label="Protein" value={`${totalNutrition.protein}g`} Icon={Beef} appearance={appearance} />
+                  <MacroCard label="Carbs" value={`${totalNutrition.carbs}g`} Icon={Wheat} appearance={appearance} />
+                  <MacroCard label="Fat" value={`${totalNutrition.fat}g`} Icon={Droplet} appearance={appearance} />
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="gap-0 rounded-2xl border-sand/60 bg-white p-4 shadow-sm shadow-earth/5">
+            <Card className={cn("gap-0 rounded-2xl p-4", isAdmin ? "border bg-background shadow-none" : "border-sand/60 bg-white shadow-sm shadow-earth/5")}>
               <CardContent className="p-4">
-                <h3 className="font-display text-lg font-medium text-earth mb-4">Thực đơn</h3>
+                <h3 className={cn("mb-4 text-lg font-semibold", !isAdmin && "font-display font-medium text-earth")}>Thực đơn</h3>
 
                 <div className="flex flex-wrap gap-3 mb-4">
                   <button type="button" className={tabClass("breakfast")} onClick={() => setSelectedMeal("breakfast")}>
                     Bữa sáng
-                    <div className={selectedMeal === "breakfast" ? "text-xs text-cream/75" : "text-xs text-earth/50"}>{meals.breakfast.length} món</div>
+                    <div className={cn("text-xs", selectedMeal === "breakfast" ? (isAdmin ? "text-primary-foreground/75" : "text-cream/75") : (isAdmin ? "text-muted-foreground" : "text-earth/50"))}>{meals.breakfast.length} món</div>
                   </button>
                   <button type="button" className={tabClass("lunch")} onClick={() => setSelectedMeal("lunch")}>
                     Bữa trưa
-                    <div className={selectedMeal === "lunch" ? "text-xs text-cream/75" : "text-xs text-earth/50"}>{meals.lunch.length} món</div>
+                    <div className={cn("text-xs", selectedMeal === "lunch" ? (isAdmin ? "text-primary-foreground/75" : "text-cream/75") : (isAdmin ? "text-muted-foreground" : "text-earth/50"))}>{meals.lunch.length} món</div>
                   </button>
                   <button type="button" className={tabClass("dinner")} onClick={() => setSelectedMeal("dinner")}>
                     Bữa tối
-                    <div className={selectedMeal === "dinner" ? "text-xs text-cream/75" : "text-xs text-earth/50"}>{meals.dinner.length} món</div>
+                    <div className={cn("text-xs", selectedMeal === "dinner" ? (isAdmin ? "text-primary-foreground/75" : "text-cream/75") : (isAdmin ? "text-muted-foreground" : "text-earth/50"))}>{meals.dinner.length} món</div>
                   </button>
                   <button type="button" className={tabClass("extra")} onClick={() => setSelectedMeal("extra")}>
                     Bữa phụ
-                    <div className={selectedMeal === "extra" ? "text-xs text-cream/75" : "text-xs text-earth/50"}>{meals.extra.length} món</div>
+                    <div className={cn("text-xs", selectedMeal === "extra" ? (isAdmin ? "text-primary-foreground/75" : "text-cream/75") : (isAdmin ? "text-muted-foreground" : "text-earth/50"))}>{meals.extra.length} món</div>
                   </button>
                 </div>
 
                 {/* Selected meal items */}
                 <div className="space-y-3">
                   {meals[selectedMeal].length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-sand/70 bg-cream/40 px-4 py-8 text-center text-sm text-earth/60">Chưa có món nào cho bữa này.</div>
+                    <div className={cn("rounded-xl border border-dashed px-4 py-8 text-center text-sm", isAdmin ? "bg-muted/30 text-muted-foreground" : "border-sand/70 bg-cream/40 text-earth/60")}>Chưa có món nào cho bữa này.</div>
                   ) : (
                     meals[selectedMeal].map((dish) => {
                       const quantity = dish.quantity ?? 1
                       return (
-                        <div key={dish.id} className="rounded-xl border border-sand/60 bg-cream/45 p-3">
+                        <div key={dish.id} className={cn("rounded-xl border p-3", isAdmin ? "bg-card" : "border-sand/60 bg-cream/45")}>
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <div className="text-earth text-sm font-semibold mb-1">{dish.name}</div>
-                              <div className="text-earth/60 text-xs">
+                              <div className={cn("mb-1 text-sm font-semibold", !isAdmin && "text-earth")}>{dish.name}</div>
+                              <div className={cn("text-xs", isAdmin ? "text-muted-foreground" : "text-earth/60")}>
                                 {((dish.calories ?? 0) * quantity).toFixed(1)} kcal &nbsp; P:{" "}
                                 {((dish.protein ?? 0) * quantity).toFixed(1)}g &nbsp; C:{" "}
                                 {((dish.carbs ?? 0) * quantity).toFixed(1)}g &nbsp; F:{" "}
@@ -468,12 +478,12 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                                   }}
                                   aria-label="Giảm số lượng"
                                   title="Giảm số lượng"
-                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-earth/80 hover:bg-sand-light/60"
+                                  className={cn("inline-flex h-8 w-8 items-center justify-center rounded-md", isAdmin ? "text-muted-foreground hover:bg-muted" : "text-earth/80 hover:bg-sand-light/60")}
                                 >
                                   -
                                 </button>
 
-                                <div className="px-3 text-sm font-medium text-earth">{quantity}</div>
+                                <div className={cn("px-3 text-sm font-medium", !isAdmin && "text-earth")}>{quantity}</div>
 
                                 <button
                                   type="button"
@@ -483,7 +493,7 @@ export const MenuForm = ({ initialData, onSubmit, isLoading }: MenuFormProps) =>
                                   }}
                                   aria-label="Tăng số lượng"
                                   title="Tăng số lượng"
-                                  className="inline-flex items-center justify-center w-8 h-8 rounded-md text-earth/80 hover:bg-sand-light/60"
+                                  className={cn("inline-flex h-8 w-8 items-center justify-center rounded-md", isAdmin ? "text-muted-foreground hover:bg-muted" : "text-earth/80 hover:bg-sand-light/60")}
                                 >
                                   +
                                 </button>

@@ -7,13 +7,15 @@ import type { MenuRequest } from "@/types/meal.type"
 import { Loader2 } from "lucide-react"
 import { useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
-import authStore from "@/stores/auth.store"
 import { toast } from "sonner"
 
-export const MenuEditPage = () => {
+type MenuEditPageProps = {
+  audience?: "admin" | "user"
+}
+
+export const MenuEditPage = ({ audience = "user" }: MenuEditPageProps) => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const isAdmin = authStore.use.auth()?.role?.name === "ADMIN"
   const { data: menuDetail, isLoading } = useGetMenuDetail(id!)
   const { mutate, isPending } = useUpdateMenu(id || "")
 
@@ -21,7 +23,7 @@ export const MenuEditPage = () => {
     mutate(data, {
       onSuccess: () => {
         toast.success("Cập nhật thực đơn thành công!")
-        if (isAdmin) {
+        if (audience === "admin") {
           navigate(ROUTES.NUTRITION.SAMPLE)
         } else {
           navigate(ROUTES.NUTRITION.MY_MEALS)

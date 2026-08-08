@@ -17,7 +17,7 @@ type Dish = {
 export const DishCard: React.FC<{ dish: Dish; onClick?: () => void }> = ({ dish, onClick }) => {
   const stats = [
     { label: "Calo", value: dish.calories, icon: Flame, color: "text-[#B35F4A]", bg: "bg-[#B35F4A]/10" },
-    { label: "Protein", value: dish.protein, icon: Beef, color: "text-[#3B82F6]", bg: "bg-[#3B82F6]/10" },
+    { label: "Protein", value: dish.protein, icon: Beef, color: "text-clay", bg: "bg-clay/10" },
     { label: "Fat", value: dish.fat, icon: Droplet, color: "text-[#D97706]", bg: "bg-[#D97706]/10" },
     { label: "Carbs", value: dish.carbs, icon: Wheat, color: "text-[#8C6239]", bg: "bg-clay/10" },
   ]

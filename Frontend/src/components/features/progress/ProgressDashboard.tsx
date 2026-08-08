@@ -15,18 +15,18 @@ const STATUS_META: Record<Exclude<DayCellStatus, "NONE">, { label: string; bar: 
   COMPLETED: { label: "Hoàn thành", bar: "bg-success", badge: "bg-success/15 text-success" },
   PARTIAL: { label: "Một phần", bar: "bg-amber-500", badge: "bg-amber-500/15 text-amber-600" },
   MISSED: { label: "Bỏ lỡ", bar: "bg-destructive", badge: "bg-destructive/15 text-destructive" },
-  PLANNED: { label: "Kế hoạch", bar: "bg-indigo-500", badge: "bg-indigo-500/15 text-indigo-600" },
+  PLANNED: { label: "Kế hoạch", bar: "bg-primary", badge: "bg-primary/15 text-primary" },
   REST: { label: "Nghỉ", bar: "bg-muted-foreground/40", badge: "bg-muted text-muted-foreground" },
 }
 
 // Bảng màu cố định gán cho từng kế hoạch (theo planId) để phân biệt khi 1 ngày có nhiều kế hoạch song song
 const PLAN_COLORS = [
-  { text: "text-indigo-600", bg: "bg-indigo-500/15" },
+  { text: "text-primary", bg: "bg-primary/15" },
   { text: "text-teal-600", bg: "bg-teal-500/15" },
   { text: "text-rose-600", bg: "bg-rose-500/15" },
   { text: "text-amber-600", bg: "bg-amber-500/15" },
-  { text: "text-violet-600", bg: "bg-violet-500/15" },
-  { text: "text-cyan-600", bg: "bg-cyan-500/15" },
+  { text: "text-orange-700", bg: "bg-orange-500/15" },
+  { text: "text-secondary-foreground", bg: "bg-secondary" },
 ]
 
 function planColor(planId: number) {

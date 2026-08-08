@@ -15,7 +15,7 @@ import { useGetPosts } from "@/hooks/queries/forum/useGetPosts"
 import { useToggleLikePost } from "@/hooks/queries/forum/useToggleLikePost"
 import authStore from "@/stores/auth.store"
 import { PostSearchParams } from "@/types/forum.type"
-import { Newspaper, PenLine } from "lucide-react"
+import { Newspaper } from "lucide-react"
 import { useState } from "react"
 import { generatePath, useNavigate } from "react-router-dom"
 import { CreatePost } from "./CreatePost"
@@ -24,8 +24,14 @@ import { EditPostModal } from "./EditPostModal"
 import { PostCard } from "./PostCard"
 import { FilterTabs, PostFilters } from "./FilterTabs"
 import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 
-export const CommunityFeed = () => {
+type CommunityFeedProps = {
+  showHeader?: boolean
+  appearance?: "user" | "admin"
+}
+
+export const CommunityFeed = ({ showHeader = true, appearance = "user" }: CommunityFeedProps) => {
   const navigate = useNavigate()
   const [filters, setFilters] = useState<PostFilters>({})
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
@@ -107,16 +113,22 @@ export const CommunityFeed = () => {
 
   return (
     <div className="space-y-6">
-      <CoreformPageHeader title="Cộng đồng" description="Chia sẻ tiến trình và kết nối với cộng đồng vận động viên." />
+      {showHeader && (
+        <CoreformPageHeader
+          title="Cộng đồng"
+          description="Chia sẻ tiến trình và kết nối với cộng đồng vận động viên."
+        />
+      )}
 
       <CreatePost
         userAvatar={auth?.avatar || "https://i.pravatar.cc/150?img=1"}
         userName={auth?.name || "User"}
         onCreateClick={handleCreatePost}
+        appearance={appearance}
       />
 
       {/* Filter Tabs */}
-      <FilterTabs filters={filters} onFiltersChange={handleFiltersChange} />
+      <FilterTabs filters={filters} onFiltersChange={handleFiltersChange} appearance={appearance} />
 
       {/* Posts List */}
       {isLoading ? (
@@ -143,6 +155,7 @@ export const CommunityFeed = () => {
               onClick={() => handlePostClick(post.id.toString())}
               onEdit={() => handleEdit(post.id.toString())}
               onDelete={() => handleDelete(post.id.toString())}
+              appearance={appearance}
             />
           ))}
         </div>
@@ -150,7 +163,7 @@ export const CommunityFeed = () => {
 
       {/* Pagination Info */}
       {pagination && posts.length > 0 && (
-        <div className="flex justify-center items-center gap-2 py-4 text-sm text-earth/50">
+        <div className={cn("flex items-center justify-center gap-2 py-4 text-sm", appearance === "admin" ? "text-muted-foreground" : "text-earth/50")}>
           <span>
             Trang {pagination.page + 1} / {pagination.totalPages}
           </span>
@@ -160,12 +173,17 @@ export const CommunityFeed = () => {
       )}
 
       {/* Create Post Modal */}
-      <CreatePostModal open={isCreateModalOpen} onOpenChange={onOpenChangeCreateModal} />
+      <CreatePostModal
+        open={isCreateModalOpen}
+        onOpenChange={onOpenChangeCreateModal}
+        appearance={appearance}
+      />
 
       {/* Edit Post Modal */}
       {editingPostId && (
         <EditPostModal
           open={isEditModalOpen}
+          appearance={appearance}
           onOpenChange={(open) => {
             if (!open) {
               setEditingPostId(null)
@@ -178,7 +196,7 @@ export const CommunityFeed = () => {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="rounded-2xl border-sand">
+        <DialogContent className={cn("rounded-2xl", appearance === "admin" ? "border-primary/20" : "border-sand")}>
           <DialogHeader>
             <DialogTitle className="font-display">Xác nhận xóa bài viết</DialogTitle>
             <DialogDescription>
@@ -186,7 +204,11 @@ export const CommunityFeed = () => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" className="rounded-full border-sand" onClick={() => setShowDeleteDialog(false)}>
+            <Button
+              variant="outline"
+              className={cn("rounded-full", appearance === "admin" ? "border-primary/20" : "border-sand")}
+              onClick={() => setShowDeleteDialog(false)}
+            >
               Hủy
             </Button>
             <Button variant="destructive" className="rounded-full" onClick={confirmDelete} disabled={deletePostMutation.isPending}>

@@ -80,7 +80,7 @@ export function Progress() {
 
   const chartConfig = {
     "Tạ (kg)": { label: "Tạ (kg)", color: "#8c6239" },
-    "1RM ước tính": { label: "1RM ước tính", color: "#0ea5e9" },
+    "1RM ước tính": { label: "1RM ước tính", color: "#c4956a" },
   }
 
   return (
@@ -181,7 +181,7 @@ export function Progress() {
                   <YAxis fontSize={12} tickLine={false} axisLine={false} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line type="monotone" dataKey="Tạ (kg)" stroke="#8c6239" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="1RM ước tính" stroke="#0ea5e9" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="1RM ước tính" stroke="#c4956a" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ChartContainer>
             )}

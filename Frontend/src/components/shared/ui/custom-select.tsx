@@ -12,6 +12,7 @@ type CustomSelectProps = {
   options: Option[]
   placeholder?: string
   searchable?: boolean
+  disabled?: boolean
   className?: string
 }
 
@@ -21,6 +22,7 @@ export const CustomSelect = ({
   options,
   placeholder = "Chọn...",
   searchable = false,
+  disabled = false,
   className = "",
 }: CustomSelectProps) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -54,34 +56,35 @@ export const CustomSelect = ({
       {/* Trigger Button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex w-full items-center justify-between rounded-2xl border border-[#e5e5e5] bg-white px-4 py-2.5 text-base font-medium text-[#0a0a0a] shadow-sm transition-all hover:border-[#3b82f6] focus:border-[#3b82f6] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/20 dark:border-[#262626] dark:bg-[#171717] dark:text-[#fafafa] dark:hover:border-[#3b82f6] dark:focus:border-[#3b82f6] dark:focus:ring-[#3b82f6]/30 ${className}`}
+        disabled={disabled}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        className={`flex w-full items-center justify-between rounded-2xl border border-border bg-input-background px-4 py-2.5 text-base font-medium text-foreground shadow-sm transition-all hover:border-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       >
-        <span className={selectedOption ? "text-[#0a0a0a] dark:text-[#fafafa]" : "text-[#737373] dark:text-[#a3a3a3]"}>
+        <span className={selectedOption ? "text-foreground" : "text-muted-foreground"}>
           {selectedOption?.label || placeholder}
         </span>
         <ChevronDown
-          className={`size-4 text-[#737373] transition-transform dark:text-[#a3a3a3] ${isOpen ? "rotate-180" : ""}`}
+          className={`size-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white shadow-lg dark:border-[#262626] dark:bg-[#171717] dark:shadow-2xl">
+        <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-lg">
           {searchable && (
-            <div className="border-b border-[#e5e5e5] p-2 dark:border-[#262626]">
+            <div className="border-b border-border p-2">
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Tìm kiếm..."
-                className="w-full rounded-xl border border-[#e5e5e5] bg-[#fafafa] px-3 py-2 text-sm text-[#0a0a0a] placeholder:text-[#737373] focus:border-[#3b82f6] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/20 dark:border-[#262626] dark:bg-[#0a0a0a] dark:text-[#fafafa] dark:placeholder:text-[#a3a3a3] dark:focus:border-[#3b82f6]"
+                className="w-full rounded-xl border border-border bg-input-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
           )}
           <div className="max-h-60 overflow-y-auto py-1">
             {filteredOptions.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-[#737373] dark:text-[#a3a3a3]">
+              <div className="px-4 py-3 text-sm text-muted-foreground">
                 Không có kết quả
               </div>
             ) : (
@@ -94,8 +97,8 @@ export const CustomSelect = ({
                     onClick={() => handleSelect(option.value)}
                     className={`flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${
                       isSelected
-                        ? "bg-[#3b82f6] text-white dark:bg-[#3b82f6] dark:text-white"
-                        : "text-[#0a0a0a] hover:bg-[#3b82f6]/10 hover:text-[#3b82f6] dark:text-[#fafafa] dark:hover:bg-[#3b82f6]/20 dark:hover:text-[#60a5fa]"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-popover-foreground hover:bg-primary/10 hover:text-primary"
                     }`}
                   >
                     <span>{option.label}</span>

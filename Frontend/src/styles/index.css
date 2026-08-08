@@ -13,23 +13,23 @@
   font-family: "Inter", "Noto Sans Vietnamese", sans-serif;
   --sidebar: #fafafa;
   --sidebar-foreground: #0a0a0a;
-  --sidebar-primary: #0ea5e9;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f5f5f5;
-  --sidebar-accent-foreground: #0a0a0a;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #0ea5e9;
+  --sidebar-primary: #8c6239;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f4efea;
+  --sidebar-accent-foreground: #4a3525;
+  --sidebar-border: #d9c3b0;
+  --sidebar-ring: #8c6239;
 }
 
 .dark {
   --sidebar: #171717;
   --sidebar-foreground: #fafafa;
-  --sidebar-primary: #0ea5e9;
-  --sidebar-primary-foreground: #ffffff;
+  --sidebar-primary: #c4956a;
+  --sidebar-primary-foreground: #09090b;
   --sidebar-accent: #262626;
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #404040;
-  --sidebar-ring: #0ea5e9;
+  --sidebar-ring: #c4956a;
 }
 
 #root {
@@ -104,7 +104,52 @@ body {
   }
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #0284c7; }
+:root[data-shell="admin"] {
+  scrollbar-color: var(--admin-accent, #0ea5e9) transparent;
+}
+
+:root[data-shell="user"],
+:root:has(.coreform-app) {
+  scrollbar-color: #8c6239 transparent;
+}
+
+:root[data-shell]::-webkit-scrollbar,
+:root[data-shell] *::-webkit-scrollbar,
+:root:has(.coreform-app)::-webkit-scrollbar,
+:root:has(.coreform-app) *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+:root[data-shell]::-webkit-scrollbar-track,
+:root[data-shell] *::-webkit-scrollbar-track,
+:root:has(.coreform-app)::-webkit-scrollbar-track,
+:root:has(.coreform-app) *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:root[data-shell="admin"]::-webkit-scrollbar-thumb,
+:root[data-shell="admin"] *::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: var(--admin-accent, #0ea5e9);
+}
+
+:root[data-shell="admin"]::-webkit-scrollbar-thumb:hover,
+:root[data-shell="admin"] *::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-accent-hover, #0284c7);
+}
+
+:root[data-shell="user"]::-webkit-scrollbar-thumb,
+:root[data-shell="user"] *::-webkit-scrollbar-thumb,
+:root:has(.coreform-app)::-webkit-scrollbar-thumb,
+:root:has(.coreform-app) *::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #8c6239;
+}
+
+:root[data-shell="user"]::-webkit-scrollbar-thumb:hover,
+:root[data-shell="user"] *::-webkit-scrollbar-thumb:hover,
+:root:has(.coreform-app)::-webkit-scrollbar-thumb:hover,
+:root:has(.coreform-app) *::-webkit-scrollbar-thumb:hover {
+  background: #4a3525;
+}

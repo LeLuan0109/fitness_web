@@ -12,9 +12,10 @@ import { useForm } from "react-hook-form"
 
 type Props = {
   onSearch: Dispatch<SetStateAction<WorkoutPlanSearchParams>>
+  appearance?: "user" | "admin"
 }
 
-export function WorkoutsSearchForm({ onSearch }: Props) {
+export function WorkoutsSearchForm({ onSearch, appearance = "user" }: Props) {
   const form = useForm()
 
   const handleSearch = () => {
@@ -23,7 +24,10 @@ export function WorkoutsSearchForm({ onSearch }: Props) {
   }
 
   return (
-    <CoreformFilterCard title="Tìm kiếm kế hoạch tập luyện">
+    <CoreformFilterCard
+      title="Tìm kiếm kế hoạch tập luyện"
+      className={appearance === "admin" ? "border-primary/15 shadow-primary/5" : undefined}
+    >
       <Form {...form}>
         <form className="flex flex-wrap items-end justify-between gap-6">
           <div className="flex flex-wrap gap-x-6 gap-y-4">

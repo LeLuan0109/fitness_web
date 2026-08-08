@@ -6,7 +6,7 @@ import {
   type Column,
   type ColumnDef,
 } from "@tanstack/react-table"
-import { Plus } from "lucide-react"
+import { Database, Plus, Sparkles } from "lucide-react"
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs"
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
@@ -161,18 +161,32 @@ export function IngredientList() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">Quản lý nguyên liệu</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Duy trì dữ liệu nguyên liệu và thông tin dinh dưỡng.</p>
+    <div className="space-y-8">
+      <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-7 text-primary-foreground shadow-xl shadow-primary/15">
+        <div className="absolute -right-16 -top-20 size-56 rounded-full bg-white/15 blur-3xl" />
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
+              <Sparkles className="size-3.5" /> Kho dữ liệu dinh dưỡng
+            </div>
+            <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+              <Database className="size-7" /> Quản lý nguyên liệu
+            </h1>
+            <p className="mt-2 text-sm text-primary-foreground/80">
+              Duy trì dữ liệu nguyên liệu, đơn vị chuẩn và thông tin dinh dưỡng.
+            </p>
+          </div>
+          <Button
+            onClick={handleCreateNew}
+            className="gap-2 bg-white text-primary shadow-md hover:bg-white/90"
+          >
+            <Plus className="size-4" />
+            Tạo mới nguyên liệu
+          </Button>
         </div>
-        <Button onClick={handleCreateNew} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
-          <Plus className="size-4" />
-          Tạo mới nguyên liệu
-        </Button>
-      </div>
-      <div className="overflow-hidden rounded-xl border border-border bg-card/60 shadow-sm backdrop-blur-sm">
+      </section>
+
+      <div className="overflow-hidden rounded-2xl border border-primary/15 bg-card/90 shadow-sm shadow-primary/5 backdrop-blur-sm">
         {isLoading ? (
           <div className="p-4">
             <DataTableSkeleton columnCount={columns.length} rowCount={10} filterCount={1} />

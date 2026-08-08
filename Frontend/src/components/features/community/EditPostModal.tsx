@@ -16,6 +16,7 @@ import { SimpleField } from "@/components/shared/ui/simple-field"
 import { MAX_FILE_SIZE } from "@/constants/common"
 import { useGetPostDetail } from "@/hooks/queries/forum/useGetPostDetail"
 import { useUpdatePost } from "@/hooks/queries/forum/useUpdatePost"
+import { cn } from "@/lib/utils"
 import { CreatePostFormData, createPostSchema } from "@/schemas/post.schema"
 import { CreatePostRequest } from "@/types/forum.type"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -28,9 +29,10 @@ interface EditPostModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   postId: string
+  appearance?: "user" | "admin"
 }
 
-export const EditPostModal = ({ open, onOpenChange, postId }: EditPostModalProps) => {
+export const EditPostModal = ({ open, onOpenChange, postId, appearance = "user" }: EditPostModalProps) => {
   const [image, setImage] = useState<File | null>(null)
   const [video, setVideo] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -263,7 +265,10 @@ export const EditPostModal = ({ open, onOpenChange, postId }: EditPostModalProps
                 variant="outline"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full rounded-full border-sand bg-cream/50"
+                className={cn(
+                  "w-full rounded-full",
+                  appearance === "admin" ? "border-border bg-muted/50" : "border-sand bg-cream/50",
+                )}
               >
                 Chọn hình ảnh
               </Button>
@@ -301,7 +306,10 @@ export const EditPostModal = ({ open, onOpenChange, postId }: EditPostModalProps
                 variant="outline"
                 onClick={() => videoInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full rounded-full border-sand bg-cream/50"
+                className={cn(
+                  "w-full rounded-full",
+                  appearance === "admin" ? "border-border bg-muted/50" : "border-sand bg-cream/50",
+                )}
               >
                 Chọn video
               </Button>
@@ -323,10 +331,25 @@ export const EditPostModal = ({ open, onOpenChange, postId }: EditPostModalProps
             </div>
 
             <DialogFooter className="gap-2 pt-2">
-              <Button type="button" variant="outline" className="rounded-full border-sand" onClick={handleCancel} disabled={isPending}>
+              <Button
+                type="button"
+                variant="outline"
+                className={cn("rounded-full", appearance === "admin" ? "border-border" : "border-sand")}
+                onClick={handleCancel}
+                disabled={isPending}
+              >
                 Hủy
               </Button>
-              <Button type="submit" className="rounded-full bg-earth text-cream hover:bg-clay" disabled={isPending}>
+              <Button
+                type="submit"
+                className={cn(
+                  "rounded-full",
+                  appearance === "admin"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-earth text-cream hover:bg-clay",
+                )}
+                disabled={isPending}
+              >
                 {isPending ? (
                   <span className="flex items-center gap-2">
                     <CoreformLiftLoader size="sm" />

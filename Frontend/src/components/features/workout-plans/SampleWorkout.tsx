@@ -3,7 +3,6 @@ import { CommonPagination } from "@/components/shared/ui/common-pagination"
 import { ROUTES } from "@/constants/routes"
 import { useCopyPlan } from "@/hooks/queries/workout-plan/useCopyPlan"
 import { useGetSamplePlan } from "@/hooks/queries/workout-plan/useGetSamplePlans"
-import authStore from "@/stores/auth.store"
 import { PlanListResponse, WorkoutPlanSearchParams } from "@/types/workout-plan.type"
 import { Calendar } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -12,9 +11,12 @@ import { toast } from "sonner"
 import { WorkoutCard } from "./WorkoutCard"
 import { WorkoutsSearchForm } from "./WorkoutsSearchForm"
 
-export const SampleWorkout = () => {
+type SampleWorkoutProps = {
+  audience?: "admin" | "user"
+}
+
+export const SampleWorkout = ({ audience = "user" }: SampleWorkoutProps) => {
   const navigate = useNavigate()
-  const isAdmin = authStore.use.auth().role?.name === "ADMIN"
   const [searchParams, setSearchParams] = useState<WorkoutPlanSearchParams>({
     page: 0,
     limit: 12,
@@ -52,7 +54,7 @@ export const SampleWorkout = () => {
   }
 
   const handleClonePlan = (plan: PlanListResponse) => {
-    if (isAdmin) {
+    if (audience === "admin") {
       navigate(generatePath(ROUTES.WORKOUTS.EDIT, { id: plan.id.toString() }))
     } else {
       copyPlan(plan.id.toString())

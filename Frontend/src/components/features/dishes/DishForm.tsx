@@ -15,7 +15,7 @@ import { useUpdateDish } from "@/hooks/queries/dishes/useUpdateDish"
 import { DishFormData, DishFormSchema } from "@/schemas/dish.schema"
 import { DishRequest } from "@/types/dish.type"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CheckCircle2, ChevronRight, Image as ImageIcon, Plus, Trash2, XIcon } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Image as ImageIcon, Plus, Trash2, XIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { useNavigate, useParams } from "react-router"
@@ -23,6 +23,21 @@ import { toast } from "sonner"
 
 type DishFormProps = {
   isEdit?: boolean
+}
+
+const getRequestErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error !== "object" || error === null || !("response" in error)) return fallback
+
+  const response = error.response
+  if (typeof response !== "object" || response === null || !("data" in response)) return fallback
+
+  const data = response.data
+  if (typeof data !== "object" || data === null || !("error" in data)) return fallback
+
+  const requestError = data.error
+  if (typeof requestError !== "object" || requestError === null || !("message" in requestError)) return fallback
+
+  return typeof requestError.message === "string" ? requestError.message : fallback
 }
 
 export const DishForm = ({ isEdit }: DishFormProps) => {
@@ -117,8 +132,8 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
             toast.success("Cập nhật món ăn thành công!")
             navigate(ROUTES.DISHES.LIST)
           },
-          onError: (error: any) => {
-            toast.error(error?.response?.data?.error?.message || "Có lỗi xảy ra khi cập nhật món ăn")
+          onError: (error: unknown) => {
+            toast.error(getRequestErrorMessage(error, "Có lỗi xảy ra khi cập nhật món ăn"))
           },
         },
       )
@@ -128,8 +143,8 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
           toast.success("Tạo món ăn mới thành công!")
           navigate(ROUTES.DISHES.LIST)
         },
-        onError: (error: any) => {
-          toast.error(error?.response?.data?.error?.message || "Có lỗi xảy ra khi tạo món ăn")
+        onError: (error: unknown) => {
+          toast.error(getRequestErrorMessage(error, "Có lỗi xảy ra khi tạo món ăn"))
         },
       })
     }
@@ -140,10 +155,16 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button type="button" variant="ghost" onClick={handleBack}>
-          <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
+    <div className="mx-auto max-w-6xl space-y-6">
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
+            {isEdit ? "Chỉnh sửa món ăn" : "Tạo món ăn mới"}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">Quản lý công thức, dinh dưỡng và nguyên liệu của món ăn.</p>
+        </div>
+        <Button type="button" variant="outline" className="self-start border-slate-200" onClick={handleBack}>
+          <ArrowLeft className="mr-2 size-4" />
           Quay lại
         </Button>
       </div>
@@ -151,10 +172,10 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           {/* Thông tin cơ bản */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{isEdit ? "Chỉnh sửa món ăn" : "Tạo món ăn mới"}</CardTitle>
-              <CardDescription>Nhập thông tin chi tiết về món ăn</CardDescription>
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg text-slate-900">Thông tin cơ bản</CardTitle>
+              <CardDescription>Tên, thời gian chế biến, hướng dẫn và ảnh đại diện.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -192,14 +213,14 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
                     />
                     <label
                       htmlFor="image-upload"
-                      className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md cursor-pointer hover:bg-secondary/80 w-fit"
+                      className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
                     >
                       <ImageIcon className="w-4 h-4" />
                       Chọn ảnh
                     </label>
                     {imagePreview && (
-                      <div className="relative w-full h-60 border rounded-md overflow-hidden">
-                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <div className="relative h-60 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                        <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -209,9 +230,9 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
           </Card>
 
           {/* Giá trị dinh dưỡng */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Giá trị dinh dưỡng</CardTitle>
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg text-slate-900">Giá trị dinh dưỡng</CardTitle>
               <CardDescription>Thông tin dinh dưỡng trên 100g</CardDescription>
             </CardHeader>
             <CardContent>
@@ -272,15 +293,15 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
           </Card>
 
           {/* Nguyên liệu */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Nguyên liệu</CardTitle>
+          <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg text-slate-900">Nguyên liệu</CardTitle>
               <CardDescription>Danh sách nguyên liệu cần thiết</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {fields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-12 gap-2 items-start">
-                  <div className="col-span-4">
+                <div key={field.id} className="grid grid-cols-1 items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4 md:grid-cols-12">
+                  <div className="md:col-span-4">
                     <SimpleField name={`ingredients.${index}.ingredientId`} control={form.control} label="Nguyên liệu">
                       {(field) => (
                         <CustomSelect
@@ -294,7 +315,7 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
                     </SimpleField>
                   </div>
 
-                  <div className="col-span-2">
+                  <div className="md:col-span-2">
                     <SimpleField name={`ingredients.${index}.quantity`} control={form.control} label="Số lượng">
                       {(field) => (
                         <Input
@@ -309,7 +330,7 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
                     </SimpleField>
                   </div>
 
-                  <div className="col-span-2">
+                  <div className="md:col-span-2">
                     <SimpleField name={`ingredients.${index}.unit`} control={form.control} label="Đơn vị">
                       {(field) => (
                         <CustomSelect
@@ -322,13 +343,13 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
                     </SimpleField>
                   </div>
 
-                  <div className="col-span-3">
+                  <div className="md:col-span-3">
                     <SimpleField name={`ingredients.${index}.preparationNote`} control={form.control} label="Ghi chú">
                       {(field) => <Input {...field} placeholder="Cắt nhỏ, băm..." />}
                     </SimpleField>
                   </div>
 
-                  <div className="col-span-1 flex items-start mt-[28px]">
+                  <div className="flex items-start md:col-span-1 md:mt-[28px]">
                     <Button
                       type="button"
                       variant="ghost"
@@ -355,7 +376,7 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
                     preparationNote: "",
                   })
                 }
-                className="w-full"
+                className="w-full border-blue-200 text-blue-700 hover:bg-blue-50"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Thêm nguyên liệu
@@ -364,8 +385,8 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
           </Card>
 
           {/* Submit buttons */}
-          <div className="flex items-center justify-center gap-3">
-            <Button type="submit" disabled={isPending}>
+          <div className="sticky bottom-4 flex items-center justify-end gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur">
+            <Button type="submit" disabled={isPending} className="bg-blue-600 text-white hover:bg-blue-700">
               {isPending ? (
                 "Đang xử lý..."
               ) : (

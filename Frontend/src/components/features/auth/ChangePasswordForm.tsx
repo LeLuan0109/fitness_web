@@ -13,7 +13,11 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-export const ChangePasswordForm = () => {
+type ChangePasswordFormProps = {
+  showHeader?: boolean
+}
+
+export const ChangePasswordForm = ({ showHeader = true }: ChangePasswordFormProps) => {
   const [showOldPassword, setShowOldPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false)
@@ -48,8 +52,8 @@ export const ChangePasswordForm = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <TypographyH3 variant="bold">Đổi mật khẩu</TypographyH3>
+      <div className={`flex items-center mb-6 ${showHeader ? "justify-between" : "justify-end"}`}>
+        {showHeader && <TypographyH3 variant="bold">Đổi mật khẩu</TypographyH3>}
         <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
           <Save />
           Lưu

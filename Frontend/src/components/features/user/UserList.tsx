@@ -212,16 +212,23 @@ export const UserList = () => {
   })
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">Quản lý người dùng</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Xem, tìm kiếm và quản lý tài khoản người dùng trong hệ thống.</p>
-      </div>
+    <div className="w-full space-y-8">
+      <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-7 text-primary-foreground shadow-xl shadow-primary/15">
+        <div className="absolute -right-16 -top-20 size-56 rounded-full bg-white/15 blur-3xl" />
+        <div className="relative">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
+            <ShieldCheck className="size-3.5" /> Quản trị tài khoản
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Quản lý người dùng</h1>
+          <p className="mt-2 max-w-2xl text-sm text-primary-foreground/80">
+            Theo dõi, tìm kiếm và kiểm soát trạng thái tài khoản trên toàn hệ thống.
+          </p>
+        </div>
+      </section>
 
       {/* Stats Bar */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
             <Users className="size-5 text-primary" />
           </div>
@@ -230,7 +237,7 @@ export const UserList = () => {
             <p className="text-xs text-muted-foreground">Tổng người dùng</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-500/10">
             <UserCheck className="size-5 text-emerald-600 dark:text-emerald-400" />
           </div>
@@ -239,7 +246,7 @@ export const UserList = () => {
             <p className="text-xs text-muted-foreground">Đang hoạt động</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex size-10 items-center justify-center rounded-lg bg-destructive/10">
             <UserX className="size-5 text-destructive" />
           </div>
@@ -248,9 +255,9 @@ export const UserList = () => {
             <p className="text-xs text-muted-foreground">Đã khóa</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-card/60 p-4 backdrop-blur-sm">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
-            <ShieldCheck className="size-5 text-violet-600 dark:text-violet-400" />
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+            <ShieldCheck className="size-5 text-primary" />
           </div>
           <div>
             <p className="text-2xl font-bold text-foreground">{adminCount.toLocaleString()}</p>
@@ -260,7 +267,7 @@ export const UserList = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card/60 shadow-sm backdrop-blur-sm">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         {isLoading ? (
           <div className="p-4">
             <DataTableSkeleton columnCount={columns.length} rowCount={10} filterCount={1} />

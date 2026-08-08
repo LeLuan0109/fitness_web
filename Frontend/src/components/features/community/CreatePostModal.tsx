@@ -17,6 +17,7 @@ import { MAX_FILE_SIZE } from "@/constants/common"
 import { QUERY_KEYS } from "@/constants/querykeys.constant"
 import { useCreatePost } from "@/hooks/queries/forum/useCreatePost"
 import { queryClient } from "@/lib/react-query"
+import { cn } from "@/lib/utils"
 import { CreatePostFormData, createPostSchema } from "@/schemas/post.schema"
 import { CreatePostRequest } from "@/types/forum.type"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -28,9 +29,10 @@ import { toast } from "sonner"
 interface CreatePostModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  appearance?: "user" | "admin"
 }
 
-export const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) => {
+export const CreatePostModal = ({ open, onOpenChange, appearance = "user" }: CreatePostModalProps) => {
   const [image, setImage] = useState<File | null>(null)
   const [video, setVideo] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -180,7 +182,10 @@ export const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) =>
                 variant="outline"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full rounded-full border-sand bg-cream/50"
+                className={cn(
+                  "w-full rounded-full",
+                  appearance === "admin" ? "border-border bg-muted/50" : "border-sand bg-cream/50",
+                )}
               >
                 Chọn hình ảnh
               </Button>
@@ -218,7 +223,10 @@ export const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) =>
                 variant="outline"
                 onClick={() => videoInputRef.current?.click()}
                 disabled={isPending}
-                className="w-full rounded-full border-sand bg-cream/50"
+                className={cn(
+                  "w-full rounded-full",
+                  appearance === "admin" ? "border-border bg-muted/50" : "border-sand bg-cream/50",
+                )}
               >
                 Chọn video
               </Button>
@@ -240,10 +248,25 @@ export const CreatePostModal = ({ open, onOpenChange }: CreatePostModalProps) =>
             </div>
 
             <DialogFooter className="gap-2 pt-2">
-              <Button type="button" variant="outline" className="rounded-full border-sand" onClick={handleCancel} disabled={isPending}>
+              <Button
+                type="button"
+                variant="outline"
+                className={cn("rounded-full", appearance === "admin" ? "border-border" : "border-sand")}
+                onClick={handleCancel}
+                disabled={isPending}
+              >
                 Hủy
               </Button>
-              <Button type="submit" className="rounded-full bg-earth text-cream hover:bg-clay" disabled={isPending}>
+              <Button
+                type="submit"
+                className={cn(
+                  "rounded-full",
+                  appearance === "admin"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-earth text-cream hover:bg-clay",
+                )}
+                disabled={isPending}
+              >
                 {isPending ? (
                   <span className="flex items-center gap-2">
                     <CoreformLiftLoader size="sm" />

@@ -11,13 +11,11 @@ import { SimpleField } from "@/components/shared/ui/simple-field"
 import { Textarea } from "@/components/shared/ui/textarea"
 import { FITNESS_GOAL_OPTIONS, LEVEL_OPTIONS } from "@/constants/common"
 import { ROUTES } from "@/constants/routes"
-import { ROLES } from "@/constants/roles.constant"
 import { daysPerWeekOptions, durationOptions } from "@/constants/workout-plan.constant"
 import { useGetExerciseOptions } from "@/hooks/queries/exercises/useGetExerciseOptions"
 import { useDetailPlan } from "@/hooks/queries/workout-plan/useDetailPlan"
 import { useUpdatePlan } from "@/hooks/queries/workout-plan/useUpdatePlan"
 import { ExerciseSelected, ScheduleItem, WorkoutPlanFormSchema } from "@/schemas/workout-plan.schema"
-import authStore from "@/stores/auth.store"
 import { WorkoutFormData } from "@/types/workout-plan.type"
 import { mapPlanDetailToForm, transformWorkoutPlanDTO } from "@/utils/workout-plan.util"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,6 +24,7 @@ import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { generatePath, useNavigate, useParams } from "react-router"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 // Helper function to map day names to numbers
 const getDayOfWeekNumber = (dayId: string): number => {
@@ -41,12 +40,15 @@ const getDayOfWeekNumber = (dayId: string): number => {
   return dayMap[dayId] || 0
 }
 
-export const WorkoutFormEdit = () => {
+type WorkoutFormEditProps = {
+  audience?: "admin" | "user"
+}
+
+export const WorkoutFormEdit = ({ audience = "user" }: WorkoutFormEditProps) => {
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [hasStarted, setHasStarted] = useState(false)
   const { id } = useParams()
-  const auth = authStore.use.auth()
-  const isAdmin = auth?.role?.name === ROLES.ADMIN
+  const isAdmin = audience === "admin"
 
   const form = useForm<WorkoutFormData>({
     resolver: zodResolver(WorkoutPlanFormSchema),
@@ -75,7 +77,12 @@ export const WorkoutFormEdit = () => {
   })
 
   const { data: exerciseOptions } = useGetExerciseOptions()
-  const { data: dataDetailPlan, isFetching: isFetchingPlanDetail } = useDetailPlan(id)
+  const {
+    data: dataDetailPlan,
+    isFetching: isFetchingPlanDetail,
+    isError: isPlanDetailError,
+    refetch: refetchPlanDetail,
+  } = useDetailPlan(id)
 
   const { mutate: updatePlan, isPending: isUpdating } = useUpdatePlan({
     id: id || "",
@@ -280,31 +287,44 @@ export const WorkoutFormEdit = () => {
 
   if (isFetchingPlanDetail) {
     return (
-      <div className="flex justify-center items-center py-12">
+      <div className="flex min-h-64 items-center justify-center rounded-2xl border bg-card">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (isPlanDetailError || !dataDetailPlan) {
+    return (
+      <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-10 text-center">
+        <p className="font-medium text-destructive">Không thể tải thông tin kế hoạch</p>
+        <Button type="button" variant="outline" className="mt-4" onClick={() => refetchPlanDetail()}>
+          Thử tải lại
+        </Button>
       </div>
     )
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSavePlan)} className="space-y-2">
-        <div className="flex items-center gap-4">
+      <form onSubmit={form.handleSubmit(handleSavePlan)} className="space-y-4">
+        <div className={cn("flex items-center gap-4", isAdmin && "hidden")}>
           <Button type="button" variant="ghost" onClick={handleBackToList}>
             <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
             Quay lại
           </Button>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Chỉnh sửa kế hoạch tập luyện</CardTitle>
+        <Card className={cn(isAdmin && "rounded-2xl border bg-card shadow-sm")}>
+          <CardHeader className={cn(isAdmin && "border-b pb-5")}>
+            <CardTitle>{isAdmin ? "Thông tin kế hoạch" : "Chỉnh sửa kế hoạch tập luyện"}</CardTitle>
             <CardDescription>
               {hasStarted
                 ? "Kế hoạch đã bắt đầu - Chỉ có thể chỉnh sửa tên, mô tả, mục tiêu và cấp độ"
-                : "Chỉnh sửa kế hoạch tập luyện phù hợp với mục tiêu của bạn"}
+                : isAdmin
+                  ? "Cập nhật thông tin cơ bản, lịch theo tuần và danh sách bài tập."
+                  : "Chỉnh sửa kế hoạch tập luyện phù hợp với mục tiêu của bạn"}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={cn("space-y-6", isAdmin && "pt-6")}>
             {/*Thêm cảnh báo nếu đã bắt đầu */}
             {hasStarted && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
@@ -316,7 +336,7 @@ export const WorkoutFormEdit = () => {
             )}
 
             {/* Basic Info */}
-            <div className="grid gap-y-2 gap-x-4 md:grid-cols-2">
+            <div className="grid gap-x-5 gap-y-4 md:grid-cols-2">
               <SimpleField name="name" control={form.control} label="Tên kế hoạch" required>
                 {(field) => <Input {...field} placeholder="VD: Kế hoạch giảm cân mùa hè" disabled={hasStarted} />}
               </SimpleField>
@@ -398,7 +418,7 @@ export const WorkoutFormEdit = () => {
                 <label className="text-sm text-foreground leading-5 h-5 font-bold">
                   Ngày tập trong tuần (tối đa {watchedDaysPerWeek} ngày)
                 </label>
-                <div className="flex flex-wrap gap-4 mt-2">
+                <div className={cn("mt-2 flex flex-wrap gap-3", isAdmin && "rounded-xl border bg-muted/20 p-4")}>
                   {[
                     { id: "monday", label: "Thứ 2" },
                     { id: "tuesday", label: "Thứ 3" },
@@ -408,7 +428,7 @@ export const WorkoutFormEdit = () => {
                     { id: "saturday", label: "Thứ 7" },
                     { id: "sunday", label: "Chủ nhật" },
                   ].map((day) => (
-                    <div key={day.id} className="flex items-center space-x-2">
+                    <div key={day.id} className={cn("flex items-center space-x-2", isAdmin && "rounded-lg bg-background px-3 py-2")}>
                       <Checkbox
                         id={day.id}
                         className="border-gray-300"
@@ -460,7 +480,7 @@ export const WorkoutFormEdit = () => {
 
                 {/* Hiển thị message khi chưa chọn đủ ngày */}
                 {Number(watchedDaysPerWeek) > 0 && selectedDays.length < Number(watchedDaysPerWeek) && (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="rounded-xl border border-dashed bg-muted/30 py-10 text-center text-muted-foreground">
                     <p>Vui lòng chọn đủ {watchedDaysPerWeek} ngày trong tuần để tiếp tục thiết kế bài tập</p>
                     <p className="text-sm mt-1">
                       Đã chọn: {selectedDays.length}/{watchedDaysPerWeek} ngày
@@ -480,7 +500,7 @@ export const WorkoutFormEdit = () => {
               </div>
             )}
 
-            <div className="flex items-center justify-center gap-3 pt-4">
+            <div className={cn("flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end", isAdmin && "border-t")}>
               <Button type="submit" disabled={isUpdating || hasStarted}>
                 {isUpdating ? (
                   <Loader2 className={`w-4 h-4 mr-2 animate-spin`} />

@@ -23,10 +23,10 @@ export function IngredientActions({ ingredient, onViewDetail }: IngredientAction
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon" onClick={handleView} title="Xem chi tiết">
+      <Button variant="ghost" size="icon" className="text-slate-500 hover:bg-blue-50 hover:text-blue-700" onClick={handleView} title="Xem chi tiết">
         <Eye className="size-4" />
       </Button>
-      <Button variant="ghost" size="icon" onClick={handleEdit} title="Chỉnh sửa">
+      <Button variant="ghost" size="icon" className="text-slate-500 hover:bg-blue-50 hover:text-blue-700" onClick={handleEdit} title="Chỉnh sửa">
         <Pencil className="size-4" />
       </Button>
     </div>

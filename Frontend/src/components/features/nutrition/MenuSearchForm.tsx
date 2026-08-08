@@ -7,6 +7,7 @@ import { Slider } from "@/components/shared/ui/slider"
 import { useGetFitnessGoalOptions } from "@/hooks/queries/common/useGetFitnessGoaloptions"
 import { SearchIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
+import { cn } from "@/lib/utils"
 
 interface MealSearchFormData {
   title: string
@@ -39,9 +40,10 @@ interface MenuSearchFormProps {
     minFat?: number
     maxFat?: number
   }) => void
+  appearance?: "user" | "admin"
 }
 
-export const MenuSearchForm = ({ onSearch }: MenuSearchFormProps) => {
+export const MenuSearchForm = ({ onSearch, appearance = "user" }: MenuSearchFormProps) => {
   const form = useForm<MealSearchFormData>({
     defaultValues: DEFAULT_VALUES,
   })
@@ -66,7 +68,7 @@ export const MenuSearchForm = ({ onSearch }: MenuSearchFormProps) => {
   }
 
   return (
-    <CoreformFilterCard>
+    <CoreformFilterCard className={appearance === "admin" ? "border-primary/15 shadow-primary/5" : undefined}>
       <Form {...form}>
         <form className="flex flex-wrap items-start justify-between gap-6">
           <div className="grid w-full flex-1 grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
@@ -77,7 +79,15 @@ export const MenuSearchForm = ({ onSearch }: MenuSearchFormProps) => {
               className="col-span-1"
               enableFormMessage={false}
             >
-              {(field) => <Input {...field} className="rounded-xl border-sand/60 bg-cream/50" />}
+              {(field) => (
+                <Input
+                  {...field}
+                  className={cn(
+                    "rounded-xl",
+                    appearance === "admin" ? "border-primary/15 bg-primary/[0.03]" : "border-sand/60 bg-cream/50",
+                  )}
+                />
+              )}
             </SimpleField>
 
             <SimpleField
@@ -100,7 +110,7 @@ export const MenuSearchForm = ({ onSearch }: MenuSearchFormProps) => {
               {(field) => (
                 <div>
                   <Slider value={field.value} onValueChange={field.onChange} min={0} max={3000} step={50} className="mt-2" />
-                  <div className="mt-2 text-sm text-earth/60">
+                  <div className={cn("mt-2 text-sm", appearance === "admin" ? "text-muted-foreground" : "text-earth/60")}>
                     {field.value?.[0]} - {field.value?.[1]} kcal
                   </div>
                 </div>
@@ -117,7 +127,7 @@ export const MenuSearchForm = ({ onSearch }: MenuSearchFormProps) => {
               {(field) => (
                 <div>
                   <Slider value={field.value} onValueChange={field.onChange} min={0} max={200} step={5} className="mt-2" />
-                  <div className="mt-2 text-sm text-earth/60">
+                  <div className={cn("mt-2 text-sm", appearance === "admin" ? "text-muted-foreground" : "text-earth/60")}>
                     {field.value?.[0]} - {field.value?.[1]} g
                   </div>
                 </div>
@@ -134,7 +144,7 @@ export const MenuSearchForm = ({ onSearch }: MenuSearchFormProps) => {
               {(field) => (
                 <div>
                   <Slider value={field.value} onValueChange={field.onChange} min={0} max={300} step={5} className="mt-2" />
-                  <div className="mt-2 text-sm text-earth/60">
+                  <div className={cn("mt-2 text-sm", appearance === "admin" ? "text-muted-foreground" : "text-earth/60")}>
                     {field.value?.[0]} - {field.value?.[1]} g
                   </div>
                 </div>
@@ -151,7 +161,7 @@ export const MenuSearchForm = ({ onSearch }: MenuSearchFormProps) => {
               {(field) => (
                 <div>
                   <Slider value={field.value} onValueChange={field.onChange} min={0} max={150} step={5} className="mt-2" />
-                  <div className="mt-2 text-sm text-earth/60">
+                  <div className={cn("mt-2 text-sm", appearance === "admin" ? "text-muted-foreground" : "text-earth/60")}>
                     {field.value?.[0]} - {field.value?.[1]} g
                   </div>
                 </div>

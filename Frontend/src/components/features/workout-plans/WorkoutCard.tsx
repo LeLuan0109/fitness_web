@@ -11,6 +11,7 @@ interface WorkoutCardProps {
   plan: PlanListResponse
   showFeaturedIcon?: boolean
   variant?: "sample" | "personal"
+  appearance?: "user" | "admin"
   onEdit?: (plan: PlanListResponse) => void
   onDelete?: (planId: number) => void
   onViewDetail?: (plan: PlanListResponse) => void
@@ -24,6 +25,7 @@ export const WorkoutCard = ({
   plan,
   showFeaturedIcon = false,
   variant = "sample",
+  appearance = "user",
   onEdit,
   onDelete,
   onViewDetail,
@@ -61,14 +63,17 @@ export const WorkoutCard = ({
   return (
     <Card
       className={cn(
-        "border border-border bg-card text-card-foreground hover:shadow-[0_20px_40px_rgba(16,185,129,0.14)] transition-all cursor-pointer hover:border-primary/50 justify-between",
+        "cursor-pointer justify-between border bg-card text-card-foreground transition-all hover:-translate-y-0.5 hover:border-primary/50",
+        appearance === "admin"
+          ? "border-primary/15 shadow-sm hover:shadow-lg hover:shadow-primary/10"
+          : "border-border hover:shadow-[0_20px_40px_rgba(140,98,57,0.14)]",
         variant === "personal" && !isActive && "opacity-60",
       )}
       onClick={handleViewDetail}
     >
       <CardHeader>
-        <div className="flex items-start justify-between mb-2">
-          <CardTitle className="text-lg">{plan.name}</CardTitle>
+        <div className="mb-2 flex items-start justify-between">
+          <CardTitle className={cn("text-lg", appearance === "admin" && "group-hover:text-primary")}>{plan.name}</CardTitle>
 
           {/* Sample workout: Show featured icon */}
           {variant === "personal" && showFeaturedIcon && (
@@ -102,7 +107,7 @@ export const WorkoutCard = ({
             <Button
               size="icon"
               variant="ghost"
-              className="h-8 w-8 flex-shrink-0"
+              className={cn("h-8 w-8 flex-shrink-0", appearance === "admin" && "text-primary hover:bg-primary/10")}
               onClick={handleClone}
               disabled={isCloning}
               title="Sao chép về kế hoạch cá nhân"
@@ -127,7 +132,10 @@ export const WorkoutCard = ({
           <Badge className={getDifficultyColor(plan.difficultyLevel)} variant="outline">
             {getLevelName(plan.difficultyLevel)}
           </Badge>
-          <Badge className={getGoalColor(plan.targetGoal)} variant="outline">
+          <Badge
+            className={appearance === "admin" ? "border-primary/25 bg-primary/10 text-primary" : getGoalColor(plan.targetGoal)}
+            variant="outline"
+          >
             {getFitnessGoalName(plan.targetGoal)}
           </Badge>
         </div>

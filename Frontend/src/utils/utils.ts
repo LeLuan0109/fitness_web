@@ -29,9 +29,9 @@ export const getGoalColor = (goal: string) => {
     case "lose_weight":
       return "bg-orange-500/20 text-orange-400 border-orange-500/30"
     case "muscle_gain":
-      return "bg-blue-500/20 text-blue-400 border-blue-500/30"
+      return "bg-primary/20 text-primary border-primary/30"
     case "gain_weight":
-      return "bg-purple-500/20 text-purple-400 border-purple-500/30"
+      return "bg-amber-500/20 text-amber-600 border-amber-500/30"
     case "shape_body":
       return "bg-green-500/20 text-green-400 border-green-500/30"
     default:

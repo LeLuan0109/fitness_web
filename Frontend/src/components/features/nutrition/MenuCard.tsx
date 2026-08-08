@@ -5,15 +5,17 @@ import { Separator } from "@/components/shared/ui/separator"
 import { FITNESS_GOAL_LABELS } from "@/constants/common"
 import { MenuListResponse } from "@/types/meal.type"
 import { Beef, Droplet, Edit, Flame, Trash2, Wheat } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface MenuCardProps {
   menu: MenuListResponse
   onDetailClick?: () => void
   onDeleteClick?: () => void
   onUpdateClick?: () => void
+  appearance?: "user" | "admin"
 }
 
-export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick }: MenuCardProps) => {
+export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick, appearance = "user" }: MenuCardProps) => {
   const { name, description, fitnessGoal, calories, protein, carbs, fat, isDefault } = menu
   const nutrition = [
     { label: "Calories", value: calories, Icon: Flame },
@@ -23,14 +25,33 @@ export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick }: 
   ]
 
   return (
-    <Card className="group w-full justify-between gap-0 rounded-2xl border-sand/60 bg-white py-0 text-earth shadow-sm shadow-earth/5 transition-all duration-300 hover:-translate-y-1 hover:border-clay/40 hover:shadow-xl hover:shadow-earth/10">
+    <Card
+      className={cn(
+        "group w-full justify-between gap-0 rounded-2xl bg-card py-0 text-card-foreground shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
+        appearance === "admin"
+          ? "border-primary/15 hover:border-primary/45 hover:shadow-primary/10"
+          : "border-sand/60 shadow-earth/5 hover:border-clay/40 hover:shadow-earth/10",
+      )}
+    >
       <CardContent className="p-6">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <CardTitle className="mb-2 font-display text-2xl font-semibold leading-tight text-earth transition-colors group-hover:text-clay">
+            <CardTitle
+              className={cn(
+                "mb-2 font-display text-2xl font-semibold leading-tight transition-colors",
+                appearance === "admin" ? "text-foreground group-hover:text-primary" : "text-earth group-hover:text-clay",
+              )}
+            >
               {name}
             </CardTitle>
-            <Badge className="rounded-full border border-sand/60 bg-cream px-3 py-1.5 text-xs font-semibold text-clay shadow-sm">
+            <Badge
+              className={cn(
+                "rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm",
+                appearance === "admin"
+                  ? "border-primary/20 bg-primary/10 text-primary"
+                  : "border-sand/60 bg-cream text-clay",
+              )}
+            >
               {FITNESS_GOAL_LABELS[fitnessGoal]}
             </Badge>
           </div>
@@ -58,21 +79,21 @@ export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick }: 
         </div>
 
         {description && (
-          <p className="mb-6 line-clamp-2 truncate text-sm font-normal leading-relaxed text-earth/65">
+          <p className={cn("mb-6 line-clamp-2 truncate text-sm font-normal leading-relaxed", appearance === "admin" ? "text-muted-foreground" : "text-earth/65")}>
             {description}
           </p>
         )}
 
-        <Separator className="mb-6 bg-sand/60" />
+        <Separator className={cn("mb-6", appearance === "admin" ? "bg-primary/15" : "bg-sand/60")} />
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {nutrition.map(({ label, value, Icon }) => (
-            <div key={label} className="rounded-xl border border-sand/40 bg-cream/45 p-3 text-center">
-              <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-full bg-earth/5 text-clay transition-transform group-hover:scale-105">
+            <div key={label} className={cn("rounded-xl border p-3 text-center", appearance === "admin" ? "border-primary/10 bg-primary/[0.04]" : "border-sand/40 bg-cream/45")}>
+              <div className={cn("mx-auto mb-2 flex size-10 items-center justify-center rounded-full transition-transform group-hover:scale-105", appearance === "admin" ? "bg-primary/10 text-primary" : "bg-earth/5 text-clay")}>
                 <Icon className="h-5 w-5" />
               </div>
-              <span className="mb-1 block text-xs font-medium uppercase text-earth/50">{label}</span>
-              <span className="block text-lg font-bold text-earth">{value}</span>
+              <span className={cn("mb-1 block text-xs font-medium uppercase", appearance === "admin" ? "text-muted-foreground" : "text-earth/50")}>{label}</span>
+              <span className={cn("block text-lg font-bold", appearance === "admin" ? "text-foreground" : "text-earth")}>{value}</span>
             </div>
           ))}
         </div>
@@ -81,7 +102,12 @@ export const MenuCard = ({ menu, onDetailClick, onDeleteClick, onUpdateClick }: 
       <CardFooter className="pb-6 pt-0">
         <Button
           variant="ghost"
-          className="w-full rounded-full border border-sand/60 bg-cream/70 font-semibold text-earth transition-all duration-300 hover:border-clay hover:bg-earth hover:text-cream"
+          className={cn(
+            "w-full rounded-full border font-semibold transition-all duration-300",
+            appearance === "admin"
+              ? "border-primary/20 bg-primary/5 text-primary hover:bg-primary hover:text-primary-foreground"
+              : "border-sand/60 bg-cream/70 text-earth hover:border-clay hover:bg-earth hover:text-cream",
+          )}
           onClick={onDetailClick}
         >
           Xem chi tiết

@@ -33,7 +33,7 @@ const STATUS_META: Record<MealSlotStatus, { label: string; badge: string }> = {
   MATCH: { label: "Đúng thực đơn", badge: "bg-success/15 text-success" },
   CHANGED: { label: "Đổi món", badge: "bg-amber-500/15 text-amber-600" },
   SKIPPED: { label: "Bỏ bữa", badge: "bg-destructive/15 text-destructive" },
-  PLANNED: { label: "Kế hoạch", badge: "bg-indigo-500/15 text-indigo-600" },
+  PLANNED: { label: "Kế hoạch", badge: "bg-primary/15 text-primary" },
 }
 
 function completionColor(percent: number) {
@@ -296,8 +296,8 @@ export function FoodDiary() {
           <div className="flex flex-col gap-4">
             <MacroBar label="Calories" current={dayDetail.totalCalories} target={dayDetail.targetCalories} unit="kcal" color="#f97316" />
             <MacroBar label="Protein" current={dayDetail.totalProtein} target={dayDetail.targetProtein} unit="g" color="#22c55e" />
-            <MacroBar label="Carbs" current={dayDetail.totalCarbs} target={dayDetail.targetCarbs} unit="g" color="#3b82f6" />
-            <MacroBar label="Fat" current={dayDetail.totalFat} target={dayDetail.targetFat} unit="g" color="#8b5cf6" />
+            <MacroBar label="Carbs" current={dayDetail.totalCarbs} target={dayDetail.targetCarbs} unit="g" color="#c4956a" />
+            <MacroBar label="Fat" current={dayDetail.totalFat} target={dayDetail.targetFat} unit="g" color="#6b5a4d" />
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-4">

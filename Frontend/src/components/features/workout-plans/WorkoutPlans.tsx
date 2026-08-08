@@ -1,12 +1,14 @@
 import { CoreformPageHeader, CoreformPrimaryButton } from "@/components/shared/coreform"
 import { ROUTES } from "@/constants/routes"
-import authStore from "@/stores/auth.store"
 import { useNavigate } from "react-router"
 import { SampleWorkout } from "./SampleWorkout"
 import { OutstandingPlan } from "./OutstandingPlan"
 
-export function WorkoutPlans() {
-  const isAdmin = authStore.use.auth().role?.name === "ADMIN"
+type WorkoutPlansProps = {
+  audience?: "admin" | "user"
+}
+
+export function WorkoutPlans({ audience = "user" }: WorkoutPlansProps) {
   const navigate = useNavigate()
 
   const handleCreateSamplePlan = () => {
@@ -19,7 +21,7 @@ export function WorkoutPlans() {
         title="Kế hoạch tập luyện mẫu"
         description="Khám phá và tạo kế hoạch tập luyện phù hợp với mục tiêu của bạn."
         action={
-          isAdmin ? (
+          audience === "admin" ? (
             <CoreformPrimaryButton onClick={handleCreateSamplePlan}>
               Tạo kế hoạch mẫu
             </CoreformPrimaryButton>
@@ -28,7 +30,7 @@ export function WorkoutPlans() {
       />
       <OutstandingPlan />
       <div className="border-t border-border/40 pt-8">
-        <SampleWorkout />
+        <SampleWorkout audience={audience} />
       </div>
     </div>
   )

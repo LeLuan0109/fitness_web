@@ -24,65 +24,65 @@ export const AdminExerciseCard = ({ title, description, muscleGroups, difficulty
   const getDifficultyColor = (level: string) => {
     switch (level) {
       case "BEGINNER":
-        return "bg-emerald-600 hover:bg-emerald-700"
+        return "border-emerald-200 bg-emerald-50 text-emerald-700"
       case "INTERMEDIATE":
-        return "bg-amber-500 hover:bg-amber-600"
+        return "border-amber-200 bg-amber-50 text-amber-700"
       case "ADVANCED":
-        return "bg-destructive hover:bg-destructive/90"
+        return "border-red-200 bg-red-50 text-red-700"
       default:
-        return "bg-muted text-muted-foreground hover:bg-muted/80"
+        return "border-slate-200 bg-slate-50 text-slate-600"
     }
   }
 
   return (
     <Card
-      className="group w-full max-w-md cursor-pointer overflow-hidden border-border bg-card/80 py-0 backdrop-blur-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:scale-[1.02] hover:border-primary/40 hover:shadow-xl"
+      className="group w-full cursor-pointer gap-0 overflow-hidden rounded-2xl border-slate-200 bg-white py-0 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
       onClick={() => navigateToExerciseDetail(id)}
     >
       {/* Image Section */}
-      <div className="relative h-60 overflow-hidden bg-muted/30">
+      <div className="relative h-48 overflow-hidden bg-slate-100 sm:h-52">
         {imageUrl ? (
           <ImageWithFallback
             src={imageUrl}
             alt={title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted/60 to-muted transition-colors duration-300">
-            <span className="text-muted-foreground/60 transition-colors duration-300">Ảnh bài tập</span>
+          <div className="flex h-full w-full items-center justify-center bg-slate-100">
+            <span className="text-sm text-slate-400">Chưa có ảnh bài tập</span>
           </div>
         )}
         {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="absolute inset-0 bg-blue-600/5 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       </div>
 
-      <CardContent className="p-4 transition-all duration-300">
+      <CardContent className="p-5">
         {/* Header */}
         <div className="mb-2 flex items-center justify-between gap-2">
-          <h3 className="font-display text-xl font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
+          <h3 className="line-clamp-1 text-lg font-semibold text-slate-900 transition-colors group-hover:text-blue-700">
             {title}
           </h3>
           <Badge
-            className={`${getDifficultyColor(difficulty)} shrink-0 rounded-full px-3 py-1 text-sm text-white transition-transform duration-300`}
+            className={`${getDifficultyColor(difficulty)} shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium shadow-none`}
           >
             {difficulty ? EXERCISE_LEVEL_LABELS[difficulty] : "Không xác định"}
           </Badge>
         </div>
 
         {/* Description */}
-        <p className="mb-4 truncate text-sm leading-relaxed text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">
+        <p className="mb-4 line-clamp-2 min-h-10 text-sm leading-relaxed text-slate-500">
           {description}
         </p>
 
         {/* Muscle groups */}
         <div className="space-y-2">
-          <p className="font-medium text-foreground transition-colors duration-300">Nhóm cơ:</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Nhóm cơ</p>
           <div className="flex flex-wrap gap-2">
             {muscleGroups.map((muscle, index) => (
               <Badge
                 key={index}
                 variant="outline"
-                className="transform rounded-full border-border bg-muted/50 px-3 py-1 text-muted-foreground transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                className="rounded-full border-blue-100 bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700"
               >
                 {muscle}
               </Badge>

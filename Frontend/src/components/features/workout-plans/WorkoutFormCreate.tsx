@@ -11,13 +11,11 @@ import { SimpleField } from "@/components/shared/ui/simple-field"
 import { Textarea } from "@/components/shared/ui/textarea"
 import { FITNESS_GOAL_OPTIONS, LEVEL_OPTIONS } from "@/constants/common"
 import { ROUTES } from "@/constants/routes"
-import { ROLES } from "@/constants/roles.constant"
 import { daysPerWeekOptions, durationOptions } from "@/constants/workout-plan.constant"
 import { useGetExerciseOptions } from "@/hooks/queries/exercises/useGetExerciseOptions"
 import { useCreatePlan } from "@/hooks/queries/workout-plan/useCreatePlan"
 import { suggestPlanLabels } from "@/api/workout-plan.api"
 import { ExerciseSelected, ScheduleItem, WorkoutPlanFormSchema } from "@/schemas/workout-plan.schema"
-import authStore from "@/stores/auth.store"
 import { WorkoutFormData } from "@/types/workout-plan.type"
 import { transformWorkoutPlanDTO } from "@/utils/workout-plan.util"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,6 +24,7 @@ import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { generatePath, useNavigate } from "react-router"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 // Helper function to map day names to numbers
 const getDayOfWeekNumber = (dayId: string): number => {
@@ -41,11 +40,14 @@ const getDayOfWeekNumber = (dayId: string): number => {
   return dayMap[dayId] || 0
 }
 
-export const WorkoutFormCreate = () => {
+type WorkoutFormCreateProps = {
+  audience?: "admin" | "user"
+}
+
+export const WorkoutFormCreate = ({ audience = "user" }: WorkoutFormCreateProps) => {
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [isSuggesting, setIsSuggesting] = useState(false)
-  const auth = authStore.use.auth()
-  const isAdmin = auth?.role?.name === ROLES.ADMIN
+  const isAdmin = audience === "admin"
 
   const form = useForm<WorkoutFormData>({
     resolver: zodResolver(WorkoutPlanFormSchema),
@@ -245,21 +247,23 @@ export const WorkoutFormCreate = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSavePlan)} className="space-y-2">
-        <div className="flex items-center gap-4">
+      <form onSubmit={form.handleSubmit(handleSavePlan)} className="space-y-4">
+        <div className={cn("flex items-center gap-4", isAdmin && "hidden")}>
           <Button type="button" variant="ghost" onClick={handleBackToList}>
             <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
             Quay lại
           </Button>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Tạo kế hoạch tập luyện mới</CardTitle>
-            <CardDescription>Thiết kế kế hoạch tập luyện phù hợp với mục tiêu của bạn</CardDescription>
+        <Card className={cn(isAdmin && "rounded-2xl border bg-card shadow-sm")}>
+          <CardHeader className={cn(isAdmin && "border-b pb-5")}>
+            <CardTitle>{isAdmin ? "Thông tin kế hoạch" : "Tạo kế hoạch tập luyện mới"}</CardTitle>
+            <CardDescription>
+              {isAdmin ? "Thiết lập thông tin cơ bản, lịch theo tuần và danh sách bài tập." : "Thiết kế kế hoạch tập luyện phù hợp với mục tiêu của bạn"}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={cn("space-y-6", isAdmin && "pt-6")}>
             {/* Basic Info */}
-            <div className="grid gap-y-2 gap-x-4 md:grid-cols-2">
+            <div className="grid gap-x-5 gap-y-4 md:grid-cols-2">
               <SimpleField name="name" control={form.control} label="Tên kế hoạch" required>
                 {(field) => <Input {...field} placeholder="VD: Kế hoạch giảm cân mùa hè" />}
               </SimpleField>
@@ -348,7 +352,7 @@ export const WorkoutFormCreate = () => {
                 <label className="text-sm text-foreground leading-5 h-5 font-bold">
                   Ngày tập trong tuần (tối đa {watchedDaysPerWeek} ngày)
                 </label>
-                <div className="flex flex-wrap gap-4 mt-2">
+                <div className={cn("mt-2 flex flex-wrap gap-3", isAdmin && "rounded-xl border bg-muted/20 p-4")}>
                   {[
                     { id: "monday", label: "Thứ 2" },
                     { id: "tuesday", label: "Thứ 3" },
@@ -358,7 +362,7 @@ export const WorkoutFormCreate = () => {
                     { id: "saturday", label: "Thứ 7" },
                     { id: "sunday", label: "Chủ nhật" },
                   ].map((day) => (
-                    <div key={day.id} className="flex items-center space-x-2">
+                    <div key={day.id} className={cn("flex items-center space-x-2", isAdmin && "rounded-lg bg-background px-3 py-2")}>
                       <Checkbox
                         id={day.id}
                         className="border-gray-300"
@@ -397,7 +401,7 @@ export const WorkoutFormCreate = () => {
 
             {/* Hiển thị message khi chưa chọn đủ ngày */}
             {Number(watchedDaysPerWeek) > 0 && selectedDays.length < Number(watchedDaysPerWeek) && (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="rounded-xl border border-dashed bg-muted/30 py-10 text-center text-muted-foreground">
                 <p>Vui lòng chọn đủ {watchedDaysPerWeek} ngày trong tuần để tiếp tục thiết kế bài tập</p>
                 <p className="text-sm mt-1">
                   Đã chọn: {selectedDays.length}/{watchedDaysPerWeek} ngày
@@ -405,7 +409,7 @@ export const WorkoutFormCreate = () => {
               </div>
             )}
 
-            <div className="flex items-center justify-center gap-3 pt-4">
+            <div className={cn("flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end", isAdmin && "border-t")}>
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <Loader2 className={`w-4 h-4 mr-2 animate-spin`} />

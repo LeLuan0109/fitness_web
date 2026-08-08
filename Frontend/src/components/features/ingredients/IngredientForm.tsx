@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronRight, Image as ImageIcon, XIcon } from "lucide-react"
+import { ArrowLeft, Image as ImageIcon, Loader2, Save, XIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router"
@@ -88,22 +88,28 @@ export function IngredientForm({ idEdit, initialData, onSubmit, isLoading, exist
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button type="button" variant="ghost" onClick={handleBack}>
-          <ChevronRight className="w-4 h-4 mr-2 rotate-180" />
+    <div className="mx-auto max-w-4xl space-y-6">
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
+            {isEdit ? "Chỉnh sửa nguyên liệu" : "Tạo nguyên liệu mới"}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {isEdit ? "Cập nhật thông tin nguyên liệu trong hệ thống." : "Thêm nguyên liệu vào kho dữ liệu dinh dưỡng."}
+          </p>
+        </div>
+        <Button type="button" variant="outline" className="self-start border-slate-200" onClick={handleBack}>
+          <ArrowLeft className="mr-2 size-4" />
           Quay lại
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{isEdit ? "Chỉnh sửa nguyên liệu" : "Tạo nguyên liệu mới"}</CardTitle>
-          <CardDescription>
-            {isEdit ? "Cập nhật thông tin nguyên liệu" : "Nhập thông tin để tạo nguyên liệu mới"}
-          </CardDescription>
+      <Card className="rounded-2xl border-slate-200 bg-white shadow-sm">
+        <CardHeader className="border-b border-slate-100">
+          <CardTitle className="text-lg text-slate-900">Thông tin nguyên liệu</CardTitle>
+          <CardDescription>Tên, đơn vị chuẩn, năng lượng và hình ảnh hiển thị.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-5 sm:p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
               {/* Name */}
@@ -138,12 +144,12 @@ export function IngredientForm({ idEdit, initialData, onSubmit, isLoading, exist
                   <div className="space-y-4">
                     {imagePreview ? (
                       <div className="relative w-full max-w-md">
-                        <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover rounded-lg border" />
+                        <img src={imagePreview} alt="Preview" className="h-64 w-full rounded-xl border border-slate-200 object-cover" />
                         <Button
                           type="button"
                           variant="destructive"
                           size="icon"
-                          className="absolute top-2 right-2"
+                          className="absolute right-2 top-2"
                           onClick={handleRemoveImage}
                           disabled={isLoading}
                         >
@@ -151,10 +157,10 @@ export function IngredientForm({ idEdit, initialData, onSubmit, isLoading, exist
                         </Button>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center w-full max-w-md h-64 border-2 border-dashed border-gray-300 rounded-lg">
+                      <div className="flex h-64 w-full max-w-md items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50">
                         <div className="text-center">
-                          <ImageIcon className="w-12 h-12 mx-auto text-gray-400" />
-                          <p className="mt-2 text-sm text-gray-500">Chưa có hình ảnh</p>
+                          <ImageIcon className="mx-auto size-10 text-slate-400" />
+                          <p className="mt-2 text-sm text-slate-500">Chưa có hình ảnh</p>
                         </div>
                       </div>
                     )}
@@ -175,7 +181,8 @@ export function IngredientForm({ idEdit, initialData, onSubmit, isLoading, exist
                 <Button type="button" variant="outline" onClick={handleBack} disabled={isLoading}>
                   Hủy
                 </Button>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading} className="bg-blue-600 text-white hover:bg-blue-700">
+                  {isLoading ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="mr-2 size-4" />}
                   {isLoading ? "Đang xử lý..." : isEdit ? "Cập nhật" : "Tạo mới"}
                 </Button>
               </div>

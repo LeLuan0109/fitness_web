@@ -5,7 +5,11 @@ import { PlanListResponse } from "@/types/workout-plan.type"
 import { generatePath, useNavigate } from "react-router"
 import { ROUTES } from "@/constants/routes"
 
-export function OutstandingPlan() {
+type OutstandingPlanProps = {
+  appearance?: "user" | "admin"
+}
+
+export function OutstandingPlan({ appearance = "user" }: OutstandingPlanProps) {
   const navigate = useNavigate()
   const { data: outstandingPlans = [] } = useGetOutstandingPlans()
   const handleWorkoutClick = (plan: PlanListResponse) => {
@@ -24,6 +28,7 @@ export function OutstandingPlan() {
             key={plan.id}
             plan={plan}
             showFeaturedIcon={true}
+            appearance={appearance}
             onViewDetail={() => handleWorkoutClick(plan)}
           />
         ))}

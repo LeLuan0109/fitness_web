@@ -2,45 +2,67 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 
 import { GuestRoute } from "@/components/shared/routes/GuestRoute"
 import { ProtectedRoute } from "@/components/shared/routes/ProtectedRoute"
+import { RolePage } from "@/components/shared/routes/RolePage"
 import { ROLE_ADMIN, ROLE_USER } from "@/constants/roles.constant"
 import { ROUTES } from "@/constants/routes"
 import AppLayout from "@/layouts/AppLayout"
 import { lazyImport } from "@/lib/lazy-import"
+import {
+  AdminMenuCreatePage,
+  AdminMenuEditPage,
+  AdminSampleMenuDetailPage,
+  AdminSampleMenuListPage,
+} from "@/pages/admin/nutrition/AdminMenuPages"
+import {
+  AdminSampleWorkoutListPage,
+  AdminWorkoutCreatePage,
+  AdminWorkoutDetailPage,
+  AdminWorkoutEditPage,
+} from "@/pages/admin/workouts/AdminWorkoutPages"
+import { AdminChangePasswordPage } from "@/pages/auth/AdminChangePasswordPage"
+import { UserChangePasswordPage } from "@/pages/auth/UserChangePasswordPage"
+import { AdminCommunityFeedPage } from "@/pages/community/AdminCommunityFeedPage"
+import { AdminPostDetailPage } from "@/pages/community/AdminPostDetailPage"
+import { UserCommunityFeedPage } from "@/pages/community/UserCommunityFeedPage"
+import { UserPostDetailPage } from "@/pages/community/UserPostDetailPage"
+import { AdminDishesDetailPage } from "@/pages/dishes/AdminDishesDetailPage"
+import { AdminDishesListPage } from "@/pages/dishes/AdminDishesListPage"
+import { UserDishesDetailPage } from "@/pages/dishes/UserDishesDetailPage"
+import { UserDishesListPage } from "@/pages/dishes/UserDishesListPage"
+import { AdminExerciseDetailPage } from "@/pages/exercises/AdminExerciseDetailPage"
+import { AdminExerciseListPage } from "@/pages/exercises/AdminExerciseListPage"
+import { UserExerciseDetailPage } from "@/pages/exercises/UserExerciseDetailPage"
+import { UserExerciseListPage } from "@/pages/exercises/UserExerciseListPage"
 import { IngredientListPage } from "@/pages/ingredients/IngredientListPage"
 import { IngredientCreatePage } from "@/pages/ingredients/IngredientCreatePage"
 import { IngredientEditPage } from "@/pages/ingredients/IngredientEditPage"
+import { AdminProfilePage } from "@/pages/profile/AdminProfilePage"
+import { UserProfilePage } from "@/pages/profile/UserProfilePage"
+import {
+  UserMenuCreatePage,
+  UserMenuEditPage,
+  UserSampleMenuDetailPage,
+  UserSampleMenuListPage,
+} from "@/pages/user/nutrition/UserMenuPages"
+import {
+  UserSampleWorkoutListPage,
+  UserWorkoutCreatePage,
+  UserWorkoutDetailPage,
+  UserWorkoutEditPage,
+} from "@/pages/user/workouts/UserWorkoutPages"
 const { UserListPage } = lazyImport(() => import("@/pages/user/UserListPage"), "UserListPage")
-const { CommunityFeedPage } = lazyImport(() => import("@/pages/community/CommunityFeedPage"), "CommunityFeedPage")
 const { MyPostsPage } = lazyImport(() => import("@/pages/community/MyPostsPage"), "MyPostsPage")
-const { PostDetailPage } = lazyImport(() => import("@/pages/community/PostDetailPage"), "PostDetailPage")
 const { ForgotPasswordPage } = lazyImport(() => import("@/pages/auth/ForgotPasswordPage"), "ForgotPasswordPage")
 const { AdminDashboardPage } = lazyImport(() => import("@/pages/dashboard/AdminDashboardPage"), "AdminDashboardPage")
-const { DishesDetailPage } = lazyImport(() => import("@/pages/dishes/DishesDetailPage"), "DishesDetailPage")
-const { DishesListPage } = lazyImport(() => import("@/pages/dishes/DishesListPage"), "DishesListPage")
 const { ForbiddenPage } = lazyImport(() => import("@/pages/errors/ForbiddenPage"), "ForbiddenPage")
 const { DishCreatePage } = lazyImport(() => import("@/pages/nutrition/DishCreatePage"), "DishCreatePage")
 const { DishEditPage } = lazyImport(() => import("@/pages/nutrition/DishEditPage"), "DishEditPage")
-const { MenuCreatePage } = lazyImport(() => import("@/pages/nutrition/MenuCreatePage"), "MenuCreatePage")
-const { MenuEditPage } = lazyImport(() => import("@/pages/nutrition/MenuEditPage"), "MenuEditPage")
 const { MyMenuDetailPage } = lazyImport(() => import("@/pages/nutrition/MyMenuDetailPage"), "MyMenuDetailPage")
 const { MyMenuPage } = lazyImport(() => import("@/pages/nutrition/MyMenuPage"), "MyMenuPage")
-const { SampleMenuDetailPage } = lazyImport(
-  () => import("@/pages/nutrition/SampleMenuDetailPage"),
-  "SampleMenuDetailPage",
-)
-const { SampleMenuPage } = lazyImport(() => import("@/pages/nutrition/SampleMenuPage"), "SampleMenuPage")
 const { MyWorkoutListPage } = lazyImport(() => import("@/pages/workouts/MyWorkoutListPage"), "MyWorkoutListPage")
-const { WorkoutCreatePage } = lazyImport(() => import("@/pages/workouts/WorkoutCreatePage"), "WorkoutCreatePage")
-const { WorkoutEditPage } = lazyImport(() => import("@/pages/workouts/WorkoutEditPage"), "WorkoutEditPage")
-const { ProfilePage } = lazyImport(() => import("@/pages/profile/ProfilePage"), "ProfilePage")
-const { ChangePasswordPage } = lazyImport(() => import("@/pages/auth/ChangePasswordPage"), "ChangePasswordPage")
-const { ExerciseDetailPage } = lazyImport(() => import("@/pages/exercises/ExerciseDetailPage"), "ExerciseDetailPage")
-const { ExerciseListPage } = lazyImport(() => import("@/pages/exercises/ExerciseListPage"), "ExerciseListPage")
 const { ExerciseCreatePage } = lazyImport(() => import("@/pages/exercises/ExerciseCreatePage"), "ExerciseCreatePage")
 const { ExerciseEditPage } = lazyImport(() => import("@/pages/exercises/ExerciseEditPage"), "ExerciseEditPage")
 const { OnboardingPage } = lazyImport(() => import("@/pages/onboarding/OnboardingPage"), "OnboardingPage")
-const { WorkoutDetailPage } = lazyImport(() => import("@/pages/workouts/WorkoutDetailPage"), "WorkoutDetailPage")
-const { WorkoutListPage } = lazyImport(() => import("@/pages/workouts/SampleWorkoutListPage"), "WorkoutListPage")
 const { LoginPage } = lazyImport(() => import("@/pages/auth/Login"), "LoginPage")
 const { RegisterPage } = lazyImport(() => import("@/pages/auth/Register"), "RegisterPage")
 const { Dashboard } = lazyImport(() => import("@/pages/dashboard/DashboardPage"), "Dashboard")
@@ -82,16 +104,16 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.PROFILE,
         element: (
-           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <ProfilePage />
+          <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
+            <RolePage admin={<AdminProfilePage />} user={<UserProfilePage />} />
           </ProtectedRoute>
         ),
       },
       {
         path: ROUTES.AUTH.CHANGE_PASSWORD,
         element: (
-          <ProtectedRoute>
-            <ChangePasswordPage />
+          <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
+            <RolePage admin={<AdminChangePasswordPage />} user={<UserChangePasswordPage />} />
           </ProtectedRoute>
         ),
       },
@@ -99,7 +121,7 @@ export const router = createBrowserRouter([
         path: ROUTES.EXERCISES.LIST,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_ADMIN, ROLE_USER]}>
-            <ExerciseListPage />
+            <RolePage admin={<AdminExerciseListPage />} user={<UserExerciseListPage />} />
           </ProtectedRoute>
         ),
       },
@@ -107,7 +129,7 @@ export const router = createBrowserRouter([
         path: ROUTES.EXERCISES.DETAIL,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_ADMIN, ROLE_USER]}>
-            <ExerciseDetailPage />
+            <RolePage admin={<AdminExerciseDetailPage />} user={<UserExerciseDetailPage />} />
           </ProtectedRoute>
         ),
       },
@@ -131,7 +153,7 @@ export const router = createBrowserRouter([
         path: ROUTES.WORKOUTS.SAMPLE_LIST,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <WorkoutListPage />
+            <RolePage admin={<AdminSampleWorkoutListPage />} user={<UserSampleWorkoutListPage />} />
           </ProtectedRoute>
         ),
       },
@@ -147,7 +169,7 @@ export const router = createBrowserRouter([
         path: ROUTES.WORKOUTS.DETAIL,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <WorkoutDetailPage />
+            <RolePage admin={<AdminWorkoutDetailPage />} user={<UserWorkoutDetailPage />} />
           </ProtectedRoute>
         ),
       },
@@ -155,7 +177,7 @@ export const router = createBrowserRouter([
         path: ROUTES.WORKOUTS.CREATE,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <WorkoutCreatePage />
+            <RolePage admin={<AdminWorkoutCreatePage />} user={<UserWorkoutCreatePage />} />
           </ProtectedRoute>
         ),
       },
@@ -163,7 +185,7 @@ export const router = createBrowserRouter([
         path: ROUTES.WORKOUTS.EDIT,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <WorkoutEditPage />
+            <RolePage admin={<AdminWorkoutEditPage />} user={<UserWorkoutEditPage />} />
           </ProtectedRoute>
         ),
       },
@@ -187,7 +209,7 @@ export const router = createBrowserRouter([
         path: ROUTES.NUTRITION.SAMPLE,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <SampleMenuPage />
+            <RolePage admin={<AdminSampleMenuListPage />} user={<UserSampleMenuListPage />} />
           </ProtectedRoute>
         ),
       },
@@ -211,7 +233,7 @@ export const router = createBrowserRouter([
         path: ROUTES.NUTRITION.SAMPLE_DETAIL,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <SampleMenuDetailPage />
+            <RolePage admin={<AdminSampleMenuDetailPage />} user={<UserSampleMenuDetailPage />} />
           </ProtectedRoute>
         ),
       },
@@ -227,7 +249,7 @@ export const router = createBrowserRouter([
         path: ROUTES.NUTRITION.CREATE_MENU,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <MenuCreatePage />
+            <RolePage admin={<AdminMenuCreatePage />} user={<UserMenuCreatePage />} />
           </ProtectedRoute>
         ),
       },
@@ -235,7 +257,7 @@ export const router = createBrowserRouter([
         path: ROUTES.NUTRITION.EDIT_MENU,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <MenuEditPage />
+            <RolePage admin={<AdminMenuEditPage />} user={<UserMenuEditPage />} />
           </ProtectedRoute>
         ),
       },
@@ -243,7 +265,7 @@ export const router = createBrowserRouter([
         path: ROUTES.DISHES.LIST,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <DishesListPage />
+            <RolePage admin={<AdminDishesListPage />} user={<UserDishesListPage />} />
           </ProtectedRoute>
         ),
       },
@@ -251,7 +273,7 @@ export const router = createBrowserRouter([
         path: ROUTES.DISHES.DETAIL,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <DishesDetailPage />
+            <RolePage admin={<AdminDishesDetailPage />} user={<UserDishesDetailPage />} />
           </ProtectedRoute>
         ),
       },
@@ -316,7 +338,7 @@ export const router = createBrowserRouter([
         path: ROUTES.COMMUNITY.FEED,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <CommunityFeedPage />
+            <RolePage admin={<AdminCommunityFeedPage />} user={<UserCommunityFeedPage />} />
           </ProtectedRoute>
         ),
       },
@@ -332,7 +354,7 @@ export const router = createBrowserRouter([
         path: ROUTES.COMMUNITY.POST_DETAIL,
         element: (
           <ProtectedRoute allowedRoles={[ROLE_USER, ROLE_ADMIN]}>
-            <PostDetailPage />
+            <RolePage admin={<AdminPostDetailPage />} user={<UserPostDetailPage />} />
           </ProtectedRoute>
         ),
       },

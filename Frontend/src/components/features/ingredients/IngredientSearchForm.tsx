@@ -39,17 +39,17 @@ export function IngredientSearchForm({ isFetching }: IngredientSearchFormProps) 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSearch)} className="flex w-full items-start justify-between gap-2">
-        <div className="flex flex-1 flex-wrap items-center gap-2">
-          <div className="w-[300px] max-w-xs">
+      <form onSubmit={form.handleSubmit(handleSearch)} className="flex w-full flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex-1">
+          <div className="w-full sm:max-w-md">
             <SimpleField control={form.control} name="search" label="Tìm kiếm">
-              {(field) => <Input {...field} disabled={isFetching} placeholder="Tìm kiếm nguyên liệu..." />}
+              {(field) => <Input {...field} disabled={isFetching} placeholder="Tìm theo tên nguyên liệu..." className="border-slate-200 bg-white focus-visible:ring-blue-600" />}
             </SimpleField>
           </div>
         </div>
 
-        <div className="mt-8 flex items-start gap-2">
-          <Button type="submit" variant="secondary" disabled={isFetching}>
+        <div className="flex items-center gap-2">
+          <Button type="submit" disabled={isFetching} className="bg-blue-600 text-white hover:bg-blue-700">
             <Search className="mr-2 size-4" />
             Tìm kiếm
           </Button>

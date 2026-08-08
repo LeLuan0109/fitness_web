@@ -84,9 +84,9 @@ export function AdminParticleCanvas() {
     /** Read the live accent from the CSS var set by admin-theme.store. */
     const getAccent = () => {
       const raw = getComputedStyle(document.documentElement)
-        .getPropertyValue("--accent")
+        .getPropertyValue("--admin-accent")
         .trim()
-      return raw || "#6366f1"
+      return raw || "#0ea5e9"
     }
 
     const drawFrame = () => {

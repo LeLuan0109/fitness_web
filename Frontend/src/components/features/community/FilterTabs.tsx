@@ -18,9 +18,10 @@ export type PostFilters = {
 interface FilterTabsProps {
   filters: PostFilters
   onFiltersChange: (filters: PostFilters) => void
+  appearance?: "user" | "admin"
 }
 
-export const FilterTabs = ({ filters, onFiltersChange }: FilterTabsProps) => {
+export const FilterTabs = ({ filters, onFiltersChange, appearance = "user" }: FilterTabsProps) => {
   const [searchValue, setSearchValue] = useState(filters.key || "")
   const [startDate, setStartDate] = useState<Date | undefined>(filters.startDate)
   const [endDate, setEndDate] = useState<Date | undefined>(filters.endDate)
@@ -62,11 +63,11 @@ export const FilterTabs = ({ filters, onFiltersChange }: FilterTabsProps) => {
   const hasActiveFilters = filters.key || filters.startDate || filters.endDate
 
   return (
-    <CoreformFilterCard>
+    <CoreformFilterCard className={appearance === "admin" ? "border-primary/15 shadow-primary/5" : undefined}>
       <div className="space-y-4">
         <div className="flex flex-wrap gap-3">
           <div className="relative min-w-[240px] flex-1">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-earth/40" />
+            <Search className={cn("absolute left-3 top-1/2 size-4 -translate-y-1/2", appearance === "admin" ? "text-primary/60" : "text-earth/40")} />
             <Input
               placeholder="Tìm kiếm bài viết..."
               value={searchValue}
@@ -74,7 +75,7 @@ export const FilterTabs = ({ filters, onFiltersChange }: FilterTabsProps) => {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSearchSubmit()
               }}
-              className="rounded-xl border-sand/60 bg-cream/50 pl-9"
+              className={cn("rounded-xl pl-9", appearance === "admin" ? "border-primary/15 bg-primary/[0.03]" : "border-sand/60 bg-cream/50")}
             />
           </div>
           <CoreformPrimaryButton type="button" onClick={handleSearchSubmit}>
@@ -88,15 +89,21 @@ export const FilterTabs = ({ filters, onFiltersChange }: FilterTabsProps) => {
               <Button
                 variant="outline"
                 className={cn(
-                  "rounded-full border-sand/60 bg-cream/50 font-normal hover:border-clay hover:bg-sand-light/40",
-                  !startDate && "text-earth/50",
+                  "rounded-full font-normal",
+                  appearance === "admin"
+                    ? "border-primary/15 bg-primary/[0.03] hover:border-primary/40 hover:bg-primary/10"
+                    : "border-sand/60 bg-cream/50 hover:border-clay hover:bg-sand-light/40",
+                  !startDate && (appearance === "admin" ? "text-muted-foreground" : "text-earth/50"),
                 )}
               >
                 <CalendarIcon className="mr-2 size-4" />
                 {startDate ? format(startDate, "dd/MM/yyyy", { locale: vi }) : "Từ ngày"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto rounded-2xl border-sand p-0" align="start">
+            <PopoverContent
+              className={cn("w-auto rounded-2xl p-0", appearance === "admin" ? "border-primary/20" : "border-sand")}
+              align="start"
+            >
               <Calendar
                 mode="single"
                 selected={startDate}
@@ -112,15 +119,21 @@ export const FilterTabs = ({ filters, onFiltersChange }: FilterTabsProps) => {
               <Button
                 variant="outline"
                 className={cn(
-                  "rounded-full border-sand/60 bg-cream/50 font-normal hover:border-clay hover:bg-sand-light/40",
-                  !endDate && "text-earth/50",
+                  "rounded-full font-normal",
+                  appearance === "admin"
+                    ? "border-primary/15 bg-primary/[0.03] hover:border-primary/40 hover:bg-primary/10"
+                    : "border-sand/60 bg-cream/50 hover:border-clay hover:bg-sand-light/40",
+                  !endDate && (appearance === "admin" ? "text-muted-foreground" : "text-earth/50"),
                 )}
               >
                 <CalendarIcon className="mr-2 size-4" />
                 {endDate ? format(endDate, "dd/MM/yyyy", { locale: vi }) : "Đến ngày"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto rounded-2xl border-sand p-0" align="start">
+            <PopoverContent
+              className={cn("w-auto rounded-2xl p-0", appearance === "admin" ? "border-primary/20" : "border-sand")}
+              align="start"
+            >
               <Calendar
                 mode="single"
                 selected={endDate}
@@ -140,17 +153,17 @@ export const FilterTabs = ({ filters, onFiltersChange }: FilterTabsProps) => {
         </div>
 
         {hasActiveFilters && (
-          <div className="flex flex-wrap gap-2 text-sm text-earth/60">
+          <div className={cn("flex flex-wrap gap-2 text-sm", appearance === "admin" ? "text-muted-foreground" : "text-earth/60")}>
             {filters.key && (
-              <span className="rounded-full border border-sand/40 bg-sand-light/50 px-3 py-1">Từ khóa: {filters.key}</span>
+              <span className={cn("rounded-full border px-3 py-1", appearance === "admin" ? "border-primary/15 bg-primary/10 text-primary" : "border-sand/40 bg-sand-light/50")}>Từ khóa: {filters.key}</span>
             )}
             {filters.startDate && (
-              <span className="rounded-full border border-sand/40 bg-sand-light/50 px-3 py-1">
+              <span className={cn("rounded-full border px-3 py-1", appearance === "admin" ? "border-primary/15 bg-primary/10 text-primary" : "border-sand/40 bg-sand-light/50")}>
                 Từ: {format(filters.startDate, "dd/MM/yyyy", { locale: vi })}
               </span>
             )}
             {filters.endDate && (
-              <span className="rounded-full border border-sand/40 bg-sand-light/50 px-3 py-1">
+              <span className={cn("rounded-full border px-3 py-1", appearance === "admin" ? "border-primary/15 bg-primary/10 text-primary" : "border-sand/40 bg-sand-light/50")}>
                 Đến: {format(filters.endDate, "dd/MM/yyyy", { locale: vi })}
               </span>
             )}

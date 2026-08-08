@@ -24,10 +24,10 @@ export function IngredientDetailModal({ ingredientId, open, onOpenChange }: Ingr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={coreformDialogContentWideClass}>
+      <DialogContent className={`${coreformDialogContentWideClass} border-slate-200 bg-white`}>
         <DialogHeader>
-          <DialogTitle>Chi tiết nguyên liệu</DialogTitle>
-          <DialogDescription>Thông tin chi tiết về nguyên liệu</DialogDescription>
+          <DialogTitle className="text-slate-950">Chi tiết nguyên liệu</DialogTitle>
+          <DialogDescription className="text-slate-500">Thông tin đơn vị và giá trị năng lượng.</DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
@@ -36,31 +36,31 @@ export function IngredientDetailModal({ ingredientId, open, onOpenChange }: Ingr
           </div>
         ) : ingredient ? (
           <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <Avatar className="size-24 rounded-2xl border border-sand/60">
+            <div className="flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
+              <Avatar className="size-24 rounded-2xl border border-slate-200 bg-white">
                 <AvatarImage src={ingredient.image || undefined} alt={ingredient.name} />
-                <AvatarFallback className="rounded-2xl bg-cream text-2xl text-earth">
+                <AvatarFallback className="rounded-2xl bg-blue-50 text-2xl font-semibold text-blue-700">
                   {ingredient.name?.charAt(0) || "N"}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-display text-2xl font-medium text-earth">{ingredient.name}</h3>
+                <h3 className="text-2xl font-semibold text-slate-950">{ingredient.name}</h3>
               </div>
             </div>
 
-            <div className="grid gap-4 border-t border-sand/40 pt-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-earth/50">ID</p>
-                  <p className="text-base font-medium text-earth">{ingredient.id}</p>
+            <div className="grid gap-4 border-t border-slate-200 pt-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="space-y-1 rounded-xl border border-slate-200 p-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">ID</p>
+                  <p className="text-base font-semibold text-slate-800">{ingredient.id}</p>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-earth/50">Đơn vị chuẩn</p>
-                  <p className="text-base font-medium text-earth">{ingredient.standardUnitLabel}</p>
+                <div className="space-y-1 rounded-xl border border-slate-200 p-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Đơn vị chuẩn</p>
+                  <p className="text-base font-semibold text-slate-800">{ingredient.standardUnitLabel}</p>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-earth/50">Calo/Đơn vị</p>
-                  <p className="text-base font-medium text-earth">
+                <div className="space-y-1 rounded-xl border border-slate-200 p-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Calo/Đơn vị</p>
+                  <p className="text-base font-semibold text-blue-700">
                     {ingredient.caloriesPerUnit.toFixed(2)} kcal/{ingredient.standardUnit}
                   </p>
                 </div>
@@ -68,7 +68,7 @@ export function IngredientDetailModal({ ingredientId, open, onOpenChange }: Ingr
             </div>
           </div>
         ) : (
-          <div className="py-8 text-center text-earth/50">Không tìm thấy thông tin nguyên liệu</div>
+          <div className="py-8 text-center text-slate-500">Không tìm thấy thông tin nguyên liệu</div>
         )}
       </DialogContent>
     </Dialog>

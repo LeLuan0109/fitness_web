@@ -5,16 +5,16 @@ import createSelectors from "@/lib/zustand-selectors"
 
 /** Admin accent color presets shown in the ThemeColorCustomizer. */
 export const ADMIN_THEME_PRESETS = [
-  { name: "Cyber Purple", hex: "#8b5cf6" },
-  { name: "Emerald", hex: "#10b981" },
-  { name: "Neon Blue", hex: "#2563eb" },
-  { name: "Sunset Orange", hex: "#f97316" },
+  { name: "Google Blue", hex: "#1a73e8" },
+  { name: "Sky Blue", hex: "#0b57d0" },
+  { name: "Deep Blue", hex: "#174ea6" },
+  { name: "Light Blue", hex: "#4285f4" },
 ] as const
 
 export type AdminThemePreset = (typeof ADMIN_THEME_PRESETS)[number]
 
-const DEFAULT_ACCENT = "#6366f1"
-const DEFAULT_NAME = "Indigo"
+const DEFAULT_ACCENT = "#1a73e8"
+const DEFAULT_NAME = "Google Blue"
 
 type AdminThemeState = {
   accent: string
@@ -33,27 +33,19 @@ export function hexToRgbTriplet(hex: string): string {
           .join("")
       : clean
   const int = parseInt(full, 16)
-  if (Number.isNaN(int) || full.length !== 6) return "99 102 241"
+  if (Number.isNaN(int) || full.length !== 6) return "14 165 233"
   const r = (int >> 16) & 255
   const g = (int >> 8) & 255
   const b = int & 255
   return `${r} ${g} ${b}`
 }
 
-/**
- * Push the accent color into CSS custom properties on :root so that every
- * scoped rule under `.coreform-admin` (buttons, active menu, border glow,
- * chart series, canvas particles, selection) updates instantly without reload.
- */
+/** Update admin-only variables without changing the generic user theme. */
 export function applyAdminAccent(hex: string) {
   const root = document.documentElement
-  root.style.setProperty("--accent", hex)
-  root.style.setProperty("--accent-rgb", hexToRgbTriplet(hex))
-  root.style.setProperty("--primary", hex)
-  root.style.setProperty("--ring", hex)
-  root.style.setProperty("--button-primary", hex)
-  root.style.setProperty("--accent-hover", `${hex}cc`)
-  root.style.setProperty("--sidebar-primary", hex)
+  root.style.setProperty("--admin-accent", hex)
+  root.style.setProperty("--admin-accent-rgb", hexToRgbTriplet(hex))
+  root.style.setProperty("--admin-accent-hover", `${hex}cc`)
 }
 
 const useAdminThemeStoreBase = create<AdminThemeState>()(

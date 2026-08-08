@@ -7,7 +7,6 @@ import {
 import { CommonPagination } from "@/components/shared/ui/common-pagination"
 import { ROUTES } from "@/constants/routes"
 import { useGetSampleMenu } from "@/hooks/queries/menus/useGetSampleMenu"
-import authStore from "@/stores/auth.store"
 import { MenuSearhParams } from "@/types/meal.type"
 import { UtensilsCrossed } from "lucide-react"
 import { useState } from "react"
@@ -15,9 +14,12 @@ import { generatePath, useNavigate } from "react-router"
 import { MenuCard } from "./MenuCard"
 import { MenuSearchForm } from "./MenuSearchForm"
 
-export function SampleMenu() {
+type SampleMenuProps = {
+  audience?: "admin" | "user"
+}
+
+export function SampleMenu({ audience = "user" }: SampleMenuProps) {
   const navigate = useNavigate()
-  const isAdmin = authStore.use.auth()?.role?.name === "ADMIN"
   const [searchParams, setSearchParams] = useState<MenuSearhParams>({
     page: 0,
     size: 12,
@@ -48,7 +50,7 @@ export function SampleMenu() {
         title="Thực đơn mẫu"
         description="Khám phá thực đơn cân bằng được thiết kế cho từng mục tiêu dinh dưỡng."
         action={
-          isAdmin ? (
+          audience === "admin" ? (
             <CoreformPrimaryButton onClick={() => navigate(ROUTES.NUTRITION.CREATE_MENU)}>
               Tạo thực đơn mới
             </CoreformPrimaryButton>

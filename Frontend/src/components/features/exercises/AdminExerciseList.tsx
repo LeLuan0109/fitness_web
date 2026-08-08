@@ -5,7 +5,7 @@ import { Button } from "@/components/shared/ui/button"
 import { ROUTES } from "@/constants/routes"
 import { useGetListExercises } from "@/hooks/queries/exercises/useGetListExercises"
 import { ExerciseSearchParams } from "@/types/exercises.type"
-import { Dumbbell, Plus, Loader2 } from "lucide-react"
+import { Dumbbell, Plus, Loader2, LibraryBig } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 
@@ -42,36 +42,42 @@ export const AdminExerciseList = () => {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground">Danh sách bài tập</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Quản lý thư viện bài tập và tinh chỉnh kỹ thuật.
-          </p>
+    <div className="w-full space-y-8">
+      <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-7 text-primary-foreground shadow-xl shadow-primary/15">
+        <div className="absolute -right-16 -top-20 size-56 rounded-full bg-white/15 blur-3xl" />
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
+              <LibraryBig className="size-3.5" /> Thư viện vận động
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight">Quản lý bài tập</h1>
+            <p className="mt-2 text-sm text-primary-foreground/80">Quản lý thư viện, cấp độ và nhóm cơ của từng bài tập.</p>
+          </div>
+          <Button onClick={handleCreateExercise} className="gap-2 bg-white text-primary shadow-md hover:bg-white/90">
+            <Plus className="size-4" /> Tạo bài tập
+          </Button>
         </div>
-        <Button onClick={handleCreateExercise} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
-          <Plus className="size-4" /> Tạo bài tập
-        </Button>
+      </section>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <ExerciseSearchForm onSearch={setSearchParams} />
       </div>
 
-      <ExerciseSearchForm onSearch={setSearchParams} />
-
       {isFetchingExercises ? (
-        <div className="flex h-64 items-center justify-center text-muted-foreground">
-          <Loader2 className="size-8 animate-spin text-primary" />
+        <div className="flex h-64 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500">
+          <Loader2 className="size-8 animate-spin text-blue-600" />
         </div>
       ) : !hasResults ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-16 text-center backdrop-blur-sm">
-          <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted text-primary">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center">
+          <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
             <Dumbbell className="size-6" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">Không tìm thấy bài tập</h3>
-          <p className="mt-2 text-sm text-muted-foreground">Không có bài tập nào phù hợp với từ khóa tìm kiếm. Thử điều chỉnh bộ lọc.</p>
+          <h3 className="text-lg font-semibold text-slate-900">Không tìm thấy bài tập</h3>
+          <p className="mt-2 max-w-md text-sm text-slate-500">Không có bài tập nào phù hợp. Hãy thử điều chỉnh bộ lọc.</p>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {dataListExercises.data.map((exercise) => (
               <AdminExerciseCard
                 id={exercise.id.toString()}
