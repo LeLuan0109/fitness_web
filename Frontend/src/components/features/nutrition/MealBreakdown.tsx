@@ -10,7 +10,7 @@ interface MealBreakdownProps {
 
 export const MealBreakdown = ({ meal, mealName }: MealBreakdownProps) => {
   return (
-    <Card className="rounded-2xl border border-sand/60 bg-white p-6 text-earth shadow-sm shadow-earth/5">
+    <Card className="rounded-2xl border border-sand/60 bg-card p-6 text-card-foreground shadow-sm shadow-earth/5">
       {/* Header with meal name and macro info */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
         <TypographyH4 variant="bold">{mealName}</TypographyH4>

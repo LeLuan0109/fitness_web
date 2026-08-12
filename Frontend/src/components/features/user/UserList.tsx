@@ -34,14 +34,21 @@ export const UserList = () => {
     queryFn: () => getAllUsers({ keyword, page: page - 1, limit }),
   })
 
+  // Separate query to fetch all users for accurate stats
+  const { data: allUsersData } = useQuery({
+    queryKey: [QUERY_KEYS.USERS_LIST, "all-stats"],
+    queryFn: () => getAllUsers({ keyword: "", page: 0, limit: 9999 }),
+  })
+
   const users = data?.data || []
   const meta = data?.meta
+  const allUsers = allUsersData?.data || []
 
-  // Derive stats from current page data
-  const totalUsers = meta?.totalItems ?? 0
-  const activeCount = users.filter((u) => !u.isLocked && u.role.name !== "ADMIN").length
-  const lockedCount = users.filter((u) => u.isLocked).length
-  const adminCount = users.filter((u) => u.role.name === "ADMIN").length
+  // Derive stats from ALL users, not just current page
+  const totalUsers = meta?.total ?? 0
+  const activeCount = allUsers.filter((u) => !u.isLocked && u.role.name !== "ADMIN").length
+  const lockedCount = allUsers.filter((u) => u.isLocked).length
+  const adminCount = allUsers.filter((u) => u.role.name === "ADMIN").length
 
   const columns = React.useMemo<ColumnDef<UserResponse>[]>(
     () => [

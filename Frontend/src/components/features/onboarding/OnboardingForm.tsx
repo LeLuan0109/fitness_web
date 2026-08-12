@@ -52,6 +52,7 @@ export function OnboardingForm() {
     config: {
       onSuccess: async () => {
         toast.success("Cập nhật thông tin thành công!")
+        await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.BASIC_INFO] })
         const resp = await queryClient.fetchQuery({ queryKey: [QUERY_KEYS.BASIC_INFO], queryFn: () => getBasicInfo() })
         const profile = resp?.data
         if (profile) {
