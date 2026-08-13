@@ -11,15 +11,19 @@ import authStore from "@/stores/auth.store"
 import { Role } from "@/types/enum"
 import { ExerciseSearchParams } from "@/types/exercises.type"
 import { Dumbbell, Plus } from "lucide-react"
-import { useEffect, useState } from "react"
+import { parseAsInteger, useQueryState } from "nuqs"
+import { useState } from "react"
 import { useNavigate } from "react-router"
 
 export const ExerciseList = () => {
-  const [searchParams, setSearchParams] = useState<ExerciseSearchParams>({ page: 0, size: 9 })
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
+  const [filters, setFilters] = useState<Omit<ExerciseSearchParams, "page">>({
+    size: 9,
+  })
+  const searchParams: ExerciseSearchParams = { ...filters, page: page - 1 }
   const {
     data: dataListExercises,
     isFetching: isFetchingExercises,
-    refetch: refetchExercises,
   } = useGetListExercises(searchParams)
   const isAdmin = authStore.use.auth().role.name === Role.ADMIN
   const navigate = useNavigate()
@@ -27,20 +31,17 @@ export const ExerciseList = () => {
   const hasResults = dataListExercises?.data && dataListExercises.data.length > 0
 
   const pagination = dataListExercises?.pagination
-  const currentPage = (searchParams?.page || 0) + 1
+  const currentPage = page
   const totalPages = pagination?.totalPages || 0
 
-  useEffect(() => {
-    if (searchParams) {
-      refetchExercises()
-    }
-  }, [searchParams, refetchExercises])
 
-  const handlePageChange = (page: number) => {
-    setSearchParams((prev) => ({
-      ...prev,
-      page: page - 1,
-    }))
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
+
+  const handleSearch = (params: Partial<Omit<ExerciseSearchParams, "page" | "size">>) => {
+    setFilters((prev) => ({ ...prev, ...params }))
+    setPage(1)
   }
 
   const handleCreateExercise = () => {
@@ -83,7 +84,7 @@ export const ExerciseList = () => {
 
       {/* Search Form - Card surface hỗ trợ sáng/tối */}
       <div className="rounded-3xl border border-[#e5e5e5] bg-white p-4 shadow-sm md:p-6 dark:border-[#262626] dark:bg-[#171717]">
-        <ExerciseSearchForm onSearch={setSearchParams} />
+        <ExerciseSearchForm onSearch={handleSearch} />
       </div>
 
       {/* Loading State */}

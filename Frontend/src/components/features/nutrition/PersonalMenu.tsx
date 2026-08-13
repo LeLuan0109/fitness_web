@@ -12,6 +12,7 @@ import { useDeleteMenu } from "@/hooks/queries/menus/useDeleteMenu"
 import { useGetPersonalMenu } from "@/hooks/queries/menus/useGetPersonalMenu"
 import { MenuSearhParams } from "@/types/meal.type"
 import { Plus, UtensilsCrossed } from "lucide-react"
+import { parseAsInteger, useQueryState } from "nuqs"
 import { useState } from "react"
 import { generatePath, useNavigate } from "react-router"
 import { MenuCard } from "./MenuCard"
@@ -21,10 +22,11 @@ export const PersonalMenu = () => {
   const navigate = useNavigate()
   const { isOpen, onOpenChange, onOpen } = useDisclosure()
   const [selectedMenuId, setSelectedMenuId] = useState<number | null>(null)
-  const [searchParams, setSearchParams] = useState<MenuSearhParams>({
-    page: 0,
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
+  const [filters, setFilters] = useState<Omit<MenuSearhParams, "page">>({
     size: 12,
   })
+  const searchParams: MenuSearhParams = { ...filters, page: page - 1 }
 
   const { data: menuResponse, isLoading } = useGetPersonalMenu(searchParams)
   const { mutate: deleteMenu } = useDeleteMenu()
@@ -63,11 +65,12 @@ export const PersonalMenu = () => {
   }
 
   const handleSearch = (params: Omit<MenuSearhParams, "page" | "size">) => {
-    setSearchParams({ ...params, page: 0, size: 12 })
+    setFilters((prev) => ({ ...prev, ...params }))
+    setPage(1)
   }
 
-  const handlePageChange = (page: number) => {
-    setSearchParams((prev) => ({ ...prev, page: page - 1 }))
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
   }
 
   return (
@@ -115,7 +118,7 @@ export const PersonalMenu = () => {
 
           {totalPages > 1 && (
             <CommonPagination
-              currentPage={(searchParams.page ?? 0) + 1}
+              currentPage={page}
               totalPages={totalPages}
               onPageChange={handlePageChange}
               pageSize={searchParams.size ?? 12}

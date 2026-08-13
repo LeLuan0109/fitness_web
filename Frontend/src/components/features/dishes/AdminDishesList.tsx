@@ -1,3 +1,4 @@
+import { parseAsInteger, useQueryState } from "nuqs"
 import { useState } from "react"
 import { DishesSearchForm } from "./DishesSearchForm"
 import { CommonPagination } from "@/components/shared/ui/common-pagination"
@@ -11,13 +12,15 @@ import { DishSearchParams } from "@/types/dish.type"
 
 export function AdminDishesList() {
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useState<DishSearchParams>({ page: 0, size: 12 })
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
+  const [filters, setFilters] = useState<Omit<DishSearchParams, "page">>({ size: 12 })
+  const searchParams: DishSearchParams = { ...filters, page: page - 1 }
 
   const { data, isLoading } = useDishesList(searchParams)
 
   const dishes = data?.data ?? []
   const pagination = data?.pagination
-  const currentPage = (searchParams.page ?? 0) + 1
+  const currentPage = page
   const totalPages = pagination?.totalPages ?? 1
 
   const handleNavigateToDishDetail = (dishId: number) => {
@@ -29,16 +32,16 @@ export function AdminDishesList() {
   }
 
   const handleSearch = (query: { name?: string; cookingTime?: number }) => {
-    setSearchParams((prev) => ({
+    setFilters((prev) => ({
       ...prev,
       search: query.name,
       cookingTime: query.cookingTime,
-      page: 0,
     }))
+    setPage(1)
   }
 
-  const handlePageChange = (page: number) => {
-    setSearchParams((prev) => ({ ...prev, page: page - 1 }))
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
   }
 
   return (

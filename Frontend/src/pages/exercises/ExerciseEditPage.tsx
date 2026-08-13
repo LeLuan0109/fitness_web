@@ -1,5 +1,4 @@
 import { ExerciseForm } from "@/components/features/exercises/ExerciseForm"
-import { ROUTES } from "@/constants/routes"
 import { useDetailFormExercise } from "@/hooks/queries/exercises/useDetailFormExercise"
 import { useUpdateExercise } from "@/hooks/queries/exercises/useUpdateExercise"
 import { PageLayout } from "@/layouts/PageLayout"
@@ -43,7 +42,7 @@ export function ExerciseEditPage() {
       {
         onSuccess: () => {
           toast.success("Cập nhật bài tập thành công!")
-          navigate(ROUTES.EXERCISES.LIST)
+          navigate(-1)
         },
         onError: (error: any) => {
           toast.error(error?.response?.data?.error?.message || "Có lỗi xảy ra khi cập nhật bài tập")

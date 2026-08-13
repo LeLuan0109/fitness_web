@@ -5,7 +5,6 @@ import { AxiosError } from "axios"
 
 import { createIngredient } from "@/api/ingredient.api"
 import { QUERY_KEYS } from "@/constants/querykeys.constant"
-import { ROUTES } from "@/constants/routes"
 import { ResponseError } from "@/types/common.type"
 
 export const useCreateIngredient = () => {
@@ -17,7 +16,7 @@ export const useCreateIngredient = () => {
     onSuccess: () => {
       toast.success("Tạo nguyên liệu mới thành công!")
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INGREDIENTS.LIST] })
-      navigate(ROUTES.INGREDIENTS.LIST)
+      navigate(-1)
     },
     onError: (error: AxiosError<ResponseError>) => {
       toast.error(error?.response?.data?.error?.message || "Có lỗi xảy ra khi tạo nguyên liệu")

@@ -13,6 +13,7 @@ type CustomSelectProps = {
   placeholder?: string
   searchable?: boolean
   className?: string
+  disabled?: boolean
 }
 
 export const CustomSelect = ({
@@ -22,6 +23,7 @@ export const CustomSelect = ({
   placeholder = "Chọn...",
   searchable = false,
   className = "",
+  disabled = false,
 }: CustomSelectProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
@@ -54,8 +56,9 @@ export const CustomSelect = ({
       {/* Trigger Button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex w-full items-center justify-between rounded-2xl border border-[#e5e5e5] bg-white px-4 py-2.5 text-base font-medium text-[#0a0a0a] shadow-sm transition-all hover:border-[#3b82f6] focus:border-[#3b82f6] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/20 dark:border-[#262626] dark:bg-[#171717] dark:text-[#fafafa] dark:hover:border-[#3b82f6] dark:focus:border-[#3b82f6] dark:focus:ring-[#3b82f6]/30 ${className}`}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
+        className={`flex w-full items-center justify-between rounded-2xl border border-[#e5e5e5] bg-white px-4 py-2.5 text-base font-medium text-[#0a0a0a] shadow-sm transition-all hover:border-[#3b82f6] focus:border-[#3b82f6] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/20 dark:border-[#262626] dark:bg-[#171717] dark:text-[#fafafa] dark:hover:border-[#3b82f6] dark:focus:border-[#3b82f6] dark:focus:ring-[#3b82f6]/30 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       >
         <span className={selectedOption ? "text-[#0a0a0a] dark:text-[#fafafa]" : "text-[#737373] dark:text-[#a3a3a3]"}>
           {selectedOption?.label || placeholder}

@@ -5,7 +5,6 @@ import { AxiosError } from "axios"
 
 import { updateIngredient } from "@/api/ingredient.api"
 import { QUERY_KEYS } from "@/constants/querykeys.constant"
-import { ROUTES } from "@/constants/routes"
 import { ResponseError } from "@/types/common.type"
 import type { IngredientRequest } from "@/types/ingredient.type"
 
@@ -19,7 +18,7 @@ export const useUpdateIngredient = () => {
       toast.success("Cập nhật nguyên liệu thành công!")
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INGREDIENTS.LIST] })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INGREDIENTS.DETAIL, variables.id.toString()] })
-      navigate(ROUTES.INGREDIENTS.LIST)
+      navigate(-1)
     },
     onError: (error: AxiosError<ResponseError>) => {
       toast.error(error?.response?.data?.error?.message || "Có lỗi xảy ra khi cập nhật nguyên liệu")

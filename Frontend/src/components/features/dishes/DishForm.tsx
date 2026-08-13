@@ -115,7 +115,7 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
         {
           onSuccess: () => {
             toast.success("Cập nhật món ăn thành công!")
-            navigate(ROUTES.DISHES.LIST)
+            navigate(-1)
           },
           onError: (error: any) => {
             toast.error(error?.response?.data?.error?.message || "Có lỗi xảy ra khi cập nhật món ăn")
@@ -126,7 +126,7 @@ export const DishForm = ({ isEdit }: DishFormProps) => {
       createMutate(request, {
         onSuccess: () => {
           toast.success("Tạo món ăn mới thành công!")
-          navigate(ROUTES.DISHES.LIST)
+          navigate(-1)
         },
         onError: (error: any) => {
           toast.error(error?.response?.data?.error?.message || "Có lỗi xảy ra khi tạo món ăn")

@@ -10,6 +10,7 @@ import { useGetSampleMenu } from "@/hooks/queries/menus/useGetSampleMenu"
 import authStore from "@/stores/auth.store"
 import { MenuSearhParams } from "@/types/meal.type"
 import { UtensilsCrossed } from "lucide-react"
+import { parseAsInteger, useQueryState } from "nuqs"
 import { useState } from "react"
 import { generatePath, useNavigate } from "react-router"
 import { MenuCard } from "./MenuCard"
@@ -18,10 +19,11 @@ import { MenuSearchForm } from "./MenuSearchForm"
 export function SampleMenu() {
   const navigate = useNavigate()
   const isAdmin = authStore.use.auth()?.role?.name === "ADMIN"
-  const [searchParams, setSearchParams] = useState<MenuSearhParams>({
-    page: 0,
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
+  const [filters, setFilters] = useState<Omit<MenuSearhParams, "page">>({
     size: 12,
   })
+  const searchParams: MenuSearhParams = { ...filters, page: page - 1 }
 
   const { data: menuResponse, isLoading } = useGetSampleMenu(searchParams)
 
@@ -35,11 +37,12 @@ export function SampleMenu() {
   }
 
   const handleSearch = (params: Omit<MenuSearhParams, "page" | "size">) => {
-    setSearchParams({ ...params, page: 0, size: 12 })
+    setFilters((prev) => ({ ...prev, ...params }))
+    setPage(1)
   }
 
-  const handlePageChange = (page: number) => {
-    setSearchParams((prev) => ({ ...prev, page: page - 1 }))
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
   }
 
   return (
@@ -78,7 +81,7 @@ export function SampleMenu() {
 
           {totalPages > 1 && (
             <CommonPagination
-              currentPage={(searchParams.page ?? 0) + 1}
+              currentPage={page}
               totalPages={totalPages}
               onPageChange={handlePageChange}
               pageSize={searchParams.size ?? 12}

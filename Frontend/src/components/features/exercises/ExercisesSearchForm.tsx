@@ -9,11 +9,10 @@ import { useGetTrainingTypeOptions } from "@/hooks/queries/training-type/useGetT
 import { ExerciseSearchParams } from "@/types/exercises.type"
 import { removeEmptyValues } from "@/utils/utils"
 import { SearchIcon } from "lucide-react"
-import { Dispatch, SetStateAction } from "react"
 import { useForm } from "react-hook-form"
 
 type ExerciseSearchFormProps = {
-  onSearch: Dispatch<SetStateAction<ExerciseSearchParams>>
+  onSearch: (params: ExerciseSearchParams) => void
 }
 
 export const ExerciseSearchForm = ({ onSearch }: ExerciseSearchFormProps) => {

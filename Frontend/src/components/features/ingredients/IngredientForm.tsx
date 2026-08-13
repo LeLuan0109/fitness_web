@@ -10,7 +10,6 @@ import { CustomSelect } from "@/components/shared/ui/custom-select"
 import { Form } from "@/components/shared/ui/form"
 import { Input } from "@/components/shared/ui/input"
 import { SimpleField } from "@/components/shared/ui/simple-field"
-import { ROUTES } from "@/constants/routes"
 import { useIngredientUnits } from "@/hooks/queries/dishes/useIngredientUnits"
 import { IngredientFormData, IngredientFormSchema } from "@/schemas/ingredient.schema"
 import type { IngredientRequest } from "@/types/ingredient.type"
@@ -79,7 +78,7 @@ export function IngredientForm({ idEdit, initialData, onSubmit, isLoading, exist
   }
 
   const handleBack = () => {
-    navigate(ROUTES.INGREDIENTS.LIST)
+    navigate(-1)
   }
 
   const handleRemoveImage = () => {

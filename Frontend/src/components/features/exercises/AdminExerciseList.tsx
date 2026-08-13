@@ -6,11 +6,14 @@ import { ROUTES } from "@/constants/routes"
 import { useGetListExercises } from "@/hooks/queries/exercises/useGetListExercises"
 import { ExerciseSearchParams } from "@/types/exercises.type"
 import { Dumbbell, Plus, Loader2 } from "lucide-react"
+import { parseAsInteger, useQueryState } from "nuqs"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 
 export const AdminExerciseList = () => {
-  const [searchParams, setSearchParams] = useState<ExerciseSearchParams>({ page: 0, size: 9 })
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1))
+  const [filters, setFilters] = useState<Omit<ExerciseSearchParams, "page">>({ size: 9 })
+  const searchParams: ExerciseSearchParams = { ...filters, page: page - 1 }
   const {
     data: dataListExercises,
     isFetching: isFetchingExercises,
@@ -21,7 +24,7 @@ export const AdminExerciseList = () => {
   const hasResults = dataListExercises?.data && dataListExercises.data.length > 0
 
   const pagination = dataListExercises?.pagination
-  const currentPage = (searchParams?.page || 0) + 1
+  const currentPage = page
   const totalPages = pagination?.totalPages || 0
 
   useEffect(() => {
@@ -30,11 +33,13 @@ export const AdminExerciseList = () => {
     }
   }, [searchParams, refetchExercises])
 
-  const handlePageChange = (page: number) => {
-    setSearchParams((prev) => ({
-      ...prev,
-      page: page - 1,
-    }))
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
+
+  const handleSearch = (params: ExerciseSearchParams) => {
+    setFilters({ size: params.size || 9, ...params })
+    setPage(1)
   }
 
   const handleCreateExercise = () => {
@@ -55,7 +60,7 @@ export const AdminExerciseList = () => {
         </Button>
       </div>
 
-      <ExerciseSearchForm onSearch={setSearchParams} />
+      <ExerciseSearchForm onSearch={handleSearch} />
 
       {isFetchingExercises ? (
         <div className="flex h-64 items-center justify-center text-muted-foreground">
