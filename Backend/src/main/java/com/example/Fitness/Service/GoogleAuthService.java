@@ -1,32 +1,43 @@
 package com.example.Fitness.Service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
 
-import java.util.Collections;
+import java.util.Map;
 
 @Service
 public class GoogleAuthService {
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
-    private String googleClientId;
+    private static final String GOOGLE_USERINFO_URL =
+            "https://www.googleapis.com/oauth2/v3/userinfo";
 
-    public GoogleIdToken.Payload verifyGoogleIdToken(String idTokenString) throws Exception {
+    /**
+     * Xác minh access_token bằng cách gọi Google UserInfo API.
+     * Trả về Map chứa các trường: email, name, picture, sub, ...
+     */
+    public Map<String, Object> verifyGoogleAccessToken(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
 
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(googleClientId))
-                .build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        // Xác thực token
-        GoogleIdToken idToken = verifier.verify(idTokenString);
-        if (idToken != null) {
-            return idToken.getPayload();
-        } else {
-            throw new IllegalArgumentException("Invalid Google ID token.");
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    GOOGLE_USERINFO_URL,
+                    HttpMethod.GET,
+                    entity,
+                    Map.class
+            );
+
+            Map<String, Object> userInfo = response.getBody();
+            if (userInfo == null || userInfo.get("email") == null) {
+                throw new IllegalArgumentException("Không lấy được thông tin từ Google.");
+            }
+            return userInfo;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Access token Google không hợp lệ: " + e.getMessage(), e);
         }
     }
 }

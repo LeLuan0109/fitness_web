@@ -9,7 +9,7 @@ import com.example.Fitness.DTO.response.auth.RegisterResponse;
 import com.example.Fitness.Model.User;
 import com.example.Fitness.Service.*;
 import com.example.Fitness.Utils.JwtTokenUtils;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -96,10 +96,11 @@ public class AuthController {
     @PostMapping("/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleLoginRequest request) {
         try {
-            GoogleIdToken.Payload payload = googleAuthService.verifyGoogleIdToken(request.getTokenId());
-            String email = payload.getEmail();
-            String name = (String) payload.get("name");
-            String avatar = (String) payload.get("picture");
+            // Xác minh access_token qua Google UserInfo API
+            Map<String, Object> userInfo = googleAuthService.verifyGoogleAccessToken(request.getTokenId());
+            String email = (String) userInfo.get("email");
+            String name = (String) userInfo.get("name");
+            String avatar = (String) userInfo.get("picture");
             User user = userService.findOrCreateUserByEmail(email, name, avatar, AuthProvider.GOOGLE);
             String accessToken;
             String refreshToken;

@@ -45,7 +45,7 @@ class HttpClient {
   private static requests: RequestCallback[] = []
   private static isRefreshing = false
   private static readonly axiosInstance: AxiosInstance = axios.create(defaultConfig)
-  private static readonly whiteList: string[] = ["/auth/login", "/auth/logout", "/auth/refresh"]
+  private static readonly whiteList: string[] = ["/auth/login", "/auth/logout", "/auth/refresh", "/auth/google", "/auth/facebook"]
 
   private httpInterceptorsRequest(): void {
     HttpClient.axiosInstance.interceptors.request.use(

@@ -1,49 +1,68 @@
+import { getBasicInfo } from "@/api/auth.api"
 import { Button } from "@/components/shared/ui/button"
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@/constants/api"
 import { useLoginWithGoogle } from "@/hooks/queries/auth/useAuthQuery"
-import transitionStore from "@/stores/transition.store"
+import { ROUTES } from "@/constants/routes"
 import { localStorageServices } from "@/utils/localStorageServices"
 import { useGoogleLogin } from "@react-oauth/google"
-import axios from "axios"
 import { toast } from "sonner"
+import { router } from "@/router/router"
+import authStore from "@/stores/auth.store"
+import { queryClient } from "@/lib/react-query"
+import { QUERY_KEYS } from "@/constants/querykeys.constant"
 
 export function GoogleLoginButton() {
   const { mutate: mutateGoogleLogin, isPending } = useLoginWithGoogle({
     config: {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         localStorageServices.setAccessToken(data.data?.accessToken ?? "")
         localStorageServices.setRefreshToken(data.data?.refreshToken ?? "")
-        transitionStore.getState().playEnter(() => {
-          window.location.href = "/"
-        })
+
+        try {
+          // Phải load profile và populate authStore TRƯỚC khi navigate
+          // Nếu không, ProtectedRoute thấy auth = undefined và redirect về login
+          const resp = await getBasicInfo()
+          const profile = resp?.data
+
+          if (profile) {
+            authStore.getState().setAuth({
+              id: profile.id,
+              email: profile.email,
+              username: profile.username,
+              name: profile.name,
+              avatar: profile.avatar,
+              role: profile.role,
+              isOnboardingCompleted: profile.onboardingCompleted,
+            })
+            queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.NOTIFICATIONS] })
+            queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.NOTIFICATIONS_UNREAD_COUNT] })
+
+            if (profile.role?.name === "ADMIN") {
+              router.navigate(ROUTES.ADMIN.DASHBOARD)
+            } else {
+              router.navigate(ROUTES.HOME)
+            }
+            return
+          }
+        } catch {
+          // fallback nếu getBasicInfo lỗi
+        }
+
+        router.navigate(ROUTES.HOME)
       },
       onError: (error) => {
-        toast.error(error.response?.data?.error.message || "Đăng nhập Google thất bại.")
+        const message =
+          error.response?.data?.error?.message ||
+          (error.response?.data as unknown as { data?: string })?.data ||
+          "Đăng nhập Google thất bại."
+        toast.error(message)
       },
     },
   })
 
   const googleLogin = useGoogleLogin({
-    onSuccess: async (codeResponse) => {
+    onSuccess: async (tokenResponse) => {
       try {
-        const tokenResponse = await axios.post(
-          "https://oauth2.googleapis.com/token",
-          new URLSearchParams({
-            code: codeResponse.code,
-            client_id: GOOGLE_CLIENT_ID,
-            client_secret: GOOGLE_CLIENT_SECRET,
-            redirect_uri: "http://localhost:5173",
-            grant_type: "authorization_code",
-          }),
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          },
-        )
-
-        const tokens = tokenResponse.data
-        mutateGoogleLogin({ tokenId: tokens.id_token })
+        mutateGoogleLogin({ tokenId: tokenResponse.access_token })
       } catch (error) {
         console.error("Google OAuth error:", error)
         toast.error("Đăng nhập Google thất bại.")
@@ -52,7 +71,7 @@ export function GoogleLoginButton() {
     onError: () => {
       toast.error("Đăng nhập Google thất bại.")
     },
-    flow: "auth-code",
+    flow: "implicit",
   })
 
   return (
